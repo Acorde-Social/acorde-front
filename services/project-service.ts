@@ -137,6 +137,26 @@ export const ProjectService = {
     return handleApiError(response)
   },
 
+  // Buscar projetos do usuário logado
+  async getUserProjects(token: string): Promise<Project[]> {
+    const response = await fetch(`${API_URL}/projects/user`, {
+      headers: getAuthHeaders(token),
+    })
+    
+    const data = await handleApiError(response)
+    return Array.isArray(data) ? data : []
+  },
+  
+  // Buscar projetos em que o usuário está colaborando
+  async getUserCollaborations(token: string): Promise<any[]> {
+    const response = await fetch(`${API_URL}/projects/collaborations`, {
+      headers: getAuthHeaders(token),
+    })
+    
+    const data = await handleApiError(response)
+    return Array.isArray(data) ? data : []
+  },
+
   // Criar novo projeto
   async createProject(data: CreateProjectData, token: string): Promise<Project> {
     const response = await fetch(`${API_URL}/projects`, {

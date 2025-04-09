@@ -65,7 +65,7 @@ export default function StudioPage() {
 
   return (
     <AuthGuard>
-      <div className="container py-6">
+      <div className="px-4 py-6 space-y-6">
         <h1 className="text-3xl font-bold mb-6">Estúdio Virtual</h1>
 
         {loading ? (

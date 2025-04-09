@@ -300,7 +300,7 @@ export default function ReceivedCollaborationsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="px-4 py-6">
       <Card>
         <CardHeader>
           <CardTitle>Colaborações Recebidas</CardTitle>

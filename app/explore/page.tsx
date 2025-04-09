@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useAsync } from "@/hooks/use-async"
 import { AsyncBoundary } from "@/components/async-boundary"
 import { ErrorBoundary } from "@/components/error-boundary"
+import { fixImageUrl } from "@/lib/utils"
 
 export default function ExplorePage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -112,7 +113,7 @@ export default function ExplorePage() {
 
   return (
     <ErrorBoundary>
-      <div className="container py-6">
+      <div className="px-4 py-6">
         <h1 className="text-3xl font-bold mb-6">Explorar Projetos</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
@@ -261,7 +262,7 @@ export default function ExplorePage() {
                     <Card key={project.id} className="overflow-hidden">
                       <div className="relative h-48 w-full">
                         <Image
-                          src={project.imageUrl || "/placeholder.svg?height=200&width=400"}
+                          src={fixImageUrl(project.imageUrl)}
                           alt={project.title}
                           fill
                           className="object-cover"

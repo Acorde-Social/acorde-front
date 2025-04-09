@@ -17,6 +17,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { CollaborationService } from "@/services/collaboration-service"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { fixImageUrl } from "@/lib/utils"
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
   const [project, setProject] = useState<ProjectDetail | null>(null)
@@ -110,12 +111,12 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
     : ""
 
   return (
-    <div className="container py-6">
+    <div className="px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="relative h-64 md:h-80 w-full rounded-lg overflow-hidden">
             <Image
-              src={project.imageUrl || "/placeholder.svg?height=400&width=800"}
+              src={fixImageUrl(project.imageUrl)}
               alt={project.title}
               fill
               className="object-cover"

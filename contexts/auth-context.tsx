@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Inicializar WebSocket após login
       socketService.connect(access_token)
 
-      router.push("/explore")
+      router.push("/")  // Redirecionando para a página inicial em vez de /explore
     } catch (err) {
       // Verificar se o erro é relacionado à verificação de email
       if (err instanceof Error && err.message.includes("verifique seu email")) {

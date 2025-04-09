@@ -222,7 +222,7 @@ export default function NewProjectPage() {
 
   return (
     <AuthGuard requiredRole="COMPOSER">
-      <div className="container py-8">
+      <div className="px-4 py-6 space-y-6">
         <h1 className="text-3xl font-bold mb-6">Criar Novo Projeto</h1>
 
         <Form {...form}>

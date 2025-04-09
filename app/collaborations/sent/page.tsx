@@ -113,7 +113,7 @@ export default function SentCollaborationsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="px-4 py-6">
       <Card>
         <CardHeader>
           <CardTitle>My Collaborations</CardTitle>

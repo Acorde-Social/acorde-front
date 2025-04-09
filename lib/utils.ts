@@ -31,3 +31,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Função para corrigir URLs de imagens de projetos
+export function fixImageUrl(url: string | undefined): string {
+  if (!url) return "/placeholder.svg"
+  
+  // Se já for uma URL relativa ou absoluta que não pertence à nossa API, retorne como está
+  if (url.startsWith("/") && !url.startsWith("/uploads/")) return url
+  if (url.startsWith("http") && !url.includes(API_URL)) return url
+  
+  // Se for uma URL da nossa API, verifique se já possui o segmento '/images/'
+  if (url.includes("/uploads/") && !url.includes("/uploads/images/")) {
+    // Substitui "/uploads/" por "/uploads/images/" para URLs existentes
+    const urlParts = url.split("/uploads/")
+    return `${urlParts[0]}/uploads/images/${urlParts[1]}`
+  }
+  
+  // Se já tiver o segmento correto, retorne como está
+  return url
+}
+
