@@ -40,42 +40,38 @@ export function MainNav() {
   ]
 
   return (
-    <div className="mr-4 hidden md:flex">
-      <Link href="/" className="mr-6 flex items-center space-x-2">
-        <Music className="h-6 w-6 text-primary" />
-        <span className="hidden font-bold sm:inline-block">MusicCollab</span>
-      </Link>
-      <nav className="flex items-center space-x-6 text-sm font-medium">
-        {routes.map((route) => (
-          <Link
-            key={route.href}
-            href={route.href}
-            className={cn(
-              "transition-colors hover:text-foreground/80",
-              route.active ? "text-foreground" : "text-foreground/60",
-            )}
-          >
-            {route.label}
-          </Link>
-        ))}
-      </nav>
-
-      {user && (
-        <div className="ml-6">
-          <Button asChild variant="outline" size="sm" className="mr-2">
-            <Link href="/projects/new">
-              <Plus className="mr-1 h-4 w-4" />
-              Novo Projeto
+    <div className="mr-4 hidden md:flex items-center justify-between w-full">
+      <div className="flex items-center">
+        <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Music className="h-6 w-6 text-primary" />
+          <span className="hidden font-bold sm:inline-block">MusiCollab</span>
+        </Link>
+        <nav className="flex items-center space-x-6 text-sm font-medium">
+          {routes.map((route) => (
+            <Link
+              key={route.href}
+              href={route.href}
+              className={cn(
+                "transition-colors hover:text-foreground/80",
+                route.active ? "text-foreground" : "text-foreground/60",
+              )}
+            >
+              {route.label}
             </Link>
-          </Button>
-        </div>
-      )}
+          ))}
+        </nav>
+      </div>
 
-      <div className="ml-auto flex items-center space-x-4">
+      <div className="flex items-center space-x-4">
         {user ? (
           <>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/projects/new">
+                <Plus className="mr-1 h-4 w-4" />
+                Novo Projeto
+              </Link>
+            </Button>
             <Notifications />
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -108,14 +104,14 @@ export function MainNav() {
             </DropdownMenu>
           </>
         ) : (
-          <>
+          <div className="flex items-center space-x-2">
             <Button asChild variant="ghost" size="sm">
               <Link href="/login">Entrar</Link>
             </Button>
             <Button asChild size="sm">
               <Link href="/register">Cadastrar</Link>
             </Button>
-          </>
+          </div>
         )}
       </div>
     </div>

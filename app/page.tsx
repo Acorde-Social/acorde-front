@@ -17,7 +17,6 @@ import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { AudioFeed } from "@/components/audio/audio-feed"
 import { HowItWorks } from "@/components/how-it-works"
-import { FeaturedProjects } from "@/components/featured-projects"
 import { fixImageUrl } from "@/lib/utils"
 
 export default function Home() {
@@ -64,43 +63,25 @@ export default function Home() {
   if (!user && !isLoading) {
     return (
       <>
-        <>
-          <div className="ml-auto flex items-center space-x-4">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/login">Entrar</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/register">Cadastrar</Link>
-            </Button>
-          </div>
-          <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-            <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+        <div className="bg-background">
+          <section className="space-y-2 pb-1 pt-4 md:pb-2 md:pt-6 lg:py-8">
+            <div className="container flex max-w-[64rem] flex-col items-center gap-1 text-center">
               <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-                Conectando <span className="text-primary">compositores</span> e{" "}
-                <span className="text-primary">músicos</span> para criar música incrível
+                Conectando <span className="text-primary">sua música</span>{" "}
+                com <span className="text-primary">músicos</span> do mundo inteiro!
               </h1>
               <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
                 Compartilhe suas composições, colabore com músicos talentosos e expanda seu network musical. Tudo em uma
                 única plataforma.
               </p>
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <Button asChild size="lg">
-                  <Link href="/register?role=composer">Sou Compositor</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/register?role=musician">Sou Músico</Link>
-                </Button>
-              </div>
             </div>
           </section>
-        </>
-        <HowItWorks />
-        <FeaturedProjects />
+          <HowItWorks />
+        </div>
       </>
     )
   }
 
-  // Estado de carregamento
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -116,12 +97,12 @@ export default function Home() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         {/* Sidebar com perfil e links rápidos */}
         <div className="hidden md:block space-y-6">
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className="card-hover border border-border overflow-hidden">
+            <CardHeader className="pb-2 relative">
               <div className="flex justify-center">
-                <Avatar className="h-20 w-20">
+                <Avatar className="h-20 w-20 border-2 border-border">
                   <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
-                  <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                  <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
               </div>
               <CardTitle className="text-center mt-2">{user?.name}</CardTitle>
@@ -133,7 +114,7 @@ export default function Home() {
               {user?.instruments && user.instruments.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3 justify-center">
                   {user.instruments.map((instrument, i) => (
-                    <Badge key={i} variant="outline">
+                    <Badge key={i} variant="outline" className="bg-primary/5">
                       {instrument}
                     </Badge>
                   ))}
@@ -151,32 +132,32 @@ export default function Home() {
             </CardFooter>
           </Card>
 
-          <Card>
+          <Card className="card-hover">
             <CardHeader>
               <CardTitle className="text-lg">Links Rápidos</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="ghost" className="w-full justify-start" asChild>
+              <Button variant="ghost" className="w-full justify-start hover:bg-primary/5 transition-colors" asChild>
                 <Link href="/projects">
-                  <Music className="mr-2 h-4 w-4" />
+                  <Music className="mr-2 h-4 w-4 text-primary" />
                   Meus Projetos
                 </Link>
               </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
+              <Button variant="ghost" className="w-full justify-start hover:bg-primary/5 transition-colors" asChild>
                 <Link href="/collaborations">
-                  <Music className="mr-2 h-4 w-4" />
+                  <Music className="mr-2 h-4 w-4 text-primary" />
                   Colaborações
                 </Link>
               </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
+              <Button variant="ghost" className="w-full justify-start hover:bg-primary/5 transition-colors" asChild>
                 <Link href="/explore">
-                  <Music className="mr-2 h-4 w-4" />
+                  <Music className="mr-2 h-4 w-4 text-primary" />
                   Explorar Projetos
                 </Link>
               </Button>
-              <Button variant="ghost" className="w-full justify-start" asChild>
+              <Button variant="ghost" className="w-full justify-start hover:bg-primary/5 transition-colors" asChild>
                 <Link href="/studio">
-                  <Mic className="mr-2 h-4 w-4" />
+                  <Mic className="mr-2 h-4 w-4 text-primary" />
                   Estúdio Virtual
                 </Link>
               </Button>
@@ -187,11 +168,11 @@ export default function Home() {
         {/* Feed principal */}
         <div className="md:col-span-3 space-y-6">
           {/* Criar nova postagem / Gravador rápido */}
-          <Card>
+          <Card className="card-hover">
             <CardHeader>
               <CardTitle className="text-lg">Compartilhe sua música</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {quickRecordMode ? (
                 <div className="space-y-4">
                   <AudioRecorder 
@@ -202,12 +183,12 @@ export default function Home() {
                 </div>
               ) : (
                 <div 
-                  className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-primary/5 transition-all"
                   onClick={() => setQuickRecordMode(true)}
                 >
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
-                    <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-muted-foreground">Grave e compartilhe um áudio...</div>
                   <Mic className="h-5 w-5 text-muted-foreground" />
@@ -241,12 +222,12 @@ export default function Home() {
             ) : projects.length > 0 ? (
               <div className="space-y-6">
                 {projects.map((project) => (
-                  <Card key={project.id} className="overflow-hidden">
+                  <Card key={project.id} className="card-hover overflow-hidden">
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
                           <AvatarImage src={project.author.avatarUrl || ""} alt={project.author.name} />
-                          <AvatarFallback>{project.author.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback className="bg-primary text-primary-foreground">{project.author.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="font-medium">{project.author.name}</div>
@@ -264,12 +245,12 @@ export default function Home() {
                     </CardHeader>
                     
                     {project.imageUrl && (
-                      <div className="relative h-48 w-full">
+                      <div className="relative h-48 w-full overflow-hidden">
                         <Image
                           src={fixImageUrl(project.imageUrl)}
                           alt={project.title}
                           fill
-                          className="object-cover"
+                          className="object-cover transition-transform hover:scale-105 duration-700"
                         />
                       </div>
                     )}
@@ -284,21 +265,21 @@ export default function Home() {
                         
                         {/* Reprodutor de áudio (simplificado) */}
                         {project._count?.tracks && project._count.tracks > 0 ? (
-                          <div className="mt-2 p-2 bg-muted/50 rounded-md">
+                          <div className="mt-2 p-2 bg-accent/20 rounded-md">
                             <audio controls className="w-full">
                               <source src="#" type="audio/mpeg" />
                               Seu navegador não suporta o elemento de áudio.
                             </audio>
                           </div>
                         ) : (
-                          <div className="mt-2 p-4 text-center text-sm text-muted-foreground">
+                          <div className="mt-2 p-4 text-center text-sm text-muted-foreground bg-muted/30 rounded-md">
                             Este projeto não possui faixas de áudio.
                           </div>
                         )}
                         
                         <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
                           <div className="flex items-center">
-                            <Music className="mr-1 h-4 w-4" />
+                            <Music className="mr-1 h-4 w-4 text-primary" />
                             <span>{project.key}</span>
                             <span className="mx-2">•</span>
                             <span>{project.bpm} BPM</span>
@@ -312,17 +293,17 @@ export default function Home() {
                     
                     <CardFooter className="border-t px-6 py-3">
                       <div className="flex justify-between w-full">
-                        <Button variant="ghost" size="sm" className="gap-1">
+                        <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
                           <Heart className="h-4 w-4" />
                           <span>Curtir</span>
                         </Button>
-                        <Button variant="ghost" size="sm" className="gap-1" asChild>
+                        <Button variant="ghost" size="sm" className="gap-1 hover:text-primary" asChild>
                           <Link href={`/projects/${project.id}`}>
                             <MessageCircle className="h-4 w-4" />
                             <span>Comentar</span>
                           </Link>
                         </Button>
-                        <Button variant="ghost" size="sm" className="gap-1">
+                        <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
                           <Share2 className="h-4 w-4" />
                           <span>Compartilhar</span>
                         </Button>
@@ -334,7 +315,7 @@ export default function Home() {
             ) : (
               <Card className="p-6 text-center">
                 <div className="mb-4 flex justify-center">
-                  <Music className="h-12 w-12 text-muted-foreground" />
+                  <Music className="h-12 w-12 text-primary opacity-75" />
                 </div>
                 <h3 className="mb-2 text-lg font-medium">Nenhum projeto encontrado</h3>
                 <p className="text-muted-foreground mb-4">

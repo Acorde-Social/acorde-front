@@ -26,18 +26,24 @@ export function HowItWorks() {
   ]
 
   return (
-    <section className="container py-12 md:py-16">
-      <div className="mx-auto max-w-[58rem] space-y-6 text-center">
-        <h2 className="text-3xl font-bold leading-tight tracking-tighter md:text-4xl">Como funciona</h2>
+    <section className="container py-2 md:py-6">
+      <div className="mx-auto max-w-[58rem] space-y-2 text-center">
+        <h2 className="text-3xl font-bold leading-tight tracking-tighter md:text-4xl">
+          Como funciona
+        </h2>
         <p className="text-muted-foreground md:text-xl">
           Transforme suas ideias musicais em realidade com nossa plataforma de colaboração
         </p>
       </div>
-      <div className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto mt-4 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((step, index) => (
-          <Card key={index} className="flex flex-col items-center text-center">
-            <CardHeader>
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">{step.icon}</div>
+          <Card key={index} className="card-hover flex flex-col items-center text-center border border-primary/10">
+            <CardHeader className="w-full flex flex-col items-center justify-center">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/5">
+                <div className="flex items-center justify-center">
+                  {step.icon}
+                </div>
+              </div>
               <CardTitle className="mt-4">{step.title}</CardTitle>
             </CardHeader>
             <CardContent>

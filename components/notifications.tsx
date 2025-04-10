@@ -126,7 +126,7 @@ export function Notifications() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative hover:bg-primary/5">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
@@ -139,7 +139,7 @@ export function Notifications() {
         <DropdownMenuLabel className="flex justify-between items-center">
           <span>Notificações</span>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-7">
+            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-7 hover:text-primary hover:bg-primary/5">
               Marcar todas como lidas
             </Button>
           )}
@@ -153,7 +153,7 @@ export function Notifications() {
             <DropdownMenuItem
               key={notification.id}
               asChild
-              className={`p-3 cursor-pointer ${notification.read ? "" : "bg-muted/50"}`}
+              className={`p-3 cursor-pointer ${notification.read ? "" : "bg-primary/5"}`}
               onSelect={() => markAsRead(notification.id)}
             >
               <Link href={`/projects/${notification.projectId}`}>

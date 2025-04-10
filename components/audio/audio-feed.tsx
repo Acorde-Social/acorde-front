@@ -199,13 +199,13 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
           </Card>
         ) : (
           tracks.map((track) => (
-            <Card key={track.id} className="overflow-hidden">
+            <Card key={track.id} className="overflow-hidden card-hover">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
                   <Link href={`/profile/${track.author.id}`}>
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={track.author.avatarUrl || ""} alt={track.author.name} />
-                      <AvatarFallback>{track.author.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback className="bg-primary text-primary-foreground">{track.author.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Link>
                   <div>
@@ -257,7 +257,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                   <h3 className="font-medium">{track.name}</h3>
                   
                   {/* Player de áudio */}
-                  <div className="mt-2 p-2 bg-muted/50 rounded-md">
+                  <div className="mt-2 p-2 bg-accent/20 rounded-md">
                     <audio controls className="w-full" preload="metadata">
                       <source 
                         src={getFullAudioUrl(track.audioUrl)} 
@@ -283,7 +283,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
 
               <CardFooter className="border-t px-6 py-3">
                 <div className="flex justify-between w-full">
-                  <Button variant="ghost" size="sm" className="gap-1">
+                  <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
                     <Heart className="h-4 w-4" />
                     <span>Curtir</span>
                   </Button>
@@ -293,7 +293,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="gap-1"
+                      className="gap-1 hover:text-primary"
                       onClick={() => {
                         setCollaborateTrack(track);
                         setIsCollaborateDialogOpen(true);
@@ -303,7 +303,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                       <span>Colaborar</span>
                     </Button>
                   ) : (
-                    <Button variant="ghost" size="sm" className="gap-1">
+                    <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
                       <Share2 className="h-4 w-4" />
                       <span>Compartilhar</span>
                     </Button>
@@ -312,7 +312,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1"
+                    className="gap-1 hover:text-primary"
                     onClick={() => handleDownload(track)}
                   >
                     <Download className="h-4 w-4" />
@@ -330,7 +330,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
               variant="outline"
               onClick={loadMore}
               disabled={loading}
-              className="w-full"
+              className="w-full hover:bg-primary/5"
             >
               {loading ? "Carregando..." : "Carregar mais"}
             </Button>
@@ -379,7 +379,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
           
           {collaborateTrack && (
             <div className="space-y-4">
-              <div className="bg-muted/30 p-4 rounded-md">
+              <div className="bg-accent/20 p-4 rounded-md">
                 <h4 className="text-sm font-medium mb-2">Áudio original:</h4>
                 <audio controls className="w-full">
                   <source 
