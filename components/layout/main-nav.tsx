@@ -37,6 +37,11 @@ export function MainNav() {
       label: "Estúdio",
       active: pathname === "/studio",
     },
+    {
+      href: "/tools",
+      label: "Ferramentas",
+      active: pathname === "/tools" || pathname?.startsWith("/tools/"),
+    },
   ]
 
   return (
