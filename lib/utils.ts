@@ -35,6 +35,11 @@ export function cn(...inputs: ClassValue[]) {
 export function fixImageUrl(url: string | undefined): string {
   if (!url) return "/placeholder.svg"
   
+  // Se for upload estático, prefixa com API_URL
+  if (url.startsWith("/uploads/")) {
+    return `${API_URL}${url}`
+  }
+
   // Se já for uma URL relativa ou absoluta que não pertence à nossa API, retorne como está
   if (url.startsWith("/") && !url.startsWith("/uploads/")) return url
   if (url.startsWith("http") && !url.includes(API_URL)) return url

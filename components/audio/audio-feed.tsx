@@ -6,12 +6,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Heart, Share2, MoreHorizontal, Trash2, Download, Mic } from "lucide-react"
+import { Heart, Share2, MoreHorizontal, Trash2, Download, Mic, MessageSquare, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { TrackService, PaginatedResponse } from "@/services/track-service"
+import { CommentService } from "@/services/comment-service"
+import { Comment as ServiceComment } from "@/services/project-service"
 import { Track } from "@/types"
 import { useAuth } from "@/contexts/auth-context"
 import { AudioRecorder } from "@/components/audio-recorder"
+import { TrackComments } from "@/components/track-comments"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +56,12 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [collaborateTrack, setCollaborateTrack] = useState<Track | null>(null)
   const [isCollaborateDialogOpen, setIsCollaborateDialogOpen] = useState(false)
+  const [commentTrack, setCommentTrack] = useState<Track | null>(null)
+  const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false)
+  const [trackComments, setTrackComments] = useState<ServiceComment[]>([])
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [likedTracks, setLikedTracks] = useState<Record<string, boolean>>({})
+  const [likingTrack, setLikingTrack] = useState<Record<string, boolean>>({})
   const { toast } = useToast()
   const { token, user } = useAuth()
   const limit = 10
@@ -63,9 +72,37 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
     }
   }, [userId, initialTracks])
 
+  // Verificar quais faixas o usuário já curtiu
+  useEffect(() => {
+    const checkLikedTracks = async () => {
+      if (!user || !token || tracks.length === 0) return;
+
+      try {
+        // Idealmente, isso deveria ser feito em uma única chamada de API
+        // que retorna as curtidas do usuário para todas as faixas
+        const liked: Record<string, boolean> = {};
+
+        for (const track of tracks) {
+          try {
+            const response = await TrackService.checkIfLiked(track.id, token);
+            liked[track.id] = response.liked;
+          } catch (error) {
+            console.error(`Erro ao verificar curtida para a faixa ${track.id}:`, error);
+          }
+        }
+
+        setLikedTracks(liked);
+      } catch (error) {
+        console.error("Erro ao verificar faixas curtidas:", error);
+      }
+    };
+
+    checkLikedTracks();
+  }, [tracks, user, token]);
+
   const fetchTracks = async (reset = false) => {
     if (loading) return
-    
+
     const currentPage = reset ? 1 : page
     setLoading(true)
 
@@ -96,13 +133,13 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
     reset: boolean
   ) => {
     const { data, meta } = response
-    
+
     if (reset) {
       setTracks(data)
     } else {
       setTracks((prev) => [...prev, ...data])
     }
-    
+
     setHasMore(meta.hasNextPage)
     setPage(reset ? 2 : page + 1)
   }
@@ -118,10 +155,10 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
 
     try {
       await TrackService.deleteTrack(trackId, token)
-      
+
       // Atualiza a lista de áudios removendo o áudio excluído
       setTracks((prev) => prev.filter((track) => track.id !== trackId))
-      
+
       toast({
         title: "Áudio excluído",
         description: "O áudio foi excluído com sucesso.",
@@ -139,10 +176,10 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
   const getFullAudioUrl = (url: string) => {
     // Se já for uma URL completa, retorna como está
     if (url.startsWith('http')) return url;
-    
+
     // Garante que tenhamos a base URL
     const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    
+
     // Trata diferentes formatos de caminhos
     if (url.startsWith('/uploads/')) {
       // Caminho começa com /uploads/
@@ -179,6 +216,107 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
     // Opcional: recarregar os dados
     fetchTracks(true);
   };
+
+  const fetchTrackComments = async (trackId: string) => {
+    setLoadingComments(true)
+    try {
+      // Alterando para usar o serviço de comentários padrão com o token
+      const comments = await CommentService.getTrackComments(trackId)
+      // Se não houver comentários ou ocorrer um erro, tente usar o serviço de track como fallback
+      if (!comments || comments.length === 0) {
+        console.log("Tentando buscar comentários pelo serviço de tracks como fallback");
+        if (token) {
+          const trackComments = await TrackService.getTrackComments(trackId, token);
+          setTrackComments(trackComments || []);
+        }
+      } else {
+        setTrackComments(comments);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar comentários:', error)
+      // Tentando usar o serviço alternativo em caso de erro
+      try {
+        if (token) {
+          console.log("Tentando buscar comentários pelo serviço de tracks após erro");
+          const trackComments = await TrackService.getTrackComments(trackId, token);
+          setTrackComments(trackComments || []);
+        }
+      } catch (fallbackError) {
+        console.error('Erro também no fallback:', fallbackError);
+        setTrackComments([]);
+        toast({
+          title: 'Erro ao carregar comentários',
+          description: 'Não foi possível carregar os comentários. Tente novamente mais tarde.',
+          variant: 'destructive',
+        })
+      }
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  const handleCommentClick = (track: Track) => {
+    setCommentTrack(track)
+    fetchTrackComments(track.id)
+    setIsCommentDialogOpen(true)
+  }
+
+  const handleCommentAdded = () => {
+    if (commentTrack) {
+      fetchTrackComments(commentTrack.id)
+    }
+  }
+
+  const handleLike = async (trackId: string) => {
+    if (!user || !token) {
+      toast({
+        title: 'Autenticação necessária',
+        description: 'Você precisa estar logado para curtir esta faixa.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    // Evitar múltiplos cliques
+    if (likingTrack[trackId]) return;
+
+    setLikingTrack(prev => ({ ...prev, [trackId]: true }));
+
+    try {
+      const isLiked = likedTracks[trackId];
+
+      if (isLiked) {
+        // Descurtir
+        await TrackService.unlikeTrack(trackId, token);
+        setLikedTracks(prev => ({ ...prev, [trackId]: false }));
+
+        toast({
+          title: 'Curtida removida',
+          description: 'Você removeu sua curtida desta faixa.',
+        });
+      } else {
+        // Curtir
+        await TrackService.likeTrack(trackId, token);
+        setLikedTracks(prev => ({ ...prev, [trackId]: true }));
+
+        toast({
+          title: 'Faixa curtida',
+          description: 'Você curtiu esta faixa com sucesso!',
+        });
+      }
+
+      // Aqui você pode atualizar a contagem de curtidas se seu backend retornar essa informação
+    } catch (error) {
+      console.error('Erro ao curtir faixa:', error);
+      toast({
+        title: 'Erro ao processar curtida',
+        description: 'Não foi possível processar sua interação. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLikingTrack(prev => ({ ...prev, [trackId]: false }));
+    }
+  }
 
   if (loading && tracks.length === 0) {
     return (
@@ -219,7 +357,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                       })}
                     </div>
                   </div>
-                  
+
                   {/* Menu de opções para o próprio usuário */}
                   {user && (user.id === track.authorId) && (
                     <DropdownMenu>
@@ -255,18 +393,18 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
               <CardContent className="pt-3">
                 <div className="space-y-2">
                   <h3 className="font-medium">{track.name}</h3>
-                  
+
                   {/* Player de áudio */}
                   <div className="mt-2 p-2 bg-accent/20 rounded-md">
                     <audio controls className="w-full" preload="metadata">
-                      <source 
-                        src={getFullAudioUrl(track.audioUrl)} 
-                        type={track.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'} 
+                      <source
+                        src={getFullAudioUrl(track.audioUrl)}
+                        type={track.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'}
                       />
                       Seu navegador não suporta o elemento de áudio.
                     </audio>
                   </div>
-                  
+
                   <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
                     <div className="flex items-center">
                       {track.duration > 0 ? (
@@ -283,16 +421,36 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
 
               <CardFooter className="border-t px-6 py-3">
                 <div className="flex justify-between w-full">
-                  <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
-                    <Heart className="h-4 w-4" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`gap-1 ${likedTracks[track.id] ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}
+                    onClick={() => handleLike(track.id)}
+                    disabled={likingTrack[track.id]}
+                  >
+                    {likingTrack[track.id] ? (
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    ) : (
+                      <Heart className={`h-4 w-4 mr-1 ${likedTracks[track.id] ? 'fill-current' : ''}`} />
+                    )}
                     <span>Curtir</span>
                   </Button>
-                  
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 hover:text-primary"
+                    onClick={() => handleCommentClick(track)}
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    <span>Comentar</span>
+                  </Button>
+
                   {/* Botão para colaborar - só aparece se não for o próprio autor */}
                   {user && user.id !== track.authorId ? (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="gap-1 hover:text-primary"
                       onClick={() => {
                         setCollaborateTrack(track);
@@ -308,16 +466,6 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                       <span>Compartilhar</span>
                     </Button>
                   )}
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1 hover:text-primary"
-                    onClick={() => handleDownload(track)}
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Baixar</span>
-                  </Button>
                 </div>
               </CardFooter>
             </Card>
@@ -366,7 +514,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       {/* Diálogo para colaboração */}
       <Dialog open={isCollaborateDialogOpen} onOpenChange={setIsCollaborateDialogOpen}>
         <DialogContent className="max-w-4xl overflow-y-auto max-h-[90vh]">
@@ -376,21 +524,21 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
               Grave sua colaboração sobre este áudio. O autor original receberá sua contribuição para aprovação.
             </DialogDescription>
           </DialogHeader>
-          
+
           {collaborateTrack && (
             <div className="space-y-4">
               <div className="bg-accent/20 p-4 rounded-md">
                 <h4 className="text-sm font-medium mb-2">Áudio original:</h4>
                 <audio controls className="w-full">
-                  <source 
-                    src={getFullAudioUrl(collaborateTrack.audioUrl)} 
-                    type={collaborateTrack.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'} 
+                  <source
+                    src={getFullAudioUrl(collaborateTrack.audioUrl)}
+                    type={collaborateTrack.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'}
                   />
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
               </div>
-              
-              <AudioRecorder 
+
+              <AudioRecorder
                 simplified={false}
                 existingTrackUrl={getFullAudioUrl(collaborateTrack.audioUrl)}
                 collaborationMode={true}
@@ -398,6 +546,45 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                 onTrackSaved={handleCollaborationSaved}
                 onCancel={() => setIsCollaborateDialogOpen(false)}
               />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo para comentários */}
+      <Dialog open={isCommentDialogOpen} onOpenChange={setIsCommentDialogOpen}>
+        <DialogContent className="max-w-4xl overflow-y-auto max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Comentários</DialogTitle>
+            <DialogDescription>
+              Comente e interaja com esta faixa de áudio
+            </DialogDescription>
+          </DialogHeader>
+
+          {commentTrack && (
+            <div className="space-y-4">
+              <div className="bg-accent/20 p-4 rounded-md">
+                <h4 className="text-sm font-medium mb-2">Faixa: {commentTrack.name}</h4>
+                <audio controls className="w-full">
+                  <source
+                    src={getFullAudioUrl(commentTrack.audioUrl)}
+                    type={commentTrack.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'}
+                  />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
+              </div>
+
+              {loadingComments ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : (
+                <TrackComments
+                  trackId={commentTrack.id}
+                  comments={trackComments}
+                  onCommentAdded={handleCommentAdded}
+                />
+              )}
             </div>
           )}
         </DialogContent>

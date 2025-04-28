@@ -66,118 +66,115 @@ body {
 
 @layer base {
   :root {
-    --background: 240 30% 99%;
+    --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-
-    --music-primary: 355 65% 45%;
-    --music-secondary: 340 60% 45%;
-    --music-accent: 325 55% 45%;
-
-    --primary: 355 65% 45%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
-
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-
-    --accent: 240 5% 90%;
-    --accent-foreground: 240 6% 10%;
-
+    --primary: 355 90% 40%;
+    /* Vermelho escuro como nos botões */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 355 90% 40%;
+    /* Mesma cor dos botões para cor secundária */
+    --secondary-foreground: 0 0% 100%;
+    /* Texto branco para contraste */
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 355 65% 45%;
-
-    --chart-1: 355 65% 45%;
-    --chart-2: 340 60% 45%;
-    --chart-3: 325 55% 45%;
-    --chart-4: 30 80% 60%;
-    --chart-5: 150 60% 50%;
-
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 355 90% 40%;
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 355 65% 45%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 355 65% 45%;
+    /* Layout Vars */
+    --header-height: 4rem;
+    --sidebar-width: 280px;
+    --content-max-width: 1280px;
+    --content-padding: 2rem;
+    --card-gap: 1.5rem;
   }
 
+  .layout-compact {
+    --header-height: 3.5rem;
+    --sidebar-width: 240px;
+    --content-max-width: 1024px;
+    --content-padding: 1rem;
+    --card-gap: 1rem;
+    --radius: 0.25rem;
+
+    .card {
+      @apply shadow-none border-none;
+    }
+
+    .button {
+      @apply px-3 py-1.5 text-sm;
+    }
+  }
+
+  .layout-spacious {
+    --header-height: 5rem;
+    --sidebar-width: 320px;
+    --content-max-width: 1440px;
+    --content-padding: 3rem;
+    --card-gap: 2rem;
+    --radius: 1rem;
+
+    .card {
+      @apply shadow-lg hover:shadow-xl transition-shadow;
+    }
+
+    .button {
+      @apply rounded-full px-6;
+    }
+
+    .input,
+    .select {
+      @apply h-12;
+    }
+  }
+
+  /* Container styles based on layout */
+  .container {
+    @apply mx-auto px-[var(--content-padding)] max-w-[var(--content-max-width)];
+  }
+
+  /* Card styles */
+  .card {
+    @apply rounded-[var(--radius)] border border-border bg-card p-[var(--card-gap)];
+  }
+
+  /* Grid gaps based on layout */
+  .grid {
+    @apply gap-[var(--card-gap)];
+  }
+
+  /* Dark theme overrides */
   .dark {
-    --background: 0 0% 1%;
+    --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
-
-    --card: 0 0% 3%;
+    --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 3%;
+    --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-
-    --music-primary: 355 60% 50%;
-    --music-secondary: 340 50% 50%;
-    --music-accent: 325 45% 50%;
-
-    --primary: 355 60% 50%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 355 15% 12%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 355 15% 12%;
-    --muted-foreground: 355 10% 75%;
-
-    --accent: 355 15% 12%;
+    --primary: 355 85% 60%;
+    /* Vermelho escuro adaptado para o tema escuro */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 355 85% 60%;
+    /* Mesma cor dos botões para cor secundária no tema escuro */
+    --secondary-foreground: 0 0% 100%;
+    /* Texto branco para contraste */
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 12 6.5% 15.1%;
     --accent-foreground: 0 0% 98%;
-
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 355 15% 12%;
-    --input: 355 15% 12%;
-    --ring: 355 60% 50%;
-
-    --chart-1: 355 60% 50%;
-    --chart-2: 340 50% 50%;
-    --chart-3: 325 45% 50%;
-    --chart-4: 30 80% 60%;
-    --chart-5: 150 60% 50%;
-
-    --sidebar-background: 355 25% 8%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 355 60% 50%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 355 15% 12%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 355 15% 12%;
-    --sidebar-ring: 355 60% 50%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  .dark body {
-    background-image: radial-gradient(circle at 50% 120%,
-        rgb(var(--primary)/0.08) 0%,
-        rgb(var(--background)) 75%);
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 355 85% 60%;
   }
 }

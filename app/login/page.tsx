@@ -20,14 +20,14 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   })
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     try {
-      await login(values.email, values.password)
+      await login(values.identifier, values.password)
     } catch (err) {
       toast({
         title: "Erro ao fazer login",
@@ -42,7 +42,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center">Entrar</CardTitle>
-          <CardDescription className="text-center">Entre com seu email e senha para acessar sua rede</CardDescription>
+          <CardDescription className="text-center">Entre com seu email ou login para acessar sua rede</CardDescription>
         </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -51,12 +51,12 @@ export default function LoginPage() {
 
               <FormField
                 control={form.control}
-                name="email"
+                name="identifier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email ou Login</FormLabel>
                     <FormControl>
-                      <Input placeholder="seu@email.com" {...field} />
+                      <Input placeholder="seu@email.com ou seu-login" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

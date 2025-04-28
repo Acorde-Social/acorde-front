@@ -12,18 +12,20 @@ import { Slider } from "@/components/ui/slider"
 import { Headphones, Music, Search, Users, Loader2, RefreshCw, AlertTriangle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { ProjectService, type Project, type ProjectFilter } from "@/services/project-service"
+import { ProjectService, type Project, type ProjectFilter } from "@/services/project-service" // Ensure Project type is imported correctly if needed elsewhere, but service defines its own
 import { useToast } from "@/hooks/use-toast"
 import { useAsync } from "@/hooks/use-async"
 import { AsyncBoundary } from "@/components/async-boundary"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { fixImageUrl } from "@/lib/utils"
+import { useAuth } from "@/contexts/auth-context" // Import useAuth
 
 export default function ExplorePage() {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<Project[]>([]) // Use Project type from service
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("recent")
   const { toast } = useToast()
+  const { user, token } = useAuth() // Get user and token from context
 
   // Filtros
   const [filters, setFilters] = useState<ProjectFilter>({})
@@ -50,33 +52,32 @@ export default function ExplorePage() {
 
   // Função para buscar projetos
   const loadProjects = useCallback(async () => {
-    return ProjectService.getProjects(filters)
-  }, [filters])
+    // Pass the token to getProjects
+    return ProjectService.getProjects(filters, token || "")
+  }, [filters, token]) // Add token to dependency array
 
   // Carregar projetos ao montar o componente
   useEffect(() => {
-    // Usando uma flag para controlar se já tentamos fazer a requisição
-    // Isso evita um loop infinito de requisições
+    // Flag para controlar se o componente está montado
     let mounted = true;
-    
+
     const doFetchProjects = async () => {
       if (mounted) {
         try {
-          await fetchProjects(loadProjects);
+          await fetchProjects(() => ProjectService.getProjects(filters, token || ""));
         } catch (err) {
           console.error("Erro ao carregar projetos:", err);
-          // Não tentamos novamente automaticamente em caso de erro
         }
       }
     };
-    
+
     doFetchProjects();
-    
+
     // Cleanup para evitar atualizações de estado após desmontagem
     return () => {
       mounted = false;
     };
-  }, [filters]); // Apenas recarregar quando os filtros mudarem
+  }, [filters, token]); // Remova fetchProjects e loadProjects das dependências
 
   const applyFilters = () => {
     const updatedFilters: ProjectFilter = {
@@ -85,11 +86,13 @@ export default function ExplorePage() {
       maxBpm: bpmRange[1],
     }
     setFilters(updatedFilters)
-    fetchProjects(() => ProjectService.getProjects(updatedFilters))
+    // Pass the token to getProjects
+    fetchProjects(() => ProjectService.getProjects(updatedFilters, token || ""))
   }
 
   const handleRetry = () => {
     reset()
+    // Pass the correct loadProjects function
     fetchProjects(loadProjects)
   }
 
@@ -258,7 +261,7 @@ export default function ExplorePage() {
             >
               {filteredProjects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProjects.map((project) => (
+                  {filteredProjects.map((project: Project) => ( // Explicitly type project here if needed
                     <Card key={project.id} className="overflow-hidden">
                       <div className="relative h-48 w-full">
                         <Image
@@ -279,10 +282,11 @@ export default function ExplorePage() {
                         <CardTitle className="line-clamp-1">{project.title}</CardTitle>
                         <div className="flex items-center space-x-2">
                           <Avatar className="h-8 w-8">
-                            <AvatarImage src={project.author.avatarUrl || ""} alt={project.author.name} />
-                            <AvatarFallback>{project.author.name.charAt(0)}</AvatarFallback>
+                            {/* Ensure author object and avatarUrl exist before accessing */}
+                            <AvatarImage src={fixImageUrl(project.author?.avatarUrl || "")} alt={project.author?.name || "User"} />
+                            <AvatarFallback>{project.author?.name?.charAt(0) || "U"}</AvatarFallback>
                           </Avatar>
-                          <span className="text-sm font-medium">{project.author.name}</span>
+                          <span className="text-sm font-medium">{project.author?.name || "Unknown User"}</span>
                         </div>
                       </CardHeader>
                       <CardContent className="p-4 pt-0">

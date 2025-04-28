@@ -31,7 +31,6 @@ const getFullAudioUrl = (url: string) => {
 
 	// Se for identificada como blob local do frontend, não devemos buscar da API
 	if (isLocalBlobUrl(url)) {
-		console.log('URL local detectada, usando diretamente:', url);
 		return url; // Usar a URL como está, sem transformação
 	}
 
@@ -106,7 +105,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 
 			// Create player with formatted URL
 			const formattedUrl = audioUrl.startsWith('http') ? audioUrl : getFullAudioUrl(audioUrl);
-			console.log('Inicializando player com URL:', formattedUrl);
 
 			tonePlayerRef.current = new Tone.Player({
 				url: formattedUrl,
@@ -342,17 +340,14 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 				if (processedAudioUrl) {
 					try {
 						const formattedUrl = getFullAudioUrl(processedAudioUrl);
-						console.log('Carregando áudio processado para reprodução:', formattedUrl);
-
+						
 						// Verificar se já está carregado
 						if (tonePlayerRef.current.loaded) {
-							console.log("Áudio já está carregado, iniciando reprodução");
 							tonePlayerRef.current.start();
 							Tone.Transport.start();
 							setIsPlaying(true);
 						} else {
 							// Se não estiver carregado, carrega e depois toca
-							console.log("Áudio não carregado, carregando primeiro");
 							toast({
 								title: 'Carregando áudio',
 								description: 'Aguarde enquanto o áudio é preparado para reprodução.',
@@ -365,7 +360,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 								url: formattedUrl,
 								onload: () => {
 									if (tonePlayerRef.current) {
-										console.log("Áudio carregado com sucesso, iniciando reprodução");
 										tonePlayerRef.current.start();
 									}
 									Tone.Transport.start();
@@ -395,12 +389,10 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 					try {
 						// Verifica se o buffer está carregado
 						if (tonePlayerRef.current.loaded) {
-							console.log("Áudio original já carregado, iniciando reprodução");
 							tonePlayerRef.current.start();
 							Tone.Transport.start();
 							setIsPlaying(true);
 						} else {
-							console.log("Áudio original não carregado, recarregando");
 							toast({
 								title: 'Carregando áudio',
 								description: 'Aguarde enquanto o áudio é preparado para reprodução.',
@@ -415,7 +407,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 								url: formattedUrl,
 								onload: () => {
 									if (tonePlayerRef.current) {
-										console.log("Áudio original carregado com sucesso");
 										tonePlayerRef.current.start();
 									}
 									Tone.Transport.start();
@@ -543,18 +534,15 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 			const response = await fetch(audioUrl);
 			const audioBlob = await response.blob();
 
-			// Verificar o tipo MIME do blob obtido
-			console.log('Blob original tipo:', audioBlob.type);
-
 			// Garantir que o arquivo tenha um tipo MIME de áudio válido
 			let mimeType = audioBlob.type;
 			if (!mimeType || !mimeType.startsWith('audio/')) {
 				// Determinar o tipo MIME baseado na extensão do arquivo
-				if (audioUrl.toLowerCase().endsWith('.mp3')) {
+				if (audioUrl.toLowerCase().endswith('.mp3')) {
 					mimeType = 'audio/mpeg';
-				} else if (audioUrl.toLowerCase().endsWith('.wav')) {
+				} else if (audioUrl.toLowerCase().endswith('.wav')) {
 					mimeType = 'audio/wav';
-				} else if (audioUrl.toLowerCase().endsWith('.ogg')) {
+				} else if (audioUrl.toLowerCase().endswith('.ogg')) {
 					mimeType = 'audio/ogg';
 				} else {
 					// Preferimos WAV para preservar a qualidade
@@ -564,7 +552,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 
 			// Criar um novo Blob com o tipo MIME explícito
 			const typedAudioBlob = new Blob([audioBlob], { type: mimeType });
-			console.log('Tipo MIME atribuído:', mimeType);
 
 			// Criar um nome de arquivo adequado com extensão correta
 			// Priorizar o formato WAV para preservar qualidade
@@ -575,7 +562,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 
 			// Criar File object (melhor que Blob para upload)
 			const audioFile = new File([typedAudioBlob], fileName, { type: mimeType });
-			console.log('Arquivo criado:', fileName, 'tipo:', audioFile.type);
 
 			// Criar FormData e anexar o arquivo de áudio com o tipo correto
 			const formData = new FormData();
@@ -588,18 +574,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 			formData.append('quantizeStrength', String(quantizeStrength));
 			formData.append('preserveExpression', String(preserveExpression));
 			formData.append('maintainWavFormat', 'true'); // Novo parâmetro para manter formato WAV
-
-			// Log dos dados enviados para depuração
-			console.log('Enviando requisição para o backend:', {
-				originalBpm: currentBpm ? String(currentBpm) : 'null', // Log do BPM original
-				targetBpm: String(targetBpm),
-				quantizeStrength: String(quantizeStrength),
-				preserveExpression: String(preserveExpression),
-				maintainWavFormat: 'true',
-				fileType: audioFile.type,
-				fileName: audioFile.name,
-				fileSize: audioFile.size
-			});
 
 			// Enviar o FormData para o endpoint
 			const apiResponse = await fetch('http://localhost:3001/ai-audio/correct-timing-upload', {
@@ -729,7 +703,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 			try {
 				// Verificar se a URL é válida
 				if (!processedAudioUrl || processedAudioUrl === "undefined" || processedAudioUrl === "null") {
-					console.error('URL de áudio processado inválida:', processedAudioUrl);
 					toast({
 						title: 'URL de áudio inválida',
 						description: 'Não foi possível carregar o áudio processado devido a uma URL inválida.',
@@ -738,12 +711,8 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 					return;
 				}
 
-				// Log para debug
-				console.log('URL de áudio processado recebida:', processedAudioUrl);
-
 				// Aplicar a formatação correta à URL
 				const formattedUrl = getFullAudioUrl(processedAudioUrl);
-				console.log('URL formatada para carregamento:', formattedUrl);
 
 				// Verificar se o áudio está acessível antes de tentar carregar
 				fetch(formattedUrl, { method: 'HEAD' })
@@ -751,8 +720,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 						if (!response.ok) {
 							throw new Error(`Erro ao acessar o áudio: ${response.status} ${response.statusText}`);
 						}
-
-						console.log('Áudio acessível, carregando no player...');
 
 						// Atualizar o player de áudio para usar a URL formatada
 						if (tonePlayerRef.current) {
@@ -763,14 +730,12 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 							tonePlayerRef.current = new Tone.Player({
 								url: formattedUrl,
 								onload: () => {
-									console.log('Áudio processado carregado com sucesso');
 									toast({
 										title: 'Áudio processado carregado',
 										description: 'Você pode reproduzir para ouvir o resultado.'
 									});
 								},
 								onerror: (err) => {
-									console.error('Erro ao carregar áudio no player:', err);
 									toast({
 										title: 'Erro ao preparar áudio',
 										description: 'O áudio foi processado mas ocorreu um erro ao carregá-lo no player.',
@@ -784,7 +749,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 						}
 					})
 					.catch(error => {
-						console.error('Erro verificando acesso ao áudio:', error);
 						toast({
 							title: 'Erro ao acessar áudio',
 							description: 'O arquivo de áudio processado não está acessível.',
@@ -792,7 +756,6 @@ export function AudioEditor({ audioUrl, onSave, projectBpm = 120, className = ''
 						});
 					});
 			} catch (error) {
-				console.error('Erro ao processar URL do áudio:', error);
 				toast({
 					title: 'Erro ao processar áudio',
 					description: 'Ocorreu um erro ao tentar preparar o áudio processado.',

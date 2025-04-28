@@ -1,5 +1,4 @@
 "use client"
-
 import { API_URL, getAuthHeaders, handleApiError } from "@/lib/api-config"
 
 export interface Project {
@@ -94,115 +93,95 @@ export interface ProjectFilter {
   key?: string
 }
 
-export const ProjectService = {
-  // Buscar todos os projetos com filtros opcionais
-  async getProjects(filters?: ProjectFilter, token?: string): Promise<Project[]> {
-    let url = `${API_URL}/projects`
+interface GetProjectsFilters {
+  genre?: string
+  instrument?: string
+  minBpm?: number
+  maxBpm?: number
+  key?: string
+}
 
-    if (filters) {
-      const params = new URLSearchParams()
-      if (filters.genre) params.append("genre", filters.genre)
-      if (filters.instrument) params.append("instrument", filters.instrument)
-      if (filters.minBpm) params.append("minBpm", filters.minBpm.toString())
-      if (filters.maxBpm) params.append("maxBpm", filters.maxBpm.toString())
-      if (filters.key) params.append("key", filters.key)
-
-      if (params.toString()) {
-        url += `?${params.toString()}`
-      }
+export class ProjectService {
+  // Helper method for FormData requests that need auth but not Content-Type
+  private static getFormDataAuthHeaders(token: string) {
+    // Only include Authorization header without Content-Type
+    return {
+      Authorization: `Bearer ${token}`
     }
+  }
 
-    try {
-      const response = await fetch(url, {
-        headers: getAuthHeaders(token),
-      })
+  static async getProjects(filters: GetProjectsFilters = {}, token: string): Promise<Project[]> {
+    const queryParams = new URLSearchParams()
+    
+    if (filters.genre) queryParams.append("genre", filters.genre)
+    if (filters.instrument) queryParams.append("instrument", filters.instrument)
+    if (filters.minBpm) queryParams.append("minBpm", filters.minBpm.toString())
+    if (filters.maxBpm) queryParams.append("maxBpm", filters.maxBpm.toString())
+    if (filters.key) queryParams.append("key", filters.key)
 
-      const data = await handleApiError(response)
-      // Garantindo que sempre retornamos um array, mesmo se a API retornar null ou undefined
-      return Array.isArray(data) ? data : []
-    } catch (error) {
-      console.error("Erro ao buscar projetos:", error)
-      // Para evitar loops infinitos em caso de erro, retornamos um array vazio
-      // em vez de propagar a exceção
-      return []
-    }
-  },
+    const response = await fetch(`${API_URL}/projects?${queryParams}`, {
+      headers: getAuthHeaders(token),
+    })
 
-  // Buscar projeto por ID
-  async getProjectById(id: string, token?: string): Promise<ProjectDetail> {
+    return handleApiError(response)
+  }
+
+  static async getProject(id: string, token: string): Promise<Project> {
     const response = await fetch(`${API_URL}/projects/${id}`, {
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
-  },
-
-  // Buscar projetos do usuário logado
-  async getUserProjects(token: string): Promise<Project[]> {
-    const response = await fetch(`${API_URL}/projects/user`, {
-      headers: getAuthHeaders(token),
-    })
-    
-    const data = await handleApiError(response)
-    return Array.isArray(data) ? data : []
-  },
+  }
   
-  // Buscar projetos em que o usuário está colaborando
-  async getUserCollaborations(token: string): Promise<any[]> {
-    const response = await fetch(`${API_URL}/projects/collaborations`, {
-      headers: getAuthHeaders(token),
-    })
-    
-    const data = await handleApiError(response)
-    return Array.isArray(data) ? data : []
-  },
+  // Alias para getProject para compatibilidade
+  static async getProjectById(id: string, token?: string): Promise<Project> {
+    return this.getProject(id, token || '');
+  }
 
-  // Criar novo projeto
-  async createProject(data: CreateProjectData, token: string): Promise<Project> {
+  static async createProject(projectData: FormData, token: string): Promise<Project> {
     const response = await fetch(`${API_URL}/projects`, {
       method: "POST",
-      headers: getAuthHeaders(token),
-      body: JSON.stringify(data),
+      headers: this.getFormDataAuthHeaders(token), // Use auth headers without Content-Type
+      body: projectData,
     })
 
     return handleApiError(response)
-  },
+  }
 
-  // Atualizar projeto
-  async updateProject(id: string, data: Partial<CreateProjectData>, token: string): Promise<Project> {
+  static async updateProject(id: string, projectData: FormData, token: string): Promise<Project> {
     const response = await fetch(`${API_URL}/projects/${id}`, {
       method: "PATCH",
-      headers: getAuthHeaders(token),
-      body: JSON.stringify(data),
+      headers: this.getFormDataAuthHeaders(token), // Use auth headers without Content-Type
+      body: projectData,
     })
 
     return handleApiError(response)
-  },
+  }
 
-  // Excluir projeto
-  async deleteProject(id: string, token: string): Promise<void> {
+  static async deleteProject(id: string, token: string): Promise<void> {
     const response = await fetch(`${API_URL}/projects/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
-  },
+  }
 
-  // Upload de imagem do projeto
-  async uploadProjectImage(id: string, file: File, token: string): Promise<{ id: string; imageUrl: string }> {
-    const formData = new FormData()
-    formData.append("file", file)
-
-    const response = await fetch(`${API_URL}/projects/${id}/image`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
+  static async getUserProjects(token: string): Promise<Project[]> {
+    const response = await fetch(`${API_URL}/projects/user`, {
+      headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
-  },
+  }
+
+  static async getUserCollaborations(token: string): Promise<Project[]> {
+    const response = await fetch(`${API_URL}/projects/collaborations`, {
+      headers: getAuthHeaders(token),
+    })
+
+    return handleApiError(response)
+  }
 }
 

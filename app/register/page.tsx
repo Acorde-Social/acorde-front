@@ -33,6 +33,7 @@ export default function RegisterPage() {
 
   // Campos comuns
   const [name, setName] = useState("")
+  const [login, setLogin] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [termsAccepted, setTermsAccepted] = useState(false)
@@ -45,15 +46,15 @@ export default function RegisterPage() {
 
   // Definição dos tipos de usuário para o formulário
   const userTypes: UserType[] = [
-    { 
-      value: "composer", 
-      label: "Compositor", 
+    {
+      value: "composer",
+      label: "Compositor",
       icon: <Music className="h-4 w-4" />,
       description: "Crie partituras e peças musicais"
     },
-    { 
-      value: "musician", 
-      label: "Músico", 
+    {
+      value: "musician",
+      label: "Músico",
       icon: <Guitar className="h-4 w-4" />,
       description: "Toque instrumentos em projetos"
     },
@@ -159,6 +160,7 @@ export default function RegisterPage() {
     try {
       const userData: any = {
         name,
+        login,
         email,
         password,
         role: getRoleFromTab(selectedTab),
@@ -202,9 +204,9 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <TabsList className="grid w-full grid-cols-5">
                 {userTypesGroup1.map((type) => (
-                  <TabsTrigger 
-                    key={type.value} 
-                    value={type.value} 
+                  <TabsTrigger
+                    key={type.value}
+                    value={type.value}
                     className="flex flex-col items-center gap-1 py-2"
                     title={type.description}
                   >
@@ -215,9 +217,9 @@ export default function RegisterPage() {
               </TabsList>
               <TabsList className="grid w-full grid-cols-5">
                 {userTypesGroup2.map((type) => (
-                  <TabsTrigger 
-                    key={type.value} 
-                    value={type.value} 
+                  <TabsTrigger
+                    key={type.value}
+                    value={type.value}
                     className="flex flex-col items-center gap-1 py-2"
                     title={type.description}
                   >
@@ -246,6 +248,19 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="login">Login</Label>
+                    <Input
+                      id="login"
+                      placeholder="Seu nome de usuário"
+                      value={login}
+                      onChange={(e) => setLogin(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
@@ -256,17 +271,17 @@ export default function RegisterPage() {
                       required
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Senha</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
 
                 {selectedTab !== "listener" && (

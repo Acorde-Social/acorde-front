@@ -23,7 +23,7 @@ export default function MyProjectsPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("my-projects")
-  
+
   const router = useRouter()
   const { user, token } = useAuth()
   const { toast } = useToast()
@@ -41,12 +41,12 @@ export default function MyProjectsPage() {
     setLoading(true)
     try {
       // Buscar projetos do usuário
-      if (!token) {
-        throw new Error("Token is required to fetch user projects.")
+      if (!token || !user) {
+        throw new Error("Token and user are required to fetch user projects.")
       }
       const userProjects = await ProjectService.getUserProjects(token)
       setProjects(userProjects)
-      
+
       // Buscar projetos em que o usuário colabora
       const collaborationProjects = await ProjectService.getUserCollaborations(token)
       setCollaborations(collaborationProjects)
@@ -62,13 +62,13 @@ export default function MyProjectsPage() {
     }
   }
 
-  const filteredProjects = projects.filter(project => 
+  const filteredProjects = projects.filter(project =>
     project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (project.description ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.genre.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const filteredCollaborations = collaborations.filter(collab => 
+  const filteredCollaborations = collaborations.filter(collab =>
     collab.project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     collab.project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     collab.project.genre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -118,7 +118,7 @@ export default function MyProjectsPage() {
           <TabsTrigger value="my-projects">Meus Projetos</TabsTrigger>
           <TabsTrigger value="collaborations">Colaborações</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="my-projects" className="mt-6">
           {filteredProjects.length === 0 ? (
             <Card className="text-center py-12">
@@ -154,12 +154,12 @@ export default function MyProjectsPage() {
                       </Badge>
                     </div>
                   </div>
-                  
+
                   <CardContent className="p-4">
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
                       {project.description}
                     </p>
-                    
+
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3.5 w-3.5" />
@@ -176,7 +176,7 @@ export default function MyProjectsPage() {
                       </div>
                     </div>
                   </CardContent>
-                  
+
                   <CardFooter className="p-4 pt-0 flex justify-between">
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/studio?project=${project.id}`}>
@@ -195,7 +195,7 @@ export default function MyProjectsPage() {
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="collaborations" className="mt-6">
           {filteredCollaborations.length === 0 ? (
             <Card className="text-center py-12">
@@ -231,24 +231,24 @@ export default function MyProjectsPage() {
                       </Badge>
                     </div>
                   </div>
-                  
+
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Badge variant="outline" className="text-xs">
-                        {collab.status === "PENDING" ? "Pendente" : 
-                         collab.status === "ACCEPTED" ? "Aceito" : 
-                         collab.status === "REJECTED" ? "Rejeitado" : "Colaborador"}
+                        {collab.status === "PENDING" ? "Pendente" :
+                          collab.status === "ACCEPTED" ? "Aceito" :
+                            collab.status === "REJECTED" ? "Rejeitado" : "Colaborador"}
                       </Badge>
                       <span className="text-sm text-muted-foreground">
                         Criado por {collab.project.author.name}
                       </span>
                     </div>
-                    
+
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
                       {collab.project.description}
                     </p>
                   </CardContent>
-                  
+
                   <CardFooter className="p-4 pt-0 flex justify-end">
                     <Button size="sm" asChild>
                       <Link href={`/projects/${collab.project.id}`} className="flex items-center gap-1">

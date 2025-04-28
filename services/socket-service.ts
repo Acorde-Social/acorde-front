@@ -45,15 +45,15 @@ class SocketService {
     if (!this.socket) return
 
     this.socket.on("connect", () => {
-      console.log("Conectado ao servidor de WebSocket")
+      // Socket conectado
     })
 
     this.socket.on("disconnect", () => {
-      console.log("Desconectado do servidor de WebSocket")
+      // Socket desconectado
     })
 
     this.socket.on("error", (error) => {
-      console.error("Erro de WebSocket:", error)
+      // Erro silencioso no socket
     })
 
     // Listener para notificações
@@ -91,7 +91,7 @@ class SocketService {
       try {
         callback(...args)
       } catch (error) {
-        console.error(`Erro ao executar callback para evento ${event}:`, error)
+        // Erro silencioso ao executar callback
       }
     })
   }
@@ -99,7 +99,7 @@ class SocketService {
   // Enviar mensagem para o servidor
   send(event: string, data: any) {
     if (!this.socket) {
-      console.error("Socket não está conectado")
+      // Socket não conectado
       return
     }
 

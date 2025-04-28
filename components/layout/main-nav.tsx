@@ -3,122 +3,59 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Music, Plus } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Notifications } from "@/components/notifications"
+import { useThemeCustomization } from "@/contexts/theme-context"
 
 export function MainNav() {
   const pathname = usePathname()
-  const { user, logout } = useAuth()
+  const { preferences } = useThemeCustomization()
 
-  const routes = [
+  const navItems = [
+    {
+      href: "/",
+      label: "Início",
+    },
     {
       href: "/explore",
       label: "Explorar",
-      active: pathname === "/explore",
     },
     {
       href: "/projects",
       label: "Projetos",
-      active: pathname === "/projects",
+    },
+    {
+      href: "/collaborations",
+      label: "Colaborações",
     },
     {
       href: "/studio",
       label: "Estúdio",
-      active: pathname === "/studio",
-    },
-    {
-      href: "/tools",
-      label: "Ferramentas",
-      active: pathname === "/tools" || pathname?.startsWith("/tools/"),
     },
   ]
 
   return (
-    <div className="mr-4 hidden md:flex items-center justify-between w-full">
-      <div className="flex items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Music className="h-6 w-6 text-primary" />
-          <span className="hidden font-bold sm:inline-block">MusiCollab</span>
+    <nav
+      className={cn(
+        "flex items-center space-x-4 lg:space-x-6",
+        preferences.layout === "compact" && "space-x-2 lg:space-x-4 text-sm",
+        preferences.layout === "spacious" && "space-x-6 lg:space-x-8"
+      )}
+    >
+      {navItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "transition-colors hover:text-primary",
+            pathname === item.href
+              ? "text-primary font-medium"
+              : "text-muted-foreground",
+            preferences.layout === "compact" && "text-sm py-1",
+            preferences.layout === "spacious" && "text-base py-2"
+          )}
+        >
+          {item.label}
         </Link>
-        <nav className="flex items-center space-x-6 text-sm font-medium">
-          {routes.map((route) => (
-            <Link
-              key={route.href}
-              href={route.href}
-              className={cn(
-                "transition-colors hover:text-foreground/80",
-                route.active ? "text-foreground" : "text-foreground/60",
-              )}
-            >
-              {route.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
-      <div className="flex items-center space-x-4">
-        {user ? (
-          <>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/projects/new">
-                <Plus className="mr-1 h-4 w-4" />
-                Novo Projeto
-              </Link>
-            </Button>
-            <Notifications />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatarUrl || ""} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profile">Meu Perfil</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/projects">Meus Projetos</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/collaborations">Colaborações</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>Sair</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/login">Entrar</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/register">Cadastrar</Link>
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+      ))}
+    </nav>
   )
 }

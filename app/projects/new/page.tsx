@@ -20,7 +20,18 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { projectSchema } from "@/lib/validations"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import type * as z from "zod"
+import * as z from "zod"
+
+// Defina o tipo explicitamente usando a inferência do Zod
+type ProjectFormValues = {
+  title: string
+  description: string
+  genre: string
+  key: string
+  bpm: number
+  neededInstruments: string[]
+  image?: any
+}
 
 export default function NewProjectPage() {
   const router = useRouter()
@@ -33,9 +44,9 @@ export default function NewProjectPage() {
   const [newInstrument, setNewInstrument] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Define form with zod validation
-  const form = useForm<z.infer<typeof projectSchema>>({
-    resolver: zodResolver(projectSchema),
+  // Define o formulário com tipagem explícita
+  const form = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectSchema) as any,
     defaultValues: {
       title: "",
       description: "",
@@ -171,7 +182,8 @@ export default function NewProjectPage() {
     }
   }
 
-  const onSubmit = async (values: z.infer<typeof projectSchema>) => {
+  // Função que lida com a submissão do formulário
+  const onSubmit = async (values: ProjectFormValues) => {
     if (!token) {
       toast({
         title: "Erro de autenticação",
@@ -184,22 +196,25 @@ export default function NewProjectPage() {
     setIsSubmitting(true)
 
     try {
-      // Criar o projeto
-      const projectData = {
-        title: values.title,
-        description: values.description || "",
-        genre: values.genre,
-        key: values.key,
-        bpm: values.bpm,
-        neededInstruments,
+      // Criar um objeto FormData para enviar os dados
+      const formData = new FormData()
+      formData.append("title", values.title)
+      if (values.description) {
+        formData.append("description", values.description)
+      }
+      formData.append("genre", values.genre)
+      formData.append("key", values.key)
+      formData.append("bpm", values.bpm.toString())
+
+      // Sempre enviar o campo neededInstruments, mesmo que seja um array vazio
+      formData.append("neededInstruments", JSON.stringify(neededInstruments))
+
+      // Adicionar a imagem se existe (importante verificar se é um arquivo válido)
+      if (projectImage && projectImage instanceof File) {
+        formData.append("image", projectImage)
       }
 
-      const newProject = await ProjectService.createProject(projectData, token)
-
-      // Se tiver imagem, fazer upload
-      if (projectImage) {
-        await ProjectService.uploadProjectImage(newProject.id, projectImage, token)
-      }
+      const newProject = await ProjectService.createProject(formData, token)
 
       toast({
         title: "Projeto criado com sucesso!",
@@ -226,7 +241,7 @@ export default function NewProjectPage() {
         <h1 className="text-3xl font-bold mb-6">Criar Novo Projeto</h1>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit as any)}>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <Card>
@@ -330,12 +345,12 @@ export default function NewProjectPage() {
                           </div>
                           <FormControl>
                             <Controller
-                              control={form.control}
+                              control={form.control as any}
                               name="bpm"
-                              render={({ field }) => (
+                              render={({ field: { onChange, value } }) => (
                                 <Slider
-                                  value={[field.value]}
-                                  onValueChange={(values) => field.onChange(values[0])}
+                                  value={[value]}
+                                  onValueChange={(values) => onChange(values[0])}
                                   min={40}
                                   max={220}
                                   step={1}

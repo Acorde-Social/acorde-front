@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,8 +23,31 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
   const [commentText, setCommentText] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [liking, setLiking] = useState<Record<string, boolean>>({})
+  const [likedComments, setLikedComments] = useState<Record<string, boolean>>({})
   const { user, token } = useAuth()
   const { toast } = useToast()
+
+  useEffect(() => {
+    // Verificar quais comentários o usuário já curtiu
+    const checkLikedComments = async () => {
+      if (!user) return;
+
+      const likedStatus: Record<string, boolean> = {};
+
+      for (const comment of comments) {
+        try {
+          const isLiked = await CommentService.checkUserLiked(comment.id, user.id);
+          likedStatus[comment.id] = isLiked;
+        } catch (error) {
+          console.error(`Erro ao verificar curtida para o comentário ${comment.id}:`, error);
+        }
+      }
+
+      setLikedComments(likedStatus);
+    };
+
+    checkLikedComments();
+  }, [comments, user]);
 
   const handleSubmitComment = async () => {
     if (!commentText.trim() || !user || !token) return
@@ -60,7 +83,7 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
     }
   }
 
-  const handleLikeComment = async (commentId: string) => {
+  const handleToggleLike = async (commentId: string) => {
     if (!user || !token) {
       toast({
         title: "Autenticação necessária",
@@ -72,15 +95,24 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
 
     setLiking((prev) => ({ ...prev, [commentId]: true }))
     try {
-      await CommentService.likeComment(commentId, token)
+      const isLiked = likedComments[commentId];
+
+      if (isLiked) {
+        await CommentService.unlikeComment(commentId, token);
+        setLikedComments(prev => ({ ...prev, [commentId]: false }));
+      } else {
+        await CommentService.likeComment(commentId, token);
+        setLikedComments(prev => ({ ...prev, [commentId]: true }));
+      }
+
       if (onCommentAdded) {
-        onCommentAdded()
+        onCommentAdded();
       }
     } catch (error) {
-      console.error("Erro ao curtir comentário:", error)
+      console.error("Erro ao processar curtida:", error);
       toast({
-        title: "Erro ao curtir comentário",
-        description: "Não foi possível curtir o comentário. Tente novamente mais tarde.",
+        title: "Erro ao processar curtida",
+        description: "Não foi possível processar sua interação. Tente novamente mais tarde.",
         variant: "destructive",
       })
     } finally {
@@ -143,8 +175,8 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-2 text-muted-foreground"
-                        onClick={() => handleLikeComment(comment.id)}
+                        className={`h-8 px-2 ${likedComments[comment.id] ? 'text-primary' : 'text-muted-foreground'}`}
+                        onClick={() => handleToggleLike(comment.id)}
                         disabled={liking[comment.id]}
                       >
                         {liking[comment.id] ? (
@@ -153,9 +185,6 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
                           <ThumbsUp className="mr-1 h-4 w-4" />
                         )}
                         {comment.likes}
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground">
-                        Responder
                       </Button>
                     </div>
                   </div>

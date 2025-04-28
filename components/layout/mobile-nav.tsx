@@ -6,27 +6,35 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Music } from "lucide-react"
+import { Menu } from "lucide-react"
+import { useThemeCustomization } from "@/contexts/theme-context"
+import { Avatar } from "@/components/ui/avatar"
 
 export function MobileNav() {
-  const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const [open, setOpen] = useState(false)
+  const { preferences } = useThemeCustomization()
 
-  const routes = [
+  const navItems = [
+    {
+      href: "/",
+      label: "Início",
+    },
     {
       href: "/explore",
       label: "Explorar",
-      active: pathname === "/explore",
     },
     {
       href: "/projects",
       label: "Projetos",
-      active: pathname === "/projects",
+    },
+    {
+      href: "/collaborations",
+      label: "Colaborações",
     },
     {
       href: "/studio",
       label: "Estúdio",
-      active: pathname === "/studio",
     },
   ]
 
@@ -34,36 +42,71 @@ export function MobileNav() {
     <div className="md:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="mr-2">
+          <Button
+            variant="ghost"
+            size={preferences.layout === "compact" ? "sm" : "default"}
+            className={cn(
+              "md:hidden",
+              preferences.layout === "spacious" && "text-lg p-6"
+            )}
+          >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Abrir menu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="pr-0">
-          <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
-            <Music className="h-6 w-6 text-primary" />
-            <span className="ml-2 font-bold">MusicCollab</span>
+        <SheetContent side="left" className="w-[80vw] max-w-sm">
+          <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+            <Avatar className={cn(
+              "rounded-lg",
+              preferences.layout === "compact" ? "h-8 w-8" : "h-10 w-10"
+            )}>
+              <div className="flex items-center justify-center w-full h-full bg-primary text-primary-foreground font-bold">
+                MC
+              </div>
+            </Avatar>
+            <span className={cn(
+              "font-bold",
+              preferences.layout === "compact" ? "text-sm" : "text-base"
+            )}>MusicCollab</span>
           </Link>
-          <nav className="mt-8 flex flex-col space-y-3">
-            {routes.map((route) => (
+          <nav className={cn(
+            "flex flex-col space-y-4 mt-4",
+            preferences.layout === "compact" && "space-y-2",
+            preferences.layout === "spacious" && "space-y-6"
+          )}>
+            {navItems.map((item) => (
               <Link
-                key={route.href}
-                href={route.href}
+                key={item.href}
+                href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "block px-2 py-1 text-lg font-medium transition-colors hover:text-foreground/80",
-                  route.active ? "text-foreground" : "text-foreground/60",
+                  "transition-colors hover:text-primary",
+                  pathname === item.href
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground",
+                  preferences.layout === "compact" && "text-sm py-1",
+                  preferences.layout === "spacious" && "text-base py-2"
                 )}
               >
-                {route.label}
+                {item.label}
               </Link>
             ))}
           </nav>
         </SheetContent>
       </Sheet>
-      <Link href="/" className="flex items-center space-x-2">
-        <Music className="h-6 w-6 text-primary" />
-        <span className="font-bold">MusicCollab</span>
+      <Link href="/" className="flex items-center gap-2">
+        <Avatar className={cn(
+          "rounded-lg",
+          preferences.layout === "compact" ? "h-8 w-8" : "h-10 w-10"
+        )}>
+          <div className="flex items-center justify-center w-full h-full bg-primary text-primary-foreground font-bold">
+            MC
+          </div>
+        </Avatar>
+        <span className={cn(
+          "font-bold",
+          preferences.layout === "compact" ? "text-sm" : "text-base"
+        )}>MusicCollab</span>
       </Link>
     </div>
   )

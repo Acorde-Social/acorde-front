@@ -3,14 +3,19 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001
 
 // Headers padrão para requisições
 export const getAuthHeaders = (token?: string) => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  }
+  const headers: Record<string, string> = {}
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`
   }
 
+  return headers
+}
+
+// Headers for JSON requests (includes Content-Type)
+export const getJsonAuthHeaders = (token?: string) => {
+  const headers = getAuthHeaders(token)
+  headers["Content-Type"] = "application/json"
   return headers
 }
 

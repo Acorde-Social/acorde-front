@@ -90,14 +90,14 @@ export function useAudioRecorder(): AudioRecorderHook {
         video: false
       }
       
-      console.log("Tentando acessar dispositivo:", selectedDeviceId || "padrão do sistema")
+      // Tentando acessar dispositivo de áudio
       
       // Tenta conectar com diferentes combinações de configurações
       let stream: MediaStream
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints)
       } catch (initialError) {
-        console.warn("Falha na primeira tentativa, tentando configuração padrão:", initialError)
+        // Falha na primeira tentativa, tentando configuração padrão
         stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       }
       
@@ -125,9 +125,8 @@ export function useAudioRecorder(): AudioRecorderHook {
       
       recorder.start()
       setIsRecording(true)
-      console.log("Gravação iniciada com sucesso")
     } catch (error) {
-      console.error("Erro na gravação:", error)
+      // Erro na gravação
       throw error
     }
   }, [audioURL, selectedDeviceId])

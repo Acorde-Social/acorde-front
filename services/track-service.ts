@@ -188,5 +188,51 @@ export const TrackService = {
 
     return handleApiError(response)
   },
+
+  // Curtir uma faixa
+  async likeTrack(trackId: string, token: string): Promise<any> {
+    const response = await fetch(`${API_URL}/tracks/${trackId}/like`, {
+      method: "POST",
+      headers: getAuthHeaders(token),
+    })
+    return handleApiError(response)
+  },
+
+  // Descurtir uma faixa
+  async unlikeTrack(trackId: string, token: string): Promise<any> {
+    const response = await fetch(`${API_URL}/tracks/${trackId}/like`, {
+      method: "DELETE",
+      headers: getAuthHeaders(token),
+    })
+    return handleApiError(response)
+  },
+
+  // Verificar se o usuário curtiu uma faixa
+  async checkIfLiked(trackId: string, token: string): Promise<{liked: boolean}> {
+    const response = await fetch(`${API_URL}/tracks/${trackId}/like/check`, {
+      method: "GET",
+      headers: getAuthHeaders(token),
+    })
+    return handleApiError(response)
+  },
+
+  // Buscar comentários de uma faixa
+  async getTrackComments(trackId: string, token?: string): Promise<any> { // Assuming comments might be public
+    const response = await fetch(`${API_URL}/comments/track/${trackId}`, {
+      method: "GET",
+      headers: getAuthHeaders(token), // Token might be needed depending on API
+    })
+    return handleApiError(response)
+  },
+
+  // Adicionar comentário a uma faixa
+  async addTrackComment(trackId: string, content: string, token: string): Promise<any> {
+    const response = await fetch(`${API_URL}/tracks/${trackId}/comments`, {
+      method: "POST",
+      headers: getAuthHeaders(token),
+      body: JSON.stringify({ content }),
+    })
+    return handleApiError(response)
+  },
 }
 

@@ -1,14 +1,21 @@
 export interface User {
-  avatarUrl: string
   id: string
-  name: string
   email: string
-  image?: string
-  role: "composer" | "musician"
-  instruments?: string[]
-  experience?: string
+  name: string
+  role: "COMPOSER" | "MUSICIAN" | "PRODUCER" | "SONGWRITER" | "VOCALIST" | "BEATMAKER" | "ENGINEER" | "ARRANGER" | "MIXER" | "DJ" | "LISTENER"
+  login?: string
   bio?: string
-  createdAt: Date
+  avatarUrl?: string
+  coverImageUrl?: string
+  experience?: string
+  instruments?: string[]
+  theme?: {
+    primaryColor: string
+    layout: "default" | "compact" | "spacious"
+  }
+  emailVerified?: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export interface Project {
@@ -21,11 +28,16 @@ export interface Project {
   bpm: number
   key: string
   image?: string
-  tracks: Track[]
-  collaborators: User[]
+  imageUrl?: string
+  tracks?: Track[]
+  collaborators?: User[]
   neededInstruments: string[]
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
+  _count?: {
+    collaborations: number
+    tracks: number
+  }
 }
 
 export interface Track {
@@ -36,7 +48,7 @@ export interface Track {
   author: User
   audioUrl: string
   duration: number
-  createdAt: Date
+  createdAt: string
 }
 
 export interface Comment {
@@ -46,16 +58,17 @@ export interface Comment {
   authorId: string
   author: User
   likes: number
-  createdAt: Date
+  createdAt: string
 }
 
 export interface Collaboration {
   id: string
   projectId: string
   userId: string
+  user: User
   role: "composer" | "musician"
   instrument?: string
   status: "pending" | "accepted" | "rejected"
-  createdAt: Date
+  createdAt: string
 }
 

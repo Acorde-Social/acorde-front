@@ -36,7 +36,7 @@ export default function Home() {
   const fetchFeed = async () => {
     setLoadingProjects(true)
     try {
-      const data = await ProjectService.getProjects(undefined, token || undefined)
+      const data = await ProjectService.getProjects(undefined, token || '')
       setProjects(data)
     } catch (error) {
       console.error("Erro ao carregar feed:", error)
@@ -101,7 +101,7 @@ export default function Home() {
             <CardHeader className="pb-2 relative">
               <div className="flex justify-center">
                 <Avatar className="h-20 w-20 border-2 border-border">
-                  <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
+                  <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} />
                   <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
               </div>
@@ -120,7 +120,7 @@ export default function Home() {
                   ))}
                 </div>
               )}
-              
+
               <div className="text-sm text-muted-foreground text-center">
                 {user?.bio || "Adicione uma biografia ao seu perfil"}
               </div>
@@ -175,19 +175,19 @@ export default function Home() {
             <CardContent className="pt-4">
               {quickRecordMode ? (
                 <div className="space-y-4">
-                  <AudioRecorder 
-                    onTrackSaved={handleTrackSaved} 
+                  <AudioRecorder
+                    onTrackSaved={handleTrackSaved}
                     simplified={true}
                     onCancel={() => setQuickRecordMode(false)}
                   />
                 </div>
               ) : (
-                <div 
+                <div
                   className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-primary/5 transition-all"
                   onClick={() => setQuickRecordMode(true)}
                 >
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
+                    <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} />
                     <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-muted-foreground">Grave e compartilhe um áudio...</div>
@@ -226,13 +226,13 @@ export default function Home() {
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={project.author.avatarUrl || ""} alt={project.author.name} />
+                          <AvatarImage src={fixImageUrl(project.author.avatarUrl || "")} alt={project.author.name} />
                           <AvatarFallback className="bg-primary text-primary-foreground">{project.author.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="font-medium">{project.author.name}</div>
                           <div className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(project.createdAt), { 
+                            {formatDistanceToNow(new Date(project.createdAt), {
                               addSuffix: true,
                               locale: ptBR
                             })}
@@ -243,7 +243,7 @@ export default function Home() {
                         </Button>
                       </div>
                     </CardHeader>
-                    
+
                     {project.imageUrl && (
                       <div className="relative h-48 w-full overflow-hidden">
                         <Image
@@ -254,7 +254,7 @@ export default function Home() {
                         />
                       </div>
                     )}
-                    
+
                     <CardContent className="pt-3">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -262,7 +262,7 @@ export default function Home() {
                           <Badge variant="outline">{project.genre}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">{project.description}</p>
-                        
+
                         {/* Reprodutor de áudio (simplificado) */}
                         {project._count?.tracks && project._count.tracks > 0 ? (
                           <div className="mt-2 p-2 bg-accent/20 rounded-md">
@@ -276,7 +276,7 @@ export default function Home() {
                             Este projeto não possui faixas de áudio.
                           </div>
                         )}
-                        
+
                         <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
                           <div className="flex items-center">
                             <Music className="mr-1 h-4 w-4 text-primary" />
@@ -290,7 +290,7 @@ export default function Home() {
                         </div>
                       </div>
                     </CardContent>
-                    
+
                     <CardFooter className="border-t px-6 py-3">
                       <div className="flex justify-between w-full">
                         <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
