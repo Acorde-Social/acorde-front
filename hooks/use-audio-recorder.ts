@@ -5,6 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react"
 interface AudioRecorderHook {
   isRecording: boolean
   audioURL: string | null
+  audioBlob: Blob | null // Adicionando o Blob para uso no chat
   startRecording: () => Promise<void>
   stopRecording: () => void
   resetRecording: () => void
@@ -16,6 +17,7 @@ interface AudioRecorderHook {
 export function useAudioRecorder(): AudioRecorderHook {
   const [isRecording, setIsRecording] = useState(false)
   const [audioURL, setAudioURL] = useState<string | null>(null)
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null) // Estado para o Blob
   const [availableDevices, setAvailableDevices] = useState<MediaDeviceInfo[]>([])
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
 
@@ -80,6 +82,7 @@ export function useAudioRecorder(): AudioRecorderHook {
         URL.revokeObjectURL(audioURL)
         setAudioURL(null)
       }
+      setAudioBlob(null) // Resetar o blob também
       audioChunksRef.current = []
       
       // Configuração de áudio específica para o dispositivo selecionado
@@ -118,6 +121,7 @@ export function useAudioRecorder(): AudioRecorderHook {
       
       recorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current)
+        setAudioBlob(audioBlob) // Salvar o Blob no estado
         const url = URL.createObjectURL(audioBlob)
         setAudioURL(url)
         setIsRecording(false)
@@ -147,12 +151,14 @@ export function useAudioRecorder(): AudioRecorderHook {
       URL.revokeObjectURL(audioURL)
       setAudioURL(null)
     }
+    setAudioBlob(null) // Resetar o blob também
     audioChunksRef.current = []
   }, [audioURL])
 
   return {
     isRecording,
     audioURL,
+    audioBlob, // Incluir o blob na interface retornada
     startRecording,
     stopRecording,
     resetRecording,

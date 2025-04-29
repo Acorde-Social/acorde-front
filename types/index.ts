@@ -9,6 +9,13 @@ export interface User {
   coverImageUrl?: string
   experience?: string
   instruments?: string[]
+  socialLinks?: {
+    website?: string
+    instagram?: string
+    twitter?: string
+    soundcloud?: string
+    youtube?: string
+  }
   theme?: {
     primaryColor: string
     layout: "default" | "compact" | "spacious"

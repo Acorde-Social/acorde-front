@@ -4,10 +4,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useThemeCustomization } from "@/contexts/theme-context"
+import { useAuth } from "@/contexts/auth-context"
 
 export function MainNav() {
   const pathname = usePathname()
   const { preferences } = useThemeCustomization()
+  const { user } = useAuth()
 
   const navItems = [
     {
@@ -30,6 +32,13 @@ export function MainNav() {
       href: "/studio",
       label: "Estúdio",
     },
+    // Adicionar link para o chat apenas se o usuário estiver autenticado
+    ...(user ? [
+      {
+        href: "/chat",
+        label: "Chat",
+      }
+    ] : []),
   ]
 
   return (
