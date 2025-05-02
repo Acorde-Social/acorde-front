@@ -41,6 +41,7 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 	const [isTyping, setIsTyping] = useState(false);
 	const [isMinimized, setIsMinimized] = useState(false);
 	const [otherUser, setOtherUser] = useState<ConversationParticipant | null>(null);
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	const socketRef = useRef<WebSocket | null>(null);
 
@@ -76,6 +77,13 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 		loadMessages();
 	}, [conversation.id, conversation.unreadCount, getMessages, markMessagesAsRead]);
 
+	// Rolar para o final quando novas mensagens chegarem
+	useEffect(() => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
+	}, [messages]);
+
 	// Conectar ao websocket para receber mensagens em tempo real
 	useEffect(() => {
 		// Obter token de autenticação
@@ -87,6 +95,13 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 
 		socket.onopen = () => {
 			console.log('WebSocket conectado');
+			// Subscrever para atualizações desta conversa
+			if (socket.readyState === WebSocket.OPEN) {
+				socket.send(JSON.stringify({
+					event: 'join_conversation',
+					payload: { conversationId: conversation.id }
+				}));
+			}
 		};
 
 		socket.onmessage = (event) => {
@@ -133,6 +148,11 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 		// Limpar na desmontagem
 		return () => {
 			if (socket.readyState === WebSocket.OPEN) {
+				// Enviar evento de saída da conversa
+				socket.send(JSON.stringify({
+					event: 'leave_conversation',
+					payload: { conversationId: conversation.id }
+				}));
 				socket.close();
 			}
 		};
@@ -181,9 +201,9 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 
 	return (
 		<div className="fixed bottom-0 right-6 z-50 flex flex-col">
-			<Card className={`w-80 shadow-lg transition-all ${isMinimized ? 'h-12' : 'h-96'}`}>
+			<Card className={`w-80 shadow-lg flex flex-col ${isMinimized ? 'h-12' : 'h-96'}`}>
 				{/* Cabeçalho do chat */}
-				<CardHeader className="p-3 flex flex-row items-center justify-between cursor-pointer" onClick={toggleMinimized}>
+				<CardHeader className="p-3 flex flex-row items-center justify-between cursor-pointer border-b shrink-0" onClick={toggleMinimized}>
 					<div className="flex items-center">
 						{otherUser && (
 							<Avatar className="h-6 w-6 mr-2">
@@ -198,10 +218,16 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 						</span>
 					</div>
 					<div className="flex items-center gap-1">
-						<Button variant="ghost" size="icon" className="h-6 w-6" onClick={toggleMinimized}>
+						<Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => {
+							e.stopPropagation();
+							toggleMinimized();
+						}}>
 							{isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
 						</Button>
-						<Button variant="ghost" size="icon" className="h-6 w-6" onClick={onClose}>
+						<Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => {
+							e.stopPropagation();
+							onClose();
+						}}>
 							<X className="h-4 w-4" />
 						</Button>
 					</div>
@@ -211,22 +237,25 @@ export default function FloatingChat({ conversation, onClose }: FloatingChatProp
 				{!isMinimized && (
 					<>
 						{/* Lista de mensagens */}
-						<CardContent className="p-3 pt-0 flex-1 overflow-y-auto h-[calc(100%-6rem)]">
+						<CardContent className="p-3 pt-2 flex-grow overflow-y-auto">
 							{isLoading ? (
 								<div className="flex items-center justify-center h-full">
 									<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 								</div>
 							) : (
-								<MessageList
-									messages={messages}
-									isTyping={isTyping}
-									currentUserId={user?.id || ""}
-								/>
+								<>
+									<MessageList
+										messages={messages}
+										isTyping={isTyping}
+										currentUserId={user?.id || ""}
+									/>
+									<div ref={messagesEndRef} />
+								</>
 							)}
 						</CardContent>
 
 						{/* Input de mensagem */}
-						<CardFooter className="p-3 pt-0">
+						<CardFooter className="p-3 pt-2 border-t shrink-0">
 							<MessageInput
 								onSendMessage={handleSendMessage}
 								onTyping={handleTyping}

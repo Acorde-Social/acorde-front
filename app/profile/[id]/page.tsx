@@ -122,6 +122,16 @@ export default function UserProfilePage() {
 			return;
 		}
 
+		// Verificar se o ID do usuário destino é válido
+		if (!userId) {
+			toast({
+				title: "Erro ao iniciar chat",
+				description: "ID do usuário destino é inválido.",
+				variant: "destructive"
+			});
+			return;
+		}
+
 		try {
 			// Adicionar indicador de carregamento
 			const { dismiss: dismissToast } = toast({

@@ -38,10 +38,27 @@ export default function AudioPlayer({
 		if (!audioRef.current) return;
 
 		const audio = audioRef.current;
+
+		// Adicionar log para diagnóstico
+		console.log('Inicializando áudio com src:', src);
+
+		// Verificar se a URL é válida
+		if (!src) {
+			console.error('URL de áudio inválida ou não definida');
+			return;
+		}
+
 		audio.src = src;
+		audio.preload = "auto"; // Força pré-carregamento
 		setIsLoaded(false);
 
+		// Adicionar event listeners para diagnóstico
+		const handleError = (e: ErrorEvent) => {
+			console.error('Erro no elemento de áudio:', e);
+		};
+
 		const handleLoadedData = () => {
+			console.log('Áudio carregado com sucesso, duração:', audio.duration);
 			setDuration(audio.duration);
 			setIsLoaded(true);
 
@@ -50,24 +67,36 @@ export default function AudioPlayer({
 			}
 		};
 
+		audio.addEventListener('error', handleError);
 		audio.addEventListener('loadeddata', handleLoadedData);
 
 		return () => {
+			audio.removeEventListener('error', handleError);
 			audio.removeEventListener('loadeddata', handleLoadedData);
 			audio.pause();
 
 			// Limpar recursos do Web Audio API
 			if (contextRef.current && contextRef.current.state !== 'closed') {
 				if (sourceRef.current) {
-					sourceRef.current.disconnect();
+					try {
+						sourceRef.current.disconnect();
+					} catch (err) {
+						console.warn('Erro ao desconectar fonte de áudio:', err);
+					}
 				}
 				if (analyserRef.current) {
-					analyserRef.current.disconnect();
+					try {
+						analyserRef.current.disconnect();
+					} catch (err) {
+						console.warn('Erro ao desconectar analisador:', err);
+					}
 				}
-				contextRef.current.close();
+				contextRef.current.close().catch(err => console.warn('Erro ao fechar contexto:', err));
 			}
 
-			cancelAnimationFrame(requestRef.current!);
+			if (requestRef.current) {
+				cancelAnimationFrame(requestRef.current);
+			}
 		};
 	}, [src, autoPlay]);
 
@@ -89,15 +118,30 @@ export default function AudioPlayer({
 
 			// Criar fonte a partir do elemento de áudio
 			if (!sourceRef.current) {
-				sourceRef.current = contextRef.current.createMediaElementSource(audioRef.current);
-				sourceRef.current.connect(analyserRef.current);
-				analyserRef.current.connect(contextRef.current.destination);
+				try {
+					sourceRef.current = contextRef.current.createMediaElementSource(audioRef.current);
+					sourceRef.current.connect(analyserRef.current);
+					analyserRef.current.connect(contextRef.current.destination);
+				} catch (err) {
+					// Se houver erro na conexão do AudioContext, ainda permitir reprodução normal
+					console.warn('Erro ao configurar Web Audio API, usando reprodução padrão:', err);
+					// Limpamos as referências para evitar tentativas futuras de usar Web Audio API
+					if (contextRef.current) {
+						contextRef.current.close().catch(console.error);
+						contextRef.current = null;
+					}
+					analyserRef.current = null;
+					sourceRef.current = null;
+					return; // Encerramos aqui para evitar tentar usar a visualização
+				}
 			}
 
-			// Iniciar animação
+			// Iniciar animação somente se tudo estiver configurado corretamente
 			animateWaveform();
 		} catch (error) {
 			console.error('Erro ao configurar visualização de áudio:', error);
+			// Em caso de erro, garantir que o áudio ainda funcione sem a visualização
+			showWaveform = false;
 		}
 
 		return () => {

@@ -35,23 +35,34 @@ export function cn(...inputs: ClassValue[]) {
 export function fixImageUrl(url: string | undefined): string {
   if (!url) return "/placeholder.svg"
   
+  // Se já for uma URL completa (http), retorna como está
+  if (url.startsWith("http")) return url
+  
+  let finalUrl = '';
+  
   // Se for upload estático, prefixa com API_URL
   if (url.startsWith("/uploads/")) {
-    return `${API_URL}${url}`
+    finalUrl = `${API_URL}${url}`
   }
-
-  // Se já for uma URL relativa ou absoluta que não pertence à nossa API, retorne como está
-  if (url.startsWith("/") && !url.startsWith("/uploads/")) return url
-  if (url.startsWith("http") && !url.includes(API_URL)) return url
-  
-  // Se for uma URL da nossa API, verifique se já possui o segmento '/images/'
-  if (url.includes("/uploads/") && !url.includes("/uploads/images/")) {
-    // Substitui "/uploads/" por "/uploads/images/" para URLs existentes
-    const urlParts = url.split("/uploads/")
-    return `${urlParts[0]}/uploads/images/${urlParts[1]}`
+  // Para uploads de chat que não começam com '/'
+  else if (url.includes("uploads/chat/")) {
+    finalUrl = `${API_URL}/uploads/chat/${url.split("uploads/chat/")[1]}`
+  }
+  // Se já for uma URL relativa que não pertence à nossa API, retorne como está
+  else if (url.startsWith("/") && !url.startsWith("/uploads/")) {
+    return url
+  }
+  // Para outros casos, limpe qualquer 'undefined' do caminho
+  else {
+    finalUrl = `${API_URL}/${url.replace(/undefined\//, '')}`
   }
   
-  // Se já tiver o segmento correto, retorne como está
-  return url
+  // Adicionar timestamp para arquivos de áudio para evitar problemas de CORS e cache
+  if (finalUrl.match(/\.(mp3|wav|ogg|webm)$/i)) {
+    const separator = finalUrl.includes('?') ? '&' : '?';
+    finalUrl += `${separator}t=${Date.now()}`;
+  }
+  
+  return finalUrl;
 }
 

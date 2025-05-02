@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { ChatMessage, ChatParticipant } from "@/services/chat-service";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
@@ -8,7 +8,8 @@ import { AvatarFallback } from "@/components/ui/avatar";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Check, CheckCheck } from "lucide-react";
-import AudioPlayer from "../audio/audio-player";
+import { fixImageUrl } from "@/lib/utils";
+import ChatAudioPlayer from "./audio/ChatAudioPlayer";
 
 interface MessageListProps {
 	messages: ChatMessage[];
@@ -31,7 +32,9 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 
 	// Obter as iniciais do remetente para o avatar
 	const getSenderInitials = (message: ChatMessage) => {
-		return message.sender.name.substring(0, 2).toUpperCase();
+		return message.sender && message.sender.name
+			? message.sender.name.substring(0, 2).toUpperCase()
+			: "??";
 	};
 
 	// Renderizar o conteúdo da mensagem com base no tipo
@@ -43,34 +46,41 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 			switch (attachment.fileType) {
 				case 'AUDIO':
 					return (
-						<div className="mt-2">
-							<AudioPlayer
-								src={attachment.fileUrl}
-								autoPlay={false}
-								showWaveform={true}
+						<div className="w-full -mx-3 my-0">
+							<ChatAudioPlayer
+								src={fixImageUrl(attachment.fileUrl)}
+								className="w-full px-0"
 								duration={attachment.duration || 0}
+								onError={(e) => {
+									console.error("Erro ao carregar áudio:", attachment.fileUrl, e);
+								}}
 							/>
 						</div>
 					);
 
 				case 'VIDEO':
 					return (
-						<div className="mt-2 rounded-md overflow-hidden">
+						<div className="mt-1 rounded-md overflow-hidden">
 							<video
-								className="max-w-full"
+								className="w-full h-auto object-contain"
 								controls
-								src={attachment.fileUrl}
+								src={fixImageUrl(attachment.fileUrl)}
 							/>
 						</div>
 					);
 
 				case 'IMAGE':
 					return (
-						<div className="mt-2 rounded-md overflow-hidden">
+						<div className="mt-1 rounded-md overflow-hidden">
 							<img
-								className="max-w-full"
-								src={attachment.fileUrl}
+								className="w-full h-auto object-contain rounded"
+								src={fixImageUrl(attachment.fileUrl)}
 								alt="Imagem enviada"
+								onError={(e) => {
+									console.error("Erro ao carregar imagem:", attachment.fileUrl);
+									e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E";
+									e.currentTarget.onerror = null;
+								}}
 							/>
 						</div>
 					);
@@ -83,7 +93,7 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 								<p className="truncate">{attachment.fileName}</p>
 							</div>
 							<a
-								href={attachment.fileUrl}
+								href={fixImageUrl(attachment.fileUrl)}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="ml-2 text-primary text-sm"
@@ -96,12 +106,12 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 		}
 
 		// Se não tiver anexos ou tiver conteúdo de texto, mostrar o texto
-		return <p>{message.content}</p>;
+		return message.content ? <p>{message.content}</p> : null;
 	};
 
 	// Renderizar mensagens agrupadas por dia
 	const renderMessages = () => {
-		if (messages.length === 0) {
+		if (!messages || messages.length === 0) {
 			return (
 				<div className="flex flex-col items-center justify-center h-full p-4 text-muted-foreground">
 					<p className="text-center">Nenhuma mensagem encontrada</p>
@@ -113,6 +123,12 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 		return (
 			<>
 				{messages.map((message, index) => {
+					// Verificar se a mensagem tem dados válidos
+					if (!message || !message.id) {
+						console.warn("Mensagem inválida recebida:", message);
+						return null;
+					}
+
 					const isMine = message.senderId === currentUserId;
 					const showAvatar = !isSameSender(message, index);
 
@@ -124,7 +140,10 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 							<div className={`flex ${isMine ? 'flex-row-reverse' : 'flex-row'} items-end`}>
 								{showAvatar ? (
 									<Avatar className={`h-8 w-8 ${isMine ? 'ml-2' : 'mr-2'}`}>
-										<AvatarImage src={message.sender.avatarUrl || ''} />
+										<AvatarImage
+											src={message.sender && message.sender.avatarUrl ?
+												fixImageUrl(message.sender.avatarUrl) : ''}
+										/>
 										<AvatarFallback>{getSenderInitials(message)}</AvatarFallback>
 									</Avatar>
 								) : (
@@ -132,16 +151,16 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 								)}
 
 								<div className="flex flex-col">
-									{showAvatar && !isMine && (
+									{showAvatar && !isMine && message.sender && (
 										<span className="text-xs text-muted-foreground ml-1 mb-1">
 											{message.sender.name}
 										</span>
 									)}
 
 									<div
-										className={`px-3 py-2 rounded-lg max-w-md break-words ${isMine
-											? 'bg-primary text-primary-foreground'
-											: 'bg-accent text-accent-foreground'
+										className={`px-3 py-2 rounded-lg max-w-[500px] break-words ${isMine
+											? 'bg-primary text-black dark:text-white'
+											: 'bg-gray-200 border border-gray-300 text-black dark:bg-accent dark:border-accent-foreground dark:text-white'
 											}`}
 									>
 										{renderMessageContent(message)}
@@ -149,7 +168,7 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 
 									<div className={`flex items-center mt-1 text-xs text-muted-foreground ${isMine ? 'justify-end' : 'justify-start'
 										}`}>
-										<span>{formatMessageTime(message.createdAt)}</span>
+										<span>{message.createdAt ? formatMessageTime(message.createdAt) : '--:--'}</span>
 
 										{isMine && (
 											<span className="ml-1">
