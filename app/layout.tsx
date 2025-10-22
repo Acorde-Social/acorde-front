@@ -7,7 +7,7 @@ import { ClientLayout } from "./client-layout"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "MusicCollab - Conectando Compositores e Músicos",
+  title: "Acorde - Conectando Compositores e Músicos",
   description: "Plataforma para colaboração musical entre compositores e músicos",
   generator: 'v0.dev'
 }

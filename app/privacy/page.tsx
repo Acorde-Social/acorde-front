@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   return (
     <div className="container max-w-3xl py-12">
       <h1 className="text-3xl font-bold mb-6">Política de Privacidade</h1>
-      
+
       <div className="prose dark:prose-invert">
         <p className="text-lg mb-4">
           Última atualização: 8 de abril de 2025
@@ -15,8 +15,8 @@ export default function PrivacyPage() {
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">1. Introdução</h2>
         <p>
-          Esta Política de Privacidade descreve como a MusicCollab coleta, usa e compartilha dados pessoais quando você usa nossa plataforma.
-          Ao utilizar a MusicCollab, você concorda com a coleta e uso de informações de acordo com esta política.
+          Esta Política de Privacidade descreve como a Acorde coleta, usa e compartilha dados pessoais quando você usa nossa plataforma.
+          Ao utilizar a Acorde, você concorda com a coleta e uso de informações de acordo com esta política.
         </p>
 
         <h2 className="text-2xl font-semibold mt-8 mb-4">2. Informações que Coletamos</h2>
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
         <h2 className="text-2xl font-semibold mt-8 mb-4">8. Contato</h2>
         <p>
           Se você tiver dúvidas ou preocupações sobre esta Política de Privacidade, entre em contato conosco em:
-          privacy@musiccollab.com
+          privacy@acorde.social
         </p>
 
         <div className="mt-12">

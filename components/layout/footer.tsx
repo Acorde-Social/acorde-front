@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex items-center gap-2">
           <Music className="h-4 w-4 text-primary" />
           <p className="text-xs leading-loose text-center md:text-left">
-            &copy; {new Date().getFullYear()} MusicCollab. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Acorde. Todos os direitos reservados.
           </p>
         </div>
         <div className="flex items-center gap-4 text-xs">

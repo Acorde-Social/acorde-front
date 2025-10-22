@@ -67,7 +67,7 @@ export function MobileNav() {
             <span className={cn(
               "font-bold",
               preferences.layout === "compact" ? "text-sm" : "text-base"
-            )}>MusicCollab</span>
+            )}>Acorde</span>
           </Link>
           <nav className={cn(
             "flex flex-col space-y-4 mt-4",
@@ -106,7 +106,7 @@ export function MobileNav() {
         <span className={cn(
           "font-bold",
           preferences.layout === "compact" ? "text-sm" : "text-base"
-        )}>MusicCollab</span>
+        )}>Acorde</span>
       </Link>
     </div>
   )

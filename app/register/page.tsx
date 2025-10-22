@@ -177,7 +177,7 @@ export default function RegisterPage() {
 
       toast({
         title: "Conta criada com sucesso!",
-        description: "Bem-vindo ao MusicCollab",
+        description: "Bem-vindo ao Acorde!",
       })
     } catch (err) {
       toast({

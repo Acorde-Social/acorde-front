@@ -26,10 +26,10 @@ export default function PendingVerificationPage() {
     }
 
     setIsResending(true)
-    
+
     try {
       await resendVerification(verificationEmail)
-      
+
       toast({
         title: "Email reenviado!",
         description: "Verifique sua caixa de entrada para concluir a verificação.",
@@ -54,13 +54,13 @@ export default function PendingVerificationPage() {
             Enviamos um link de verificação para o seu email
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="flex flex-col items-center justify-center p-6">
           <div className="flex flex-col items-center gap-4 py-8">
             <div className="h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
               <MailOpen className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-            
+
             <div className="text-center space-y-2">
               <h3 className="font-medium text-lg">Quase lá!</h3>
               <p className="text-muted-foreground">
@@ -69,14 +69,14 @@ export default function PendingVerificationPage() {
                 <span className="font-medium">{verificationEmail || "seu email"}</span>
               </p>
               <p className="text-sm text-muted-foreground mt-4">
-                Por favor, clique no link no email para verificar sua conta e começar a usar o MusicCollab.
+                Por favor, clique no link no email para verificar sua conta e começar a usar o Acorde.
                 Se não encontrar o email, verifique sua pasta de spam.
               </p>
             </div>
-            
+
             <div className="w-full space-y-4 mt-6">
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 variant="outline"
                 onClick={handleResend}
                 disabled={isResending}
@@ -93,7 +93,7 @@ export default function PendingVerificationPage() {
             </div>
           </div>
         </CardContent>
-        
+
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
             Já verificou seu email?{" "}
@@ -101,7 +101,7 @@ export default function PendingVerificationPage() {
               Faça login
             </Link>
           </div>
-          
+
           <div className="text-xs text-center text-muted-foreground">
             <Link href="/" className="hover:underline">
               Voltar para a página inicial

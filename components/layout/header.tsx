@@ -39,7 +39,7 @@ export function Header() {
 						<span className={cn(
 							"font-bold",
 							preferences.layout === "compact" ? "text-sm" : preferences.layout === "spacious" ? "text-lg" : "text-base"
-						)}>MusicCollab</span>
+						)}>Acorde</span>
 					</div>
 				</Link>
 				<MainNav />

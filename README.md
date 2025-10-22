@@ -1,6 +1,6 @@
-# MusicCollab Frontend
+# Acorde Frontend
 
-Frontend da plataforma MusicCollab para colaboração musical entre compositores e músicos.
+Frontend da plataforma Acorde para colaboração musical entre compositores e músicos.
 
 ## Tecnologias
 
