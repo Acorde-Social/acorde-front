@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
@@ -60,45 +60,24 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
   const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false)
   const [trackComments, setTrackComments] = useState<ServiceComment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
-  const [likedTracks, setLikedTracks] = useState<Record<string, boolean>>({})
   const [likingTrack, setLikingTrack] = useState<Record<string, boolean>>({})
+  const hasFetchedRef = useRef(false) // Proteção para evitar fetch duplicado inicial
+  const isLoadingCommentsRef = useRef(false) // ✅ Proteção contra fetch duplicado de comentários
   const { toast } = useToast()
   const { token, user } = useAuth()
   const limit = 10
 
   useEffect(() => {
-    if (!initialTracks) {
+    // Evitar fetch duplicado no mount (React Strict Mode)
+    if (hasFetchedRef.current) return;
+
+    if (!initialTracks && token) {
+      hasFetchedRef.current = true;
       fetchTracks()
+    } else if (initialTracks) {
+      setTracks(initialTracks)
     }
-  }, [userId, initialTracks])
-
-  // Verificar quais faixas o usuário já curtiu
-  useEffect(() => {
-    const checkLikedTracks = async () => {
-      if (!user || !token || tracks.length === 0) return;
-
-      try {
-        // Idealmente, isso deveria ser feito em uma única chamada de API
-        // que retorna as curtidas do usuário para todas as faixas
-        const liked: Record<string, boolean> = {};
-
-        for (const track of tracks) {
-          try {
-            const response = await TrackService.checkIfLiked(track.id, token);
-            liked[track.id] = response.liked;
-          } catch (error) {
-            console.error(`Erro ao verificar curtida para a faixa ${track.id}:`, error);
-          }
-        }
-
-        setLikedTracks(liked);
-      } catch (error) {
-        console.error("Erro ao verificar faixas curtidas:", error);
-      }
-    };
-
-    checkLikedTracks();
-  }, [tracks, user, token]);
+  }, [userId, token]) // Removido initialTracks da dependência para evitar loop
 
   const fetchTracks = async (reset = false) => {
     if (loading) return
@@ -218,40 +197,30 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
   };
 
   const fetchTrackComments = async (trackId: string) => {
-    setLoadingComments(true)
+    // ✅ Proteção contra chamadas duplicadas
+    if (isLoadingCommentsRef.current) {
+      console.log('⚠️ Fetch de comentários já em andamento, ignorando...');
+      return;
+    }
+
+    isLoadingCommentsRef.current = true;
+    setLoadingComments(true);
+
     try {
-      // Alterando para usar o serviço de comentários padrão com o token
-      const comments = await CommentService.getTrackComments(trackId)
-      // Se não houver comentários ou ocorrer um erro, tente usar o serviço de track como fallback
-      if (!comments || comments.length === 0) {
-        console.log("Tentando buscar comentários pelo serviço de tracks como fallback");
-        if (token) {
-          const trackComments = await TrackService.getTrackComments(trackId, token);
-          setTrackComments(trackComments || []);
-        }
-      } else {
-        setTrackComments(comments);
-      }
+      // ✅ Passar o token para o serviço que já traz isLiked em 1 query
+      const comments = await CommentService.getTrackComments(trackId, token || undefined);
+      setTrackComments(comments || []);
     } catch (error) {
-      console.error('Erro ao carregar comentários:', error)
-      // Tentando usar o serviço alternativo em caso de erro
-      try {
-        if (token) {
-          console.log("Tentando buscar comentários pelo serviço de tracks após erro");
-          const trackComments = await TrackService.getTrackComments(trackId, token);
-          setTrackComments(trackComments || []);
-        }
-      } catch (fallbackError) {
-        console.error('Erro também no fallback:', fallbackError);
-        setTrackComments([]);
-        toast({
-          title: 'Erro ao carregar comentários',
-          description: 'Não foi possível carregar os comentários. Tente novamente mais tarde.',
-          variant: 'destructive',
-        })
-      }
+      console.error('Erro ao carregar comentários:', error);
+      setTrackComments([]);
+      toast({
+        title: 'Erro ao carregar comentários',
+        description: 'Não foi possível carregar os comentários. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
     } finally {
-      setLoadingComments(false)
+      setLoadingComments(false);
+      isLoadingCommentsRef.current = false;
     }
   }
 
@@ -283,12 +252,24 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
     setLikingTrack(prev => ({ ...prev, [trackId]: true }));
 
     try {
-      const isLiked = likedTracks[trackId];
+      // Encontrar o track no estado local
+      const track = tracks.find(t => t.id === trackId);
+      if (!track) return;
+
+      const isLiked = track.isLiked;
 
       if (isLiked) {
         // Descurtir
-        await TrackService.unlikeTrack(trackId, token);
-        setLikedTracks(prev => ({ ...prev, [trackId]: false }));
+        const response = await TrackService.unlikeTrack(trackId, token);
+
+        // Atualizar estado local com o novo count do backend
+        setTracks(prev => prev.map(t =>
+          t.id === trackId ? {
+            ...t,
+            isLiked: false,
+            likesCount: response.likesCount ?? (t.likesCount ? t.likesCount - 1 : 0)
+          } : t
+        ));
 
         toast({
           title: 'Curtida removida',
@@ -296,16 +277,22 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
         });
       } else {
         // Curtir
-        await TrackService.likeTrack(trackId, token);
-        setLikedTracks(prev => ({ ...prev, [trackId]: true }));
+        const response = await TrackService.likeTrack(trackId, token);
+
+        // Atualizar estado local com o novo count do backend
+        setTracks(prev => prev.map(t =>
+          t.id === trackId ? {
+            ...t,
+            isLiked: true,
+            likesCount: response.likesCount ?? (t.likesCount ? t.likesCount + 1 : 1)
+          } : t
+        ));
 
         toast({
           title: 'Faixa curtida',
           description: 'Você curtiu esta faixa com sucesso!',
         });
       }
-
-      // Aqui você pode atualizar a contagem de curtidas se seu backend retornar essa informação
     } catch (error) {
       console.error('Erro ao curtir faixa:', error);
       toast({
@@ -424,16 +411,16 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`gap-1 ${likedTracks[track.id] ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}
+                    className={`gap-1 ${track.isLiked ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}
                     onClick={() => handleLike(track.id)}
                     disabled={likingTrack[track.id]}
                   >
                     {likingTrack[track.id] ? (
                       <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                     ) : (
-                      <Heart className={`h-4 w-4 mr-1 ${likedTracks[track.id] ? 'fill-current' : ''}`} />
+                      <Heart className={`h-4 w-4 mr-1 ${track.isLiked ? 'fill-current' : ''}`} />
                     )}
-                    <span>Curtir</span>
+                    <span>{track.likesCount || 0}</span>
                   </Button>
 
                   <Button
@@ -443,7 +430,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                     onClick={() => handleCommentClick(track)}
                   >
                     <MessageSquare className="h-4 w-4" />
-                    <span>Comentar</span>
+                    <span>{track.commentsCount || 0}</span>
                   </Button>
 
                   {/* Botão para colaborar - só aparece se não for o próprio autor */}

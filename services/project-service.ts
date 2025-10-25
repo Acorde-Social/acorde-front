@@ -74,6 +74,7 @@ export interface Comment {
   }
   likes: number
   createdAt: string
+  isLiked?: boolean // Status de curtida do usuário logado
 }
 
 export interface CreateProjectData {

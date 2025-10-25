@@ -35,6 +35,9 @@ export function cn(...inputs: ClassValue[]) {
 export function fixImageUrl(url: string | undefined): string {
   if (!url) return "/placeholder.svg"
   
+  // Se for uma data URI (base64), retorna como está
+  if (url.startsWith("data:")) return url
+  
   // Se já for uma URL completa (http), retorna como está
   if (url.startsWith("http")) return url
   

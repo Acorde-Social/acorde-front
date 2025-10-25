@@ -36,19 +36,19 @@ interface AudioRecorderProps {
   originalTrackId?: string     // ID do áudio original que estamos colaborando
 }
 
-export function AudioRecorder({ 
-  projectId, 
-  onTrackSaved, 
-  simplified = false, 
+export function AudioRecorder({
+  projectId,
+  onTrackSaved,
+  simplified = false,
   onCancel,
   existingTrackUrl,
   collaborationMode = false,
   originalTrackId
 }: AudioRecorderProps) {
   const [trackName, setTrackName] = useState(
-    simplified ? "Post de áudio" : 
-    collaborationMode ? "Colaboração" : 
-    "Nova Faixa"
+    simplified ? "Post de áudio" :
+      collaborationMode ? "Colaboração" :
+        "Nova Faixa"
   )
   const [volume, setVolume] = useState([75])
   const [isSaving, setIsSaving] = useState(false)
@@ -62,11 +62,11 @@ export function AudioRecorder({
   const [elapsedTime, setElapsedTime] = useState(0)
   const [showEditor, setShowEditor] = useState(false)
 
-  const { 
-    isRecording, 
-    audioURL, 
-    startRecording, 
-    stopRecording, 
+  const {
+    isRecording,
+    audioURL,
+    startRecording,
+    stopRecording,
     resetRecording,
     availableDevices,
     selectedDeviceId,
@@ -101,19 +101,19 @@ export function AudioRecorder({
       setAudioBlob(null)
     }
   }, [audioURL])
-  
+
   useEffect(() => {
     if (isMetronomeActive) {
       startMetronome();
     } else {
       stopMetronome();
     }
-    
+
     return () => {
       stopMetronome();
     }
   }, [isMetronomeActive, bpm]);
-  
+
   useEffect(() => {
     if (existingTrackUrl && isOverdubMode && existingTrackRef.current) {
       existingTrackRef.current.src = existingTrackUrl;
@@ -130,21 +130,21 @@ export function AudioRecorder({
           .then((stream) => {
             // Armazenar a stream para referência
             streamRef.current = stream;
-            
+
             // Criar contexto de áudio se não existir
             if (!audioContextRef.current) {
               audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
             }
-            
+
             analyserRef.current = audioContextRef.current.createAnalyser();
             analyserRef.current.fftSize = 256;
-            
+
             const bufferLength = analyserRef.current.frequencyBinCount;
             dataArrayRef.current = new Uint8Array(bufferLength);
-            
+
             const source = audioContextRef.current.createMediaStreamSource(stream);
             source.connect(analyserRef.current);
-            
+
             // Iniciar animação
             animateWaveform();
           })
@@ -156,7 +156,7 @@ export function AudioRecorder({
         console.error("Erro ao configurar visualizador:", err);
       }
     }
-    
+
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -208,52 +208,52 @@ export function AudioRecorder({
 
     draw()
   }
-  
+
   const startMetronome = () => {
     if (!audioContextRef.current) {
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
-    
+
     if (metronomeRef.current) {
       clearInterval(metronomeRef.current);
     }
-    
+
     const beatsPerSecond = bpm / 60;
     const intervalMs = 1000 / beatsPerSecond;
-    
+
     metronomeRef.current = setInterval(() => {
       const oscillator = audioContextRef.current!.createOscillator();
       const gainNode = audioContextRef.current!.createGain();
-      
+
       oscillator.connect(gainNode);
       gainNode.connect(audioContextRef.current!.destination);
-      
+
       oscillator.frequency.value = 800;
       gainNode.gain.value = 0.1 * (volume[0] / 100);
-      
+
       oscillator.start();
       oscillator.stop(audioContextRef.current!.currentTime + 0.05);
     }, intervalMs);
   };
-  
+
   const stopMetronome = () => {
     if (metronomeRef.current) {
       clearInterval(metronomeRef.current);
       metronomeRef.current = null;
     }
   };
-  
+
   const handleStartRecording = useCallback(async () => {
     try {
       setRecordingStatus("recording");
-      
+
       if (isOverdubMode && existingTrackUrl && existingTrackRef.current) {
         existingTrackRef.current.currentTime = 0;
         existingTrackRef.current.play();
       }
-      
+
       await startRecording();
-      
+
       setElapsedTime(0);
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -261,7 +261,7 @@ export function AudioRecorder({
       timerRef.current = setInterval(() => {
         setElapsedTime(prev => prev + 1);
       }, 1000);
-      
+
     } catch (err) {
       console.error("Erro ao iniciar gravação:", err);
       setRecordingStatus("idle");
@@ -272,27 +272,27 @@ export function AudioRecorder({
       });
     }
   }, [isOverdubMode, existingTrackUrl, startRecording, toast]);
-  
+
   const handleStopRecording = useCallback(() => {
     console.log("Gravação finalizada, atualizando status para finished");
     setRecordingStatus("finished");
     stopRecording();
-    
+
     if (existingTrackRef.current) {
       existingTrackRef.current.pause();
       existingTrackRef.current.currentTime = 0;
     }
-    
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    
+
     // Mostra um toast para indicar que o botão de edição está disponível
     toast({
       title: "Gravação finalizada",
       description: "Você pode usar o botão 'Editar Áudio' para ajustar seu áudio antes de salvar.",
     });
-    
+
     // Garantir que o recordingStatus está realmente setado como "finished"
     setTimeout(() => {
       console.log("Estado atual:", recordingStatus);
@@ -324,7 +324,7 @@ export function AudioRecorder({
           // Cria um elemento de áudio temporário
           const audio = new Audio();
           audio.preload = 'metadata';
-          
+
           // Manipula eventos
           const onLoadedMetadata = () => {
             // Se a duração for Infinity ou NaN, use o tempo gravado como fallback
@@ -334,7 +334,7 @@ export function AudioRecorder({
             audio.remove();
             resolve(duration);
           };
-          
+
           // Se não conseguir carregar os metadados em 2 segundos, usa o tempo de gravação
           const timeoutId = setTimeout(() => {
             audio.removeEventListener('loadedmetadata', onLoadedMetadata);
@@ -343,7 +343,7 @@ export function AudioRecorder({
             console.warn("Falha ao obter duração dos metadados, usando tempo de gravação");
             resolve(elapsedTime || 0);
           }, 2000);
-          
+
           audio.addEventListener('loadedmetadata', onLoadedMetadata);
           audio.addEventListener('error', () => {
             clearTimeout(timeoutId);
@@ -351,7 +351,7 @@ export function AudioRecorder({
             URL.revokeObjectURL(audio.src);
             resolve(elapsedTime || 0);
           });
-          
+
           // Cria URL temporária do blob
           audio.src = URL.createObjectURL(blob);
           audio.load();
@@ -361,7 +361,7 @@ export function AudioRecorder({
       // Obtém a duração usando o método confiável
       const duration = await getDuration(audioBlob);
       console.log("Duração detectada:", duration);
-      
+
       // Modo de colaboração (adicionar áudio a um track existente)
       if (collaborationMode && originalTrackId) {
         try {
@@ -376,18 +376,18 @@ export function AudioRecorder({
             audioFile,
             token,
           )
-          
+
           toast({
             title: "Colaboração enviada",
             description: "Sua colaboração foi enviada para aprovação do autor original.",
           })
-          
+
           resetRecording()
           setTrackName(collaborationMode ? "Colaboração" : "Nova Faixa")
           setDescription("")
           setRecordingStatus("idle")
           setElapsedTime(0)
-          
+
           if (onTrackSaved) {
             onTrackSaved()
           }
@@ -413,18 +413,18 @@ export function AudioRecorder({
             audioFile,
             token,
           )
-          
+
           toast({
             title: "Áudio publicado",
             description: "Sua gravação foi publicada com sucesso.",
           })
-          
+
           resetRecording()
           setTrackName(simplified ? "Post de áudio" : "Nova Faixa")
           setDescription("")
           setRecordingStatus("idle")
           setElapsedTime(0)
-          
+
           if (onTrackSaved) {
             onTrackSaved()
           }
@@ -436,7 +436,7 @@ export function AudioRecorder({
             variant: "destructive",
           });
         }
-      } 
+      }
       // Modo de projeto (adicionar faixa a um projeto)
       else if (projectId) {
         try {
@@ -494,10 +494,10 @@ export function AudioRecorder({
   const getFullAudioUrl = (url: string) => {
     // Se já for uma URL completa, retorna como está
     if (url.startsWith('http')) return url;
-    
+
     // Garante que tenhamos a base URL
     const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-    
+
     // Trata diferentes formatos de caminhos
     if (url.startsWith('/uploads/')) {
       // Caminho começa com /uploads/
@@ -521,7 +521,7 @@ export function AudioRecorder({
     return (
       <div className="flex flex-col space-y-2 mb-4">
         <Label htmlFor="audioDeviceSelect">Dispositivo de áudio</Label>
-        <Select 
+        <Select
           value={selectedDeviceId || undefined}
           onValueChange={(value) => setSelectedDeviceId(value)}
         >
@@ -539,34 +539,34 @@ export function AudioRecorder({
       </div>
     );
   };
-  
+
   const handleSaveProcessedAudio = async (processedBlob: Blob) => {
     setAudioBlob(processedBlob);
     // Create a new object URL from the processed blob
     const newAudioURL = URL.createObjectURL(processedBlob);
-    
+
     // Update audio URL reference for playback
     if (audioURL) {
       // Revogar URL anterior para evitar vazamentos de memória
       URL.revokeObjectURL(audioURL);
     }
-    
+
     // Update the audio player URL
     if (existingTrackRef.current) {
       // Garantir que a URL esteja formatada corretamente
       existingTrackRef.current.src = newAudioURL;
       existingTrackRef.current.load();
     }
-    
+
     toast({
       title: 'Áudio processado',
       description: 'As alterações foram aplicadas e estão prontas para serem salvas.'
     });
-    
+
     // Close the editor
     setShowEditor(false);
   };
-  
+
   // When recording is finished, show the editor option
   useEffect(() => {
     if (recordingStatus === "finished" && audioURL) {
@@ -590,7 +590,7 @@ export function AudioRecorder({
               </div>
             </div>
           )}
-          
+
           {/* Recording controls and state - Only show if not in editing mode */}
           {!showEditor && (
             <div className="space-y-4">
@@ -617,7 +617,7 @@ export function AudioRecorder({
                 </div>
                 <Slider value={volume} onValueChange={setVolume} max={100} step={1} />
               </div>
-              
+
               <Tabs defaultValue="metronome" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="metronome" className="flex items-center gap-1">
@@ -627,33 +627,33 @@ export function AudioRecorder({
                     <Music className="h-4 w-4" /> Afinador
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="metronome" className="p-4 border rounded-lg mt-2">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center space-x-2">
-                      <Switch 
-                        id="metronome" 
-                        checked={isMetronomeActive} 
+                      <Switch
+                        id="metronome"
+                        checked={isMetronomeActive}
                         onCheckedChange={setIsMetronomeActive}
                       />
                       <Label htmlFor="metronome" className="ml-2 text-sm">
                         Ativar Metrônomo
                       </Label>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
+                      <Button
+                        variant="outline"
+                        size="icon"
                         onClick={() => setBpm(prev => Math.max(30, prev - 5))}
                         className="h-7 w-7 rounded-full"
                       >
                         -
                       </Button>
                       <span className="w-12 text-center">{bpm} BPM</span>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
+                      <Button
+                        variant="outline"
+                        size="icon"
                         onClick={() => setBpm(prev => Math.min(240, prev + 5))}
                         className="h-7 w-7 rounded-full"
                       >
@@ -662,19 +662,19 @@ export function AudioRecorder({
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="tuner" className="mt-2">
                   <AudioTuner className="border-none shadow-none" autoStart={true} />
                 </TabsContent>
               </Tabs>
-              
+
               {existingTrackUrl && !simplified && (
                 <div className="flex items-center space-x-2">
                   <Layers className={`h-5 w-5 ${isOverdubMode ? "text-primary" : "text-muted-foreground"}`} />
                   <div className="flex items-center">
-                    <Switch 
-                      id="overdub" 
-                      checked={isOverdubMode} 
+                    <Switch
+                      id="overdub"
+                      checked={isOverdubMode}
                       onCheckedChange={setIsOverdubMode}
                     />
                     <Label htmlFor="overdub" className="ml-2 text-sm">
@@ -698,10 +698,10 @@ export function AudioRecorder({
           {/* Audio Editor - Will be shown when editing mode is active */}
           {showEditor && audioURL && (
             <div className="mt-4">
-              <AudioEditor 
-                audioUrl={audioURL} 
+              <AudioEditor
+                audioUrl={audioURL}
                 projectBpm={bpm}
-                onSave={handleSaveProcessedAudio} 
+                onSave={handleSaveProcessedAudio}
               />
               <div className="mt-4 flex justify-end">
                 <Button variant="outline" onClick={() => setShowEditor(false)}>
@@ -720,9 +720,9 @@ export function AudioRecorder({
                     Parar Gravação (Espaço)
                   </Button>
                 ) : (
-                  <Button 
-                    variant="default" 
-                    size="lg" 
+                  <Button
+                    variant="default"
+                    size="lg"
                     onClick={handleStartRecording}
                     className="flex items-center gap-2"
                     disabled={showEditor}
@@ -748,10 +748,10 @@ export function AudioRecorder({
 
                     {/* Button to edit audio - Destacado visualmente */}
                     {recordingStatus === "finished" && (
-                      <Button 
-                        variant="outline" 
-                        size="lg" 
-                        onClick={() => setShowEditor(true)} 
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        onClick={() => setShowEditor(true)}
                         className="flex items-center gap-2"
                       >
                         <Pencil className="h-4 w-4" />
@@ -852,8 +852,8 @@ export function AudioRecorder({
                     <canvas ref={canvasRef} width={600} height={100} className="w-full h-full" />
                   ) : (
                     <p className="text-sm text-muted-foreground">
-                      {recordingStatus === "idle" 
-                        ? "Clique em Iniciar Gravação para começar" 
+                      {recordingStatus === "idle"
+                        ? "Clique em Iniciar Gravação para começar"
                         : "Forma de onda aparecerá aqui"}
                     </p>
                   )}
@@ -861,7 +861,7 @@ export function AudioRecorder({
               </div>
             </>
           )}
-          
+
           {existingTrackUrl && (
             <audio ref={existingTrackRef} style={{ display: 'none' }}>
               <source src={existingTrackUrl} type="audio/mpeg" />

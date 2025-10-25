@@ -34,20 +34,20 @@ export const CommentService = {
   },
 
   // Buscar comentários de um projeto
-  async getProjectComments(projectId: string): Promise<Comment[]> {
+  async getProjectComments(projectId: string, token?: string): Promise<Comment[]> {
     const response = await fetch(`${API_URL}/comments/project/${projectId}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: token ? getAuthHeaders(token) : { "Content-Type": "application/json" },
     })
 
     return handleApiError(response)
   },
 
   // Buscar comentários de uma faixa
-  async getTrackComments(trackId: string): Promise<Comment[]> {
+  async getTrackComments(trackId: string, token?: string): Promise<Comment[]> {
     const response = await fetch(`${API_URL}/comments/track/${trackId}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: token ? getAuthHeaders(token) : { "Content-Type": "application/json" },
     })
 
     return handleApiError(response)

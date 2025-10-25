@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { ThumbsUp, Loader2 } from "lucide-react"
 import type { Comment } from "@/services/project-service"
@@ -23,31 +23,14 @@ export function TrackComments({ trackId, comments, onCommentAdded }: TrackCommen
 	const [commentText, setCommentText] = useState("")
 	const [submitting, setSubmitting] = useState(false)
 	const [liking, setLiking] = useState<Record<string, boolean>>({})
-	const [likedComments, setLikedComments] = useState<Record<string, boolean>>({})
+	const [localComments, setLocalComments] = useState<Comment[]>(comments)
 	const { user, token } = useAuth()
 	const { toast } = useToast()
 
+	// Atualizar comentários locais quando o prop mudar
 	useEffect(() => {
-		// Verificar quais comentários o usuário já curtiu
-		const checkLikedComments = async () => {
-			if (!user || comments.length === 0) return;
-
-			const likedStatus: Record<string, boolean> = {};
-
-			for (const comment of comments) {
-				try {
-					const isLiked = await CommentService.checkUserLiked(comment.id, user.id);
-					likedStatus[comment.id] = isLiked;
-				} catch (error) {
-					console.error(`Erro ao verificar curtida para o comentário ${comment.id}:`, error);
-				}
-			}
-
-			setLikedComments(likedStatus);
-		};
-
-		checkLikedComments();
-	}, [comments, user]);
+		setLocalComments(comments)
+	}, [comments])
 
 	const handleSubmitComment = async () => {
 		if (!commentText.trim() || !user || !token) return
@@ -95,14 +78,31 @@ export function TrackComments({ trackId, comments, onCommentAdded }: TrackCommen
 
 		setLiking((prev) => ({ ...prev, [commentId]: true }))
 		try {
-			const isLiked = likedComments[commentId];
+			const comment = localComments.find(c => c.id === commentId);
+			if (!comment) return;
+
+			const isLiked = comment.isLiked;
 
 			if (isLiked) {
 				await CommentService.unlikeComment(commentId, token);
-				setLikedComments(prev => ({ ...prev, [commentId]: false }));
+				// Atualização otimista local
+				setLocalComments(prev => prev.map(c =>
+					c.id === commentId ? {
+						...c,
+						isLiked: false,
+						likes: c.likes - 1
+					} : c
+				));
 			} else {
 				await CommentService.likeComment(commentId, token);
-				setLikedComments(prev => ({ ...prev, [commentId]: true }));
+				// Atualização otimista local
+				setLocalComments(prev => prev.map(c =>
+					c.id === commentId ? {
+						...c,
+						isLiked: true,
+						likes: c.likes + 1
+					} : c
+				));
 			}
 
 			if (onCommentAdded) {
@@ -156,8 +156,8 @@ export function TrackComments({ trackId, comments, onCommentAdded }: TrackCommen
 					)}
 
 					<div className="space-y-6">
-						{comments.length > 0 ? (
-							comments.map((comment) => (
+						{localComments.length > 0 ? (
+							localComments.map((comment) => (
 								<div key={comment.id} className="flex gap-4">
 									<Avatar className="h-10 w-10">
 										<AvatarImage src={comment.author.avatarUrl || ""} alt={comment.author.name} />
@@ -175,14 +175,14 @@ export function TrackComments({ trackId, comments, onCommentAdded }: TrackCommen
 											<Button
 												variant="ghost"
 												size="sm"
-												className={`h-8 px-2 ${likedComments[comment.id] ? 'text-primary' : 'text-muted-foreground'}`}
+												className={`h-8 px-2 ${comment.isLiked ? 'text-primary' : 'text-muted-foreground'}`}
 												onClick={() => handleToggleLike(comment.id)}
 												disabled={liking[comment.id]}
 											>
 												{liking[comment.id] ? (
 													<Loader2 className="mr-1 h-4 w-4 animate-spin" />
 												) : (
-													<ThumbsUp className={`mr-1 h-4 w-4 ${likedComments[comment.id] ? 'fill-current' : ''}`} />
+													<ThumbsUp className={`mr-1 h-4 w-4 ${comment.isLiked ? 'fill-current' : ''}`} />
 												)}
 												{comment.likes}
 											</Button>
@@ -197,7 +197,7 @@ export function TrackComments({ trackId, comments, onCommentAdded }: TrackCommen
 						)}
 					</div>
 
-					{comments.length > 5 && (
+					{localComments.length > 5 && (
 						<Button variant="outline" className="w-full">
 							Ver mais comentários
 						</Button>

@@ -56,6 +56,9 @@ export interface Track {
   audioUrl: string
   duration: number
   createdAt: string
+  isLiked?: boolean // Status de curtida do usuário logado
+  likesCount?: number // Total de curtidas
+  commentsCount?: number // Total de comentários
 }
 
 export interface Comment {
@@ -66,6 +69,7 @@ export interface Comment {
   author: User
   likes: number
   createdAt: string
+  isLiked?: boolean // Status de curtida do usuário logado
 }
 
 export interface Collaboration {

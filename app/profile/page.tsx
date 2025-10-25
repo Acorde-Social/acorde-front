@@ -179,6 +179,12 @@ export default function ProfilePage() {
 
       const updatedUser = await response.json()
 
+      // Limpar os previews para usar as URLs do servidor
+      setAvatarPreview(null)
+      setCoverImagePreview(null)
+      setAvatarFile(null)
+      setCoverImageFile(null)
+
       // Atualizar contexto do usuário
       if (typeof window !== 'undefined') {
         const event = new CustomEvent('user:update', { detail: updatedUser })
@@ -253,8 +259,9 @@ export default function ProfilePage() {
       setBio(user.bio || "")
       setInstruments(user.instruments || [])
       setExperience(user.experience || "")
-      setAvatarPreview(user.avatarUrl || null)
-      setCoverImagePreview(user.coverImageUrl || null)
+      // NÃO definir previews aqui - eles são apenas para uploads locais
+      // setAvatarPreview(user.avatarUrl || null)
+      // setCoverImagePreview(user.coverImageUrl || null)
       setPrimaryColor(user.themeConfig?.primaryColor || "#000000")
       setSecondaryColor(user.themeConfig?.secondaryColor || "#3366FF")
       setBackgroundColor(user.themeConfig?.backgroundColor || "#FFFFFF")
@@ -278,7 +285,7 @@ export default function ProfilePage() {
         <div className="profile-header">
           {coverImagePreview || user?.coverImageUrl ? (
             <Image
-              src={fixImageUrl(coverImagePreview || user?.coverImageUrl || "")}
+              src={coverImagePreview || fixImageUrl(user?.coverImageUrl || "")}
               alt="Cover"
               fill
               className="object-cover"
@@ -318,7 +325,7 @@ export default function ProfilePage() {
                   <div className="relative">
                     <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
                       <AvatarImage
-                        src={fixImageUrl(avatarPreview || user?.avatarUrl || "")}
+                        src={avatarPreview || fixImageUrl(user?.avatarUrl || "")}
                         alt={name}
                         className="object-cover"
                       />
