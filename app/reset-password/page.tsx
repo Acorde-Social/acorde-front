@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,7 +32,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [isLoading, setIsLoading] = useState(false);
@@ -163,5 +163,21 @@ export default function ResetPasswordPage() {
 				</CardFooter>
 			</Card>
 		</div>
+	);
+}
+
+export default function ResetPasswordPage() {
+	return (
+		<Suspense fallback={
+			<div className="container flex items-center justify-center min-h-screen py-10">
+				<Card className="w-full max-w-md">
+					<CardHeader className="space-y-2 text-center">
+						<CardTitle className="text-2xl font-bold">Carregando...</CardTitle>
+					</CardHeader>
+				</Card>
+			</div>
+		}>
+			<ResetPasswordForm />
+		</Suspense>
 	);
 }
