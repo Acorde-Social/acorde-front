@@ -10,7 +10,7 @@ import { Headphones, MessageSquare, Music, Play, Plus, Share2, Users, Loader2 } 
 import Image from "next/image"
 import Link from "next/link"
 import { ProjectCollaborators } from "@/components/projects/project-collaborators"
-import { ProjectComments } from "@/components/projects/project-comments"
+import { ProjectComments } from "@/components/project-comments"
 import { ProjectService, type ProjectDetail } from "@/services/project-service"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/contexts/auth-context"
@@ -257,7 +257,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
                 projectId={project.id}
                 comments={project.comments}
                 onCommentAdded={fetchProject}
-                onCommentCountChange={(count) => {
+                onCommentCountChange={(count: number) => {
                   setProject(prev => prev ? { ...prev, commentsCount: count } : null)
                 }}
               />

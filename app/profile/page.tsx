@@ -17,14 +17,11 @@ import { Loader2, Upload, X, Music, Guitar, LayoutTemplate, LayoutDashboard, Lay
 import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import { AuthGuard } from "@/components/auth-guard"
-import { ProjectService } from "@/services/project-service"
+import { ProjectService, type Project as ServiceProject } from "@/services/project-service"
 import { cn, fixImageUrl } from "@/lib/utils"
-import { LayoutContainer } from "@/components/layout/layout-container"
 import { ThemePreview } from "@/components/theme-preview"
 import { useThemeCustomization, type ThemeLayout } from "@/hooks/use-theme-customization"
 import { API_URL } from "@/lib/api-config"
-import type { Project } from "@/types"
-import "./profile.css"
 
 export default function ProfilePage() {
   const { user, token } = useAuth()
@@ -62,8 +59,8 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [projectsFetched, setProjectsFetched] = useState(false)
 
-  const [projects, setProjects] = useState<Project[]>([])
-  const [collaborations, setCollaborations] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ServiceProject[]>([])
+  const [collaborations, setCollaborations] = useState<ServiceProject[]>([])
 
   const fetchUserProjects = async () => {
     if (!token || !user || projectsFetched) return
@@ -707,7 +704,7 @@ export default function ProfilePage() {
                             <Card key={project.id} className="project-card">
                               <div className="relative h-32 w-full">
                                 <Image
-                                  src={project.image || "/placeholder.svg?height=200&width=400"}
+                                  src={fixImageUrl(project.imageUrl) || "/placeholder.svg?height=200&width=400"}
                                   alt={project.title}
                                   fill
                                   className="object-cover"
@@ -766,7 +763,7 @@ export default function ProfilePage() {
                             <Card key={project.id} className="project-card">
                               <div className="relative h-32 w-full">
                                 <Image
-                                  src={project.image || "/placeholder.svg?height=200&width=400"}
+                                  src={fixImageUrl(project.imageUrl) || "/placeholder.svg?height=200&width=400"}
                                   alt={project.title}
                                   fill
                                   className="object-cover"

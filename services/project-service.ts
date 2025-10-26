@@ -132,7 +132,7 @@ export class ProjectService {
     return handleApiError(response)
   }
 
-  static async getProject(id: string, token: string): Promise<Project> {
+  static async getProject(id: string, token: string): Promise<ProjectDetail> {
     const response = await fetch(`${API_URL}/projects/${id}`, {
       headers: getAuthHeaders(token),
     })
@@ -141,7 +141,7 @@ export class ProjectService {
   }
   
   // Alias para getProject para compatibilidade
-  static async getProjectById(id: string, token?: string): Promise<Project> {
+  static async getProjectById(id: string, token?: string): Promise<ProjectDetail> {
     return this.getProject(id, token || '');
   }
 

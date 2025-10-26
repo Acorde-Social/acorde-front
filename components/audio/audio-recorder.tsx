@@ -81,7 +81,7 @@ export function AudioRecorder({
   const animationRef = useRef<number>()
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
-  const dataArrayRef = useRef<Uint8Array | null>(null)
+  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null)
   const metronomeRef = useRef<any>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const existingTrackRef = useRef<HTMLAudioElement | null>(null)

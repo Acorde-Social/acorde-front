@@ -28,7 +28,7 @@ export interface User {
 export interface Project {
   id: string
   title: string
-  description: string
+  description?: string
   authorId: string
   author: User
   genre: string
