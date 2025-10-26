@@ -1,31 +1,39 @@
 "use client"
 
 import { API_URL, getJsonAuthHeaders, handleApiError } from "@/lib/api-config"
-import type { Comment } from "./project-service"
+import type { Comment } from "@/types"
 
 export interface CreateCommentData {
-  text: string
+  text?: string
+  mediaType?: 'image' | 'gif'
+  mediaUrl?: string
+  emotions?: string
   projectId?: string
   trackId?: string
+}
+
+export interface UpdateCommentData {
+  text?: string
+  emotions?: string
 }
 
 export const CommentService = {
   // Criar novo comentário em projeto
   async createComment(data: CreateCommentData, token: string): Promise<Comment> {
-    const { projectId, trackId, text } = data;
+    const { projectId, trackId, ...commentData } = data;
     
     if (projectId) {
       const response = await fetch(`${API_URL}/comments/project/${projectId}`, {
         method: "POST",
         headers: getJsonAuthHeaders(token),
-        body: JSON.stringify({ text }),
+        body: JSON.stringify(commentData),
       })
       return handleApiError(response)
     } else if (trackId) {
       const response = await fetch(`${API_URL}/comments/track/${trackId}`, {
         method: "POST",
         headers: getJsonAuthHeaders(token),
-        body: JSON.stringify({ text }),
+        body: JSON.stringify(commentData),
       })
       return handleApiError(response)
     } else {
@@ -84,10 +92,21 @@ export const CommentService = {
   },
 
   // Excluir comentário
-  async deleteComment(id: string, token: string): Promise<void> {
+  async deleteComment(id: string, token: string): Promise<{ success: boolean; message: string; totalComments: number }> {
     const response = await fetch(`${API_URL}/comments/${id}`, {
       method: "DELETE",
       headers: getJsonAuthHeaders(token),
+    })
+
+    return handleApiError(response)
+  },
+
+  // Atualizar comentário
+  async updateComment(id: string, data: UpdateCommentData, token: string): Promise<Comment> {
+    const response = await fetch(`${API_URL}/comments/${id}`, {
+      method: "PATCH",
+      headers: getJsonAuthHeaders(token),
+      body: JSON.stringify(data),
     })
 
     return handleApiError(response)

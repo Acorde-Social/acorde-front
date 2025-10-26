@@ -253,7 +253,14 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
             </TabsContent>
 
             <TabsContent value="comments" className="mt-4">
-              <ProjectComments projectId={project.id} comments={project.comments} onCommentAdded={fetchProject} />
+              <ProjectComments
+                projectId={project.id}
+                comments={project.comments}
+                onCommentAdded={fetchProject}
+                onCommentCountChange={(count) => {
+                  setProject(prev => prev ? { ...prev, commentsCount: count } : null)
+                }}
+              />
             </TabsContent>
           </Tabs>
         </div>

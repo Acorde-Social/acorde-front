@@ -10,8 +10,7 @@ import { Heart, Share2, MoreHorizontal, Trash2, Download, Mic, MessageSquare, Lo
 import { useToast } from "@/hooks/use-toast"
 import { TrackService, PaginatedResponse } from "@/services/track-service"
 import { CommentService } from "@/services/comment-service"
-import { Comment as ServiceComment } from "@/services/project-service"
-import { Track } from "@/types"
+import { Track, Comment } from "@/types"
 import { useAuth } from "@/contexts/auth-context"
 import { AudioRecorder } from "@/components/audio-recorder"
 import { TrackComments } from "@/components/track-comments"
@@ -57,7 +56,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
   const [collaborateTrack, setCollaborateTrack] = useState<Track | null>(null)
   const [isCollaborateDialogOpen, setIsCollaborateDialogOpen] = useState(false)
   const [expandedTrackId, setExpandedTrackId] = useState<string | null>(null) // ✅ Track expandida inline
-  const [trackComments, setTrackComments] = useState<Record<string, ServiceComment[]>>({}) // ✅ Comentários por track
+  const [trackComments, setTrackComments] = useState<Record<string, Comment[]>>({}) // ✅ Comentários por track
   const [loadingComments, setLoadingComments] = useState<Record<string, boolean>>({}) // ✅ Loading por track
   const [likingTrack, setLikingTrack] = useState<Record<string, boolean>>({})
   const hasFetchedRef = useRef(false) // Proteção para evitar fetch duplicado inicial
@@ -228,10 +227,20 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
       // Se já está expandido, colapsar
       setExpandedTrackId(null);
     } else {
-      // Expandir e carregar comentários se ainda não carregou
+      // Expandir
       setExpandedTrackId(trackId);
-      if (!trackComments[trackId]) {
+
+      // Encontrar o track para verificar a contagem
+      const track = tracks.find(t => t.id === trackId);
+
+      // Só carregar comentários se:
+      // 1. Ainda não carregou E
+      // 2. A contagem de comentários for maior que 0
+      if (!trackComments[trackId] && track && (track.commentsCount ?? 0) > 0) {
         fetchTrackComments(trackId);
+      } else if (!trackComments[trackId]) {
+        // Se não tem comentários, inicializar como array vazio
+        setTrackComments(prev => ({ ...prev, [trackId]: [] }));
       }
     }
   }
@@ -473,6 +482,12 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                         trackId={track.id}
                         comments={trackComments[track.id] || []}
                         onCommentAdded={() => handleCommentAdded(track.id)}
+                        onCommentCountChange={(count) => {
+                          // Atualizar a contagem no track localmente
+                          setTracks(prev => prev.map(t =>
+                            t.id === track.id ? { ...t, commentsCount: count } : t
+                          ))
+                        }}
                       />
                     )}
                   </div>

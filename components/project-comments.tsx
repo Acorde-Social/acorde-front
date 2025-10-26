@@ -17,55 +17,57 @@ interface ProjectCommentsProps {
   projectId: string
   comments: Comment[]
   onCommentAdded?: () => void
+  onCommentCountChange?: (count: number) => void
 }
 
-export function ProjectComments({ projectId, comments, onCommentAdded }: ProjectCommentsProps) {
+export function ProjectComments({ projectId, comments, onCommentAdded, onCommentCountChange }: ProjectCommentsProps) {
   const [commentText, setCommentText] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [liking, setLiking] = useState<Record<string, boolean>>({})
-  const [likedComments, setLikedComments] = useState<Record<string, boolean>>({})
+  const [localComments, setLocalComments] = useState<Comment[]>(comments)
   const { user, token } = useAuth()
   const { toast } = useToast()
 
+  // Atualizar comentários locais quando o prop mudar
   useEffect(() => {
-    // Verificar quais comentários o usuário já curtiu
-    const checkLikedComments = async () => {
-      if (!user) return;
-
-      const likedStatus: Record<string, boolean> = {};
-
-      for (const comment of comments) {
-        try {
-          const isLiked = await CommentService.checkUserLiked(comment.id, user.id);
-          likedStatus[comment.id] = isLiked;
-        } catch (error) {
-          console.error(`Erro ao verificar curtida para o comentário ${comment.id}:`, error);
-        }
-      }
-
-      setLikedComments(likedStatus);
-    };
-
-    checkLikedComments();
-  }, [comments, user]);
+    setLocalComments(comments)
+  }, [comments])
 
   const handleSubmitComment = async () => {
     if (!commentText.trim() || !user || !token) return
 
     setSubmitting(true)
     try {
-      await CommentService.createComment(
-        {
-          text: commentText,
-          projectId,
+      const formData = new FormData()
+      formData.append("text", commentText)
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/project/${projectId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        token,
-      )
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Erro ao criar comentário")
+      }
+
+      const result = await response.json()
+
+      // Adicionar o novo comentário ao array local (com isLiked = false)
+      const newComment: Comment = {
+        ...result,
+        isLiked: false,
+      }
+      setLocalComments(prev => [newComment, ...prev])
+
+      // Atualizar contagem se veio na resposta
+      if (result.totalComments !== undefined && onCommentCountChange) {
+        onCommentCountChange(result.totalComments)
+      }
 
       setCommentText("")
-      if (onCommentAdded) {
-        onCommentAdded()
-      }
 
       toast({
         title: "Comentário adicionado",
@@ -95,21 +97,34 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
 
     setLiking((prev) => ({ ...prev, [commentId]: true }))
     try {
-      const isLiked = likedComments[commentId];
+      const comment = localComments.find(c => c.id === commentId)
+      if (!comment) return
+
+      const isLiked = comment.isLiked
 
       if (isLiked) {
-        await CommentService.unlikeComment(commentId, token);
-        setLikedComments(prev => ({ ...prev, [commentId]: false }));
+        await CommentService.unlikeComment(commentId, token)
+        // Atualização otimista local
+        setLocalComments(prev => prev.map(c =>
+          c.id === commentId ? {
+            ...c,
+            isLiked: false,
+            likes: c.likes - 1
+          } : c
+        ))
       } else {
-        await CommentService.likeComment(commentId, token);
-        setLikedComments(prev => ({ ...prev, [commentId]: true }));
-      }
-
-      if (onCommentAdded) {
-        onCommentAdded();
+        await CommentService.likeComment(commentId, token)
+        // Atualização otimista local
+        setLocalComments(prev => prev.map(c =>
+          c.id === commentId ? {
+            ...c,
+            isLiked: true,
+            likes: c.likes + 1
+          } : c
+        ))
       }
     } catch (error) {
-      console.error("Erro ao processar curtida:", error);
+      console.error("Erro ao processar curtida:", error)
       toast({
         title: "Erro ao processar curtida",
         description: "Não foi possível processar sua interação. Tente novamente mais tarde.",
@@ -156,8 +171,8 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
           )}
 
           <div className="space-y-6">
-            {comments.length > 0 ? (
-              comments.map((comment) => (
+            {localComments.length > 0 ? (
+              localComments.map((comment) => (
                 <div key={comment.id} className="flex gap-4">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={comment.author.avatarUrl || ""} alt={comment.author.name} />
@@ -170,19 +185,19 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
                         {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ptBR })}
                       </span>
                     </div>
-                    <p className="mt-1">{comment.text}</p>
+                    <p className="mt-1 whitespace-pre-wrap">{comment.text}</p>
                     <div className="mt-2 flex items-center gap-4">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className={`h-8 px-2 ${likedComments[comment.id] ? 'text-primary' : 'text-muted-foreground'}`}
+                        className={`h-8 px-2 ${comment.isLiked ? 'text-primary' : 'text-muted-foreground'}`}
                         onClick={() => handleToggleLike(comment.id)}
                         disabled={liking[comment.id]}
                       >
                         {liking[comment.id] ? (
                           <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                         ) : (
-                          <ThumbsUp className="mr-1 h-4 w-4" />
+                          <ThumbsUp className={`mr-1 h-4 w-4 ${comment.isLiked ? 'fill-current' : ''}`} />
                         )}
                         {comment.likes}
                       </Button>
@@ -197,7 +212,7 @@ export function ProjectComments({ projectId, comments, onCommentAdded }: Project
             )}
           </div>
 
-          {comments.length > 5 && (
+          {localComments.length > 5 && (
             <Button variant="outline" className="w-full">
               Ver mais comentários
             </Button>

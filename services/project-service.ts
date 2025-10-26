@@ -64,8 +64,12 @@ export interface Collaboration {
 
 export interface Comment {
   id: string
-  text: string
-  projectId: string
+  text?: string
+  mediaType?: 'image' | 'gif'
+  mediaUrl?: string
+  emotions?: string // JSON array de emojis
+  projectId?: string
+  trackId?: string
   authorId: string
   author: {
     id: string
@@ -74,6 +78,7 @@ export interface Comment {
   }
   likes: number
   createdAt: string
+  updatedAt: string
   isLiked?: boolean // Status de curtida do usuário logado
 }
 
