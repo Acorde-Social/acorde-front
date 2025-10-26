@@ -56,13 +56,12 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [collaborateTrack, setCollaborateTrack] = useState<Track | null>(null)
   const [isCollaborateDialogOpen, setIsCollaborateDialogOpen] = useState(false)
-  const [commentTrack, setCommentTrack] = useState<Track | null>(null)
-  const [isCommentDialogOpen, setIsCommentDialogOpen] = useState(false)
-  const [trackComments, setTrackComments] = useState<ServiceComment[]>([])
-  const [loadingComments, setLoadingComments] = useState(false)
+  const [expandedTrackId, setExpandedTrackId] = useState<string | null>(null) // ✅ Track expandida inline
+  const [trackComments, setTrackComments] = useState<Record<string, ServiceComment[]>>({}) // ✅ Comentários por track
+  const [loadingComments, setLoadingComments] = useState<Record<string, boolean>>({}) // ✅ Loading por track
   const [likingTrack, setLikingTrack] = useState<Record<string, boolean>>({})
   const hasFetchedRef = useRef(false) // Proteção para evitar fetch duplicado inicial
-  const isLoadingCommentsRef = useRef(false) // ✅ Proteção contra fetch duplicado de comentários
+  const isLoadingCommentsRef = useRef<Record<string, boolean>>({}) // ✅ Proteção por track
   const { toast } = useToast()
   const { token, user } = useAuth()
   const limit = 10
@@ -198,42 +197,47 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
 
   const fetchTrackComments = async (trackId: string) => {
     // ✅ Proteção contra chamadas duplicadas
-    if (isLoadingCommentsRef.current) {
+    if (isLoadingCommentsRef.current[trackId]) {
       console.log('⚠️ Fetch de comentários já em andamento, ignorando...');
       return;
     }
 
-    isLoadingCommentsRef.current = true;
-    setLoadingComments(true);
+    isLoadingCommentsRef.current[trackId] = true;
+    setLoadingComments(prev => ({ ...prev, [trackId]: true }));
 
     try {
       // ✅ Passar o token para o serviço que já traz isLiked em 1 query
       const comments = await CommentService.getTrackComments(trackId, token || undefined);
-      setTrackComments(comments || []);
+      setTrackComments(prev => ({ ...prev, [trackId]: comments || [] }));
     } catch (error) {
       console.error('Erro ao carregar comentários:', error);
-      setTrackComments([]);
+      setTrackComments(prev => ({ ...prev, [trackId]: [] }));
       toast({
         title: 'Erro ao carregar comentários',
         description: 'Não foi possível carregar os comentários. Tente novamente mais tarde.',
         variant: 'destructive',
       });
     } finally {
-      setLoadingComments(false);
-      isLoadingCommentsRef.current = false;
+      setLoadingComments(prev => ({ ...prev, [trackId]: false }));
+      isLoadingCommentsRef.current[trackId] = false;
     }
   }
 
-  const handleCommentClick = (track: Track) => {
-    setCommentTrack(track)
-    fetchTrackComments(track.id)
-    setIsCommentDialogOpen(true)
+  const handleCommentClick = (trackId: string) => {
+    if (expandedTrackId === trackId) {
+      // Se já está expandido, colapsar
+      setExpandedTrackId(null);
+    } else {
+      // Expandir e carregar comentários se ainda não carregou
+      setExpandedTrackId(trackId);
+      if (!trackComments[trackId]) {
+        fetchTrackComments(trackId);
+      }
+    }
   }
 
-  const handleCommentAdded = () => {
-    if (commentTrack) {
-      fetchTrackComments(commentTrack.id)
-    }
+  const handleCommentAdded = (trackId: string) => {
+    fetchTrackComments(trackId);
   }
 
   const handleLike = async (trackId: string) => {
@@ -426,8 +430,8 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1 hover:text-primary"
-                    onClick={() => handleCommentClick(track)}
+                    className={`gap-1 ${expandedTrackId === track.id ? 'text-primary' : 'text-muted-foreground'} hover:text-primary`}
+                    onClick={() => handleCommentClick(track.id)}
                   >
                     <MessageSquare className="h-4 w-4" />
                     <span>{track.commentsCount || 0}</span>
@@ -455,6 +459,25 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                   )}
                 </div>
               </CardFooter>
+
+              {/* ✅ Seção de comentários expandida inline */}
+              {expandedTrackId === track.id && (
+                <div className="border-t bg-muted/30">
+                  <div className="p-6">
+                    {loadingComments[track.id] ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : (
+                      <TrackComments
+                        trackId={track.id}
+                        comments={trackComments[track.id] || []}
+                        onCommentAdded={() => handleCommentAdded(track.id)}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
             </Card>
           ))
         )}
@@ -516,7 +539,7 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
             <div className="space-y-4">
               <div className="bg-accent/20 p-4 rounded-md">
                 <h4 className="text-sm font-medium mb-2">Áudio original:</h4>
-                <audio controls className="w-full">
+                <audio controls className="w-full" preload="none">
                   <source
                     src={getFullAudioUrl(collaborateTrack.audioUrl)}
                     type={collaborateTrack.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'}
@@ -533,45 +556,6 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
                 onTrackSaved={handleCollaborationSaved}
                 onCancel={() => setIsCollaborateDialogOpen(false)}
               />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Diálogo para comentários */}
-      <Dialog open={isCommentDialogOpen} onOpenChange={setIsCommentDialogOpen}>
-        <DialogContent className="max-w-4xl overflow-y-auto max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle>Comentários</DialogTitle>
-            <DialogDescription>
-              Comente e interaja com esta faixa de áudio
-            </DialogDescription>
-          </DialogHeader>
-
-          {commentTrack && (
-            <div className="space-y-4">
-              <div className="bg-accent/20 p-4 rounded-md">
-                <h4 className="text-sm font-medium mb-2">Faixa: {commentTrack.name}</h4>
-                <audio controls className="w-full">
-                  <source
-                    src={getFullAudioUrl(commentTrack.audioUrl)}
-                    type={commentTrack.audioUrl.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg'}
-                  />
-                  Seu navegador não suporta o elemento de áudio.
-                </audio>
-              </div>
-
-              {loadingComments ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                </div>
-              ) : (
-                <TrackComments
-                  trackId={commentTrack.id}
-                  comments={trackComments}
-                  onCommentAdded={handleCommentAdded}
-                />
-              )}
             </div>
           )}
         </DialogContent>

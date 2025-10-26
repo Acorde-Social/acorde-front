@@ -34,7 +34,7 @@ interface CollaborationMixerProps {
 }
 
 interface VolumeUpdate {
-	(value: number[]): void;
+  (value: number[]): void;
 }
 
 const CollaborationMixer = ({ originalTrack, collaborationTrack }: CollaborationMixerProps) => {
@@ -48,13 +48,13 @@ const CollaborationMixer = ({ originalTrack, collaborationTrack }: Collaboration
     if (originalTrack && collaborationTrack) {
       const original = new Audio(originalTrack)
       const collaboration = new Audio(collaborationTrack)
-      
+
       setOriginalAudio(original)
       setCollaborationAudio(collaboration)
 
       original.volume = originalVolume[0] / 100
       collaboration.volume = collaborationVolume[0] / 100
-      
+
       return () => {
         original.pause()
         collaboration.pause()
@@ -74,7 +74,7 @@ const CollaborationMixer = ({ originalTrack, collaborationTrack }: Collaboration
     } else {
       originalAudio.currentTime = 0
       collaborationAudio.currentTime = 0
-      
+
       originalAudio.play().catch(console.error)
       collaborationAudio.play().catch(console.error)
       setIsPlaying(true)
@@ -88,33 +88,33 @@ const CollaborationMixer = ({ originalTrack, collaborationTrack }: Collaboration
     }
   }
 
-const updateOriginalVolume: VolumeUpdate = (value) => {
-	setOriginalVolume(value)
-	if (originalAudio) {
-		originalAudio.volume = value[0] / 100
-	}
-}
+  const updateOriginalVolume: VolumeUpdate = (value) => {
+    setOriginalVolume(value)
+    if (originalAudio) {
+      originalAudio.volume = value[0] / 100
+    }
+  }
 
-const updateCollaborationVolume: VolumeUpdate = (value) => {
-	setCollaborationVolume(value)
-	if (collaborationAudio) {
-		collaborationAudio.volume = value[0] / 100
-	}
-}
+  const updateCollaborationVolume: VolumeUpdate = (value) => {
+    setCollaborationVolume(value)
+    if (collaborationAudio) {
+      collaborationAudio.volume = value[0] / 100
+    }
+  }
 
   return (
     <div className="space-y-4 border rounded-md p-4">
       <div className="flex justify-between items-center">
         <h3 className="font-medium">Mixer de Revisão</h3>
-        <Button 
-          variant={isPlaying ? "secondary" : "default"} 
-          size="sm" 
+        <Button
+          variant={isPlaying ? "secondary" : "default"}
+          size="sm"
           onClick={handlePlay}
         >
           {isPlaying ? "Pausar" : "Reproduzir Juntos"}
         </Button>
       </div>
-      
+
       <div className="space-y-3">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -134,7 +134,7 @@ const updateCollaborationVolume: VolumeUpdate = (value) => {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm">Colaboração</span>
@@ -216,12 +216,12 @@ export default function ReceivedCollaborationsPage() {
     setActionInProgress(id)
     try {
       await CollaborationService.updateAudioCollaborationStatus(id, "ACCEPTED", token)
-      
+
       // Update state to reflect the status change
-      setCollaborations(collaborations.map(collab => 
+      setCollaborations(collaborations.map(collab =>
         collab.id === id ? { ...collab, status: "ACCEPTED" } : collab
       ))
-      
+
       toast({
         title: "Colaboração aceita",
         description: "A colaboração foi aceita com sucesso.",
@@ -244,12 +244,12 @@ export default function ReceivedCollaborationsPage() {
     setActionInProgress(id)
     try {
       await CollaborationService.updateAudioCollaborationStatus(id, "REJECTED", token)
-      
+
       // Update state to reflect the status change
-      setCollaborations(collaborations.map(collab => 
+      setCollaborations(collaborations.map(collab =>
         collab.id === id ? { ...collab, status: "REJECTED" } : collab
       ))
-      
+
       toast({
         title: "Colaboração rejeitada",
         description: "A colaboração foi rejeitada.",
@@ -345,8 +345,8 @@ export default function ReceivedCollaborationsPage() {
                       <div className="flex gap-2 mt-4 md:mt-0">
                         {collab.status === "PENDING" && (
                           <>
-                            <Button 
-                              variant="default" 
+                            <Button
+                              variant="default"
                               size="sm"
                               onClick={() => handleAcceptCollaboration(collab.id)}
                               disabled={actionInProgress === collab.id}
@@ -358,8 +358,8 @@ export default function ReceivedCollaborationsPage() {
                               )}
                               Aceitar
                             </Button>
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => handleRejectCollaboration(collab.id)}
                               disabled={actionInProgress === collab.id}
@@ -405,7 +405,7 @@ export default function ReceivedCollaborationsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <div className="space-y-2">
                         <h4 className="text-sm font-medium">Faixa Original</h4>
-                        <audio controls className="w-full">
+                        <audio controls className="w-full" preload="none">
                           <source src={getFullAudioUrl(collab.track.audioUrl)} type="audio/mpeg" />
                           Seu navegador não suporta o elemento de áudio.
                         </audio>
@@ -413,7 +413,7 @@ export default function ReceivedCollaborationsPage() {
 
                       <div className="space-y-2">
                         <h4 className="text-sm font-medium">Colaboração</h4>
-                        <audio controls className="w-full">
+                        <audio controls className="w-full" preload="none">
                           <source src={getFullAudioUrl(collab.audioUrl)} type="audio/mpeg" />
                           Seu navegador não suporta o elemento de áudio.
                         </audio>
@@ -422,9 +422,9 @@ export default function ReceivedCollaborationsPage() {
 
                     {/* Mixer para testar as duas faixas juntas */}
                     <div className="mt-6">
-                      <CollaborationMixer 
-                        originalTrack={getFullAudioUrl(collab.track.audioUrl)} 
-                        collaborationTrack={getFullAudioUrl(collab.audioUrl)} 
+                      <CollaborationMixer
+                        originalTrack={getFullAudioUrl(collab.track.audioUrl)}
+                        collaborationTrack={getFullAudioUrl(collab.audioUrl)}
                       />
                     </div>
                   </div>

@@ -191,7 +191,7 @@ export default function SentCollaborationsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <div className="space-y-2">
                         <h4 className="text-sm font-medium">Original Track</h4>
-                        <audio controls className="w-full">
+                        <audio controls className="w-full" preload="none">
                           <source src={getFullAudioUrl(collab.track.audioUrl)} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>
@@ -199,7 +199,7 @@ export default function SentCollaborationsPage() {
 
                       <div className="space-y-2">
                         <h4 className="text-sm font-medium">Your Collaboration</h4>
-                        <audio controls className="w-full">
+                        <audio controls className="w-full" preload="none">
                           <source src={getFullAudioUrl(collab.audioUrl)} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>

@@ -1,6 +1,6 @@
 "use client"
 
-import { API_URL, getAuthHeaders, handleApiError } from "@/lib/api-config"
+import { API_URL, getJsonAuthHeaders, handleApiError } from "@/lib/api-config"
 import type { Comment } from "./project-service"
 
 export interface CreateCommentData {
@@ -17,14 +17,14 @@ export const CommentService = {
     if (projectId) {
       const response = await fetch(`${API_URL}/comments/project/${projectId}`, {
         method: "POST",
-        headers: getAuthHeaders(token),
+        headers: getJsonAuthHeaders(token),
         body: JSON.stringify({ text }),
       })
       return handleApiError(response)
     } else if (trackId) {
       const response = await fetch(`${API_URL}/comments/track/${trackId}`, {
         method: "POST",
-        headers: getAuthHeaders(token),
+        headers: getJsonAuthHeaders(token),
         body: JSON.stringify({ text }),
       })
       return handleApiError(response)
@@ -37,7 +37,7 @@ export const CommentService = {
   async getProjectComments(projectId: string, token?: string): Promise<Comment[]> {
     const response = await fetch(`${API_URL}/comments/project/${projectId}`, {
       method: "GET",
-      headers: token ? getAuthHeaders(token) : { "Content-Type": "application/json" },
+      headers: token ? getJsonAuthHeaders(token) : { "Content-Type": "application/json" },
     })
 
     return handleApiError(response)
@@ -47,7 +47,7 @@ export const CommentService = {
   async getTrackComments(trackId: string, token?: string): Promise<Comment[]> {
     const response = await fetch(`${API_URL}/comments/track/${trackId}`, {
       method: "GET",
-      headers: token ? getAuthHeaders(token) : { "Content-Type": "application/json" },
+      headers: token ? getJsonAuthHeaders(token) : { "Content-Type": "application/json" },
     })
 
     return handleApiError(response)
@@ -57,7 +57,7 @@ export const CommentService = {
   async likeComment(commentId: string, token: string): Promise<{ success: boolean, message: string }> {
     const response = await fetch(`${API_URL}/comments/${commentId}/like`, {
       method: "POST",
-      headers: getAuthHeaders(token),
+      headers: getJsonAuthHeaders(token),
     })
 
     return handleApiError(response)
@@ -67,7 +67,7 @@ export const CommentService = {
   async unlikeComment(commentId: string, token: string): Promise<{ success: boolean, message: string }> {
     const response = await fetch(`${API_URL}/comments/${commentId}/unlike`, {
       method: "POST",
-      headers: getAuthHeaders(token),
+      headers: getJsonAuthHeaders(token),
     })
 
     return handleApiError(response)
@@ -87,7 +87,7 @@ export const CommentService = {
   async deleteComment(id: string, token: string): Promise<void> {
     const response = await fetch(`${API_URL}/comments/${id}`, {
       method: "DELETE",
-      headers: getAuthHeaders(token),
+      headers: getJsonAuthHeaders(token),
     })
 
     return handleApiError(response)
