@@ -9,6 +9,7 @@ import { MobileNav } from "./mobile-nav"
 import { ThemeToggle } from "../theme-toggle"
 import { Notifications } from "../notifications"
 import { UserNav } from "./user-nav"
+import { UserSearch } from "./user-search"
 import { cn } from "@/lib/utils"
 
 export function Header() {
@@ -17,7 +18,7 @@ export function Header() {
 
 	return (
 		<header className={cn(
-			"sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+			"sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
 			"!h-14 md:!h-16",
 			preferences.layout === "compact" && "md:!h-14",
 			preferences.layout === "spacious" && "md:!h-20"
@@ -40,6 +41,7 @@ export function Header() {
 					<MainNav />
 				</div>
 				<div className="flex items-center gap-1 sm:gap-2">
+					<UserSearch />
 					<ThemeToggle />
 					{user ? (
 						<>
