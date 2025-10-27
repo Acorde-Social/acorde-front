@@ -14,6 +14,7 @@ interface SearchUser {
 	id: string
 	name: string
 	email: string
+	login: string
 	role: "COMPOSER" | "MUSICIAN"
 	avatarUrl: string | null
 	city?: string
@@ -151,7 +152,7 @@ export function UserSearch() {
 										{results.map((user) => (
 											<Link
 												key={user.id}
-												href={`/profile/${user.id}`}
+												href={`/@${user.login}`}
 												onClick={handleClose}
 												className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
 											>
