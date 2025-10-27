@@ -1,175 +1,361 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/contexts/auth-context"
+import { useState, useEffect, useRef } from "react"
+import { Bell, Check, X, Heart, MessageCircle, UserPlus, Sparkles, Megaphone, Loader2 } from "lucide-react"
+import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import Link from "next/link"
-import { socketService } from "@/services/socket-service"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
-
-interface Notification {
-  id: string
-  type: "collaboration_request" | "collaboration_accepted" | "new_comment" | "new_track"
-  projectId: string
-  projectTitle: string
-  userId?: string
-  userName?: string
-  message: string
-  read: boolean
-  createdAt: string
-}
+import { useNotificationCounts } from "@/hooks/use-notification-counts"
+import { fixImageUrl } from "@/lib/utils"
+import {
+  getNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  deleteNotification,
+  type Notification,
+} from "@/services/notifications.service"
 
 export function Notifications() {
-  const { user, token } = useAuth()
+  const { token } = useAuth()
   const { toast } = useToast()
+  const router = useRouter()
+  const pathname = usePathname()
+  const { notifications: unreadCount, refetch: refetchCounts } = useNotificationCounts()
+  const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [processingIds, setProcessingIds] = useState<Set<string>>(new Set())
+  const [isMobile, setIsMobile] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Buscar notificações iniciais
+  // Detectar mobile
   useEffect(() => {
-    if (user && token) {
-      // Em uma implementação real, você buscaria as notificações da API
-      const mockNotifications: Notification[] = [
-        {
-          id: "1",
-          type: "collaboration_request",
-          projectId: "project-1",
-          projectTitle: "Melodia do Amanhecer",
-          userId: "user-1",
-          userName: "Maria Costa",
-          message: "Maria Costa solicitou para colaborar em seu projeto",
-          read: false,
-          createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutos atrás
-        },
-        {
-          id: "2",
-          type: "new_comment",
-          projectId: "project-2",
-          projectTitle: "Ritmos Urbanos",
-          userId: "user-2",
-          userName: "Pedro Alves",
-          message: "Pedro Alves comentou em seu projeto",
-          read: false,
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 horas atrás
-        },
-        {
-          id: "3",
-          type: "collaboration_accepted",
-          projectId: "project-3",
-          projectTitle: "Sinfonia Eletrônica",
-          userId: "user-3",
-          userName: "Ana Santos",
-          message: "Ana Santos aceitou sua solicitação de colaboração",
-          read: true,
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 dia atrás
-        },
-      ]
-
-      setNotifications(mockNotifications)
-      setUnreadCount(mockNotifications.filter((n) => !n.read).length)
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024)
     }
-  }, [user, token])
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
-  // Configurar listener de WebSocket para novas notificações
+  // Fechar ao clicar fora
   useEffect(() => {
-    if (!user) return
-
-    const handleNewNotification = (notification: Notification) => {
-      // Adicionar nova notificação à lista
-      setNotifications((prev) => [notification, ...prev])
-      setUnreadCount((prev) => prev + 1)
-
-      // Mostrar toast para notificação
-      toast({
-        title: "Nova notificação",
-        description: notification.message,
-      })
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
     }
 
-    // Registrar listener
-    socketService.on("notification", handleNewNotification)
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
-    // Limpar listener ao desmontar
-    return () => {
-      socketService.off("notification", handleNewNotification)
+  // Buscar notificações quando abrir - APENAS uma vez ao abrir no desktop E não estiver na página /notifications
+  useEffect(() => {
+    if (isOpen && !isMobile && token && pathname !== "/notifications") {
+      fetchNotifications()
     }
-  }, [user, toast])
+  }, [isOpen, isMobile, token, pathname])
 
-  const markAsRead = (notificationId: string) => {
-    // Em uma implementação real, você enviaria uma requisição para a API
-    setNotifications(
-      notifications.map((notification) =>
-        notification.id === notificationId ? { ...notification, read: true } : notification,
-      ),
-    )
+  const fetchNotifications = async () => {
+    if (!token) return
 
-    setUnreadCount((prev) => Math.max(0, prev - 1))
+    setIsLoading(true)
+    try {
+      const data = await getNotifications(token, 20, false)
+      setNotifications(data)
+    } catch (error) {
+      console.error("Error fetching notifications:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const markAllAsRead = () => {
-    // Em uma implementação real, você enviaria uma requisição para a API
-    setNotifications(notifications.map((notification) => ({ ...notification, read: true })))
-    setUnreadCount(0)
+  const handleClick = () => {
+    if (isMobile || pathname === "/notifications") {
+      // No mobile ou se já estiver na página, redireciona/mantém na página
+      router.push("/notifications")
+      setIsOpen(false)
+    } else {
+      // No desktop em outras páginas, abre o dropdown
+      setIsOpen(!isOpen)
+    }
+  }
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    if (!token) return
+
+    setProcessingIds((prev) => new Set(prev).add(notificationId))
+    try {
+      await markNotificationAsRead(token, notificationId)
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+      )
+      refetchCounts() // Atualizar contador
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao marcar notificação",
+        variant: "destructive",
+      })
+    } finally {
+      setProcessingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(notificationId)
+        return next
+      })
+    }
+  }
+
+  const handleMarkAllAsRead = async () => {
+    if (!token) return
+
+    try {
+      await markAllNotificationsAsRead(token)
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+      refetchCounts() // Atualizar contador
+      toast({
+        title: "Sucesso",
+        description: "Todas as notificações foram marcadas como lidas",
+      })
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao marcar todas as notificações",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleDelete = async (notificationId: string, event: React.MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (!token) return
+
+    setProcessingIds((prev) => new Set(prev).add(notificationId))
+    try {
+      await deleteNotification(token, notificationId)
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+      refetchCounts() // Atualizar contador
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Erro ao deletar notificação",
+        variant: "destructive",
+      })
+    } finally {
+      setProcessingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(notificationId)
+        return next
+      })
+    }
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case "TRACK_LIKE":
+      case "COMMENT_LIKE":
+        return <Heart className="h-4 w-4 text-red-500" />
+      case "COMMENT_NEW":
+        return <MessageCircle className="h-4 w-4 text-blue-500" />
+      case "COLLABORATION_INVITE":
+      case "COLLABORATION_ACCEPTED":
+        return <Sparkles className="h-4 w-4 text-purple-500" />
+      case "FRIEND_NEW_POST":
+        return <UserPlus className="h-4 w-4 text-green-500" />
+      case "SYSTEM_ANNOUNCEMENT":
+        return <Megaphone className="h-4 w-4 text-orange-500" />
+      default:
+        return <Bell className="h-4 w-4 text-muted-foreground" />
+    }
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-primary/5 h-8 w-8 sm:h-10 sm:w-10">
-          <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-primary text-[10px] sm:text-xs text-primary-foreground">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        <DropdownMenuLabel className="flex justify-between items-center">
-          <span>Notificações</span>
-          {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="text-xs h-7 hover:text-primary hover:bg-primary/5">
-              Marcar todas como lidas
-            </Button>
-          )}
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-
-        {notifications.length === 0 ? (
-          <div className="py-4 px-2 text-center text-sm text-muted-foreground">Nenhuma notificação</div>
-        ) : (
-          notifications.map((notification) => (
-            <DropdownMenuItem
-              key={notification.id}
-              asChild
-              className={`p-3 cursor-pointer ${notification.read ? "" : "bg-primary/5"}`}
-              onSelect={() => markAsRead(notification.id)}
-            >
-              <Link href={`/projects/${notification.projectId}`}>
-                <div className="flex flex-col gap-1">
-                  <div className="font-medium">{notification.message}</div>
-                  <div className="text-xs text-muted-foreground">Projeto: {notification.projectTitle}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true, locale: ptBR })}
-                  </div>
-                </div>
-              </Link>
-            </DropdownMenuItem>
-          ))
+    <div ref={dropdownRef} className="relative">
+      {/* Botão de notificações */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleClick}
+        className="relative h-10 w-10 hover:bg-primary/5"
+      >
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
         )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <span className="sr-only">Notificações</span>
+      </Button>
+
+      {/* Dropdown - apenas desktop */}
+      {isOpen && !isMobile && (
+        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-background border border-border rounded-lg shadow-xl overflow-hidden z-50">
+          {/* Header */}
+          <div className="p-4 border-b border-border/50 flex items-center justify-between">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              Notificações
+            </h3>
+            {unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleMarkAllAsRead}
+                className="text-xs h-7"
+              >
+                <Check className="h-3 w-3 mr-1" />
+                Marcar todas
+              </Button>
+            )}
+          </div>
+
+          {/* Content */}
+          <ScrollArea className="max-h-[500px]">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <Bell className="h-16 w-16 text-muted-foreground/20 mb-4" />
+                <h4 className="font-semibold mb-1">Nenhuma notificação</h4>
+                <p className="text-sm text-muted-foreground">
+                  Suas notificações aparecerão aqui
+                </p>
+              </div>
+            ) : (
+              <div className="p-2">
+                {notifications.map((notification) => {
+                  return (
+                    <div
+                      key={notification.id}
+                      className={`flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors relative ${!notification.read ? "bg-primary/5" : ""
+                        }`}
+                    >
+                      {notification.actionUrl ? (
+                        <Link
+                          href={notification.actionUrl}
+                          onClick={() => setIsOpen(false)}
+                          className="flex items-start gap-3 flex-1"
+                        >
+                          {notification.actor ? (
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage
+                                src={fixImageUrl(notification.actor.avatarUrl || "")}
+                                alt={notification.actor.name}
+                                className="object-cover"
+                              />
+                              <AvatarFallback className="text-sm">
+                                {notification.actor.name[0]?.toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                              {getNotificationIcon(notification.type)}
+                            </div>
+                          )}
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-medium line-clamp-2">
+                                {notification.title}
+                              </p>
+                              {!notification.read && (
+                                <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {formatDistanceToNow(new Date(notification.createdAt), {
+                                addSuffix: true,
+                                locale: ptBR,
+                              })}
+                            </p>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div className="flex items-start gap-3 flex-1">
+                          {notification.actor ? (
+                            <Avatar className="h-10 w-10">
+                              <AvatarImage
+                                src={fixImageUrl(notification.actor.avatarUrl || "")}
+                                alt={notification.actor.name}
+                                className="object-cover"
+                              />
+                              <AvatarFallback className="text-sm">
+                                {notification.actor.name[0]?.toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                              {getNotificationIcon(notification.type)}
+                            </div>
+                          )}
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-medium line-clamp-2">
+                                {notification.title}
+                              </p>
+                              {!notification.read && (
+                                <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {formatDistanceToNow(new Date(notification.createdAt), {
+                                addSuffix: true,
+                                locale: ptBR,
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col gap-1">
+                        {!notification.read && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleMarkAsRead(notification.id)}
+                            disabled={processingIds.has(notification.id)}
+                            className="h-7 w-7 p-0"
+                          >
+                            <Check className="h-3 w-3" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => handleDelete(notification.id, e)}
+                          disabled={processingIds.has(notification.id)}
+                          className="h-7 w-7 p-0 hover:text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+      )}
+    </div>
   )
 }
-

@@ -8,6 +8,7 @@ import { MainNav } from "./main-nav"
 import { MobileNav } from "./mobile-nav"
 import { ThemeToggle } from "../theme-toggle"
 import { Notifications } from "../notifications"
+import { FriendshipNotifications } from "./friendship-notifications"
 import { UserNav } from "./user-nav"
 import { UserSearch } from "./user-search"
 import { cn } from "@/lib/utils"
@@ -45,6 +46,7 @@ export function Header() {
 					<ThemeToggle />
 					{user ? (
 						<>
+							<FriendshipNotifications />
 							<Notifications />
 							<UserNav />
 						</>
