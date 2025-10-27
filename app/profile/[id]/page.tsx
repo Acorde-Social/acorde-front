@@ -223,12 +223,16 @@ export default function UserProfilePage() {
 			</div>
 
 			{/* Profile content */}
-			<div className="container -mt-16">
-				<Card className="overflow-visible">
+			<div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 -mt-16">
+				<Card className="overflow-visible w-full">
 					<CardHeader className="flex flex-col md:flex-row md:items-end md:justify-between text-center md:text-left pt-8">
 						<div className="flex flex-col items-center md:items-start">
-							<Avatar className="h-32 w-32 border-4 border-background shadow-lg -mt-24 mb-4">
-								<AvatarImage src={fixImageUrl(userProfile.avatarUrl || "")} alt={userProfile.name} />
+							<Avatar className="h-32 w-32 border-4 border-background shadow-lg -mt-24 mb-4 aspect-square">
+								<AvatarImage
+									src={fixImageUrl(userProfile.avatarUrl || "")}
+									alt={userProfile.name}
+									className="object-cover w-full h-full"
+								/>
 								<AvatarFallback className="text-4xl bg-primary text-primary-foreground">
 									{userProfile.name?.charAt(0) || "U"}
 								</AvatarFallback>
@@ -252,15 +256,15 @@ export default function UserProfilePage() {
 						)}
 					</CardHeader>
 
-					<CardContent className="pb-8">
+					<CardContent className="pb-6 px-4 md:px-6">
 						{userProfile.bio && (
-							<div className="mb-6">
+							<div className="mb-4">
 								<h3 className="text-sm font-medium text-muted-foreground mb-1">Biografia</h3>
 								<p className="text-sm">{userProfile.bio}</p>
 							</div>
 						)}
 
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 							{userProfile.instruments && userProfile.instruments.length > 0 && (
 								<div>
 									<h3 className="text-sm font-medium text-muted-foreground mb-1">Instrumentos</h3>

@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { useThemeCustomization } from "@/contexts/theme-context"
-import { Avatar } from "@/components/ui/avatar"
+import { useAuth } from "@/contexts/auth-context"
 
 export function MobileNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const { preferences } = useThemeCustomization()
+  const { user } = useAuth()
 
   const navItems = [
     {
@@ -36,19 +37,23 @@ export function MobileNav() {
       href: "/studio",
       label: "Estúdio",
     },
+    // Adicionar link para o chat apenas se o usuário estiver autenticado
+    ...(user ? [
+      {
+        href: "/chat",
+        label: "Chat",
+      }
+    ] : []),
   ]
 
   return (
-    <div className="md:hidden">
+    <div className="md:hidden flex items-center gap-2">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button
             variant="ghost"
-            size={preferences.layout === "compact" ? "sm" : "default"}
-            className={cn(
-              "md:hidden",
-              preferences.layout === "spacious" && "text-lg p-6"
-            )}
+            size="icon"
+            className="h-9 w-9"
           >
             <Menu className="h-5 w-5" />
             <span className="sr-only">Abrir menu</span>
@@ -56,18 +61,7 @@ export function MobileNav() {
         </SheetTrigger>
         <SheetContent side="left" className="w-[80vw] max-w-sm">
           <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-            <Avatar className={cn(
-              "rounded-lg",
-              preferences.layout === "compact" ? "h-8 w-8" : "h-10 w-10"
-            )}>
-              <div className="flex items-center justify-center w-full h-full bg-primary text-primary-foreground font-bold">
-                MC
-              </div>
-            </Avatar>
-            <span className={cn(
-              "font-bold",
-              preferences.layout === "compact" ? "text-sm" : "text-base"
-            )}>Acorde</span>
+            <span className="font-bold text-lg">Acorde</span>
           </Link>
           <nav className={cn(
             "flex flex-col space-y-4 mt-4",
@@ -94,19 +88,8 @@ export function MobileNav() {
           </nav>
         </SheetContent>
       </Sheet>
-      <Link href="/" className="flex items-center gap-2">
-        <Avatar className={cn(
-          "rounded-lg",
-          preferences.layout === "compact" ? "h-8 w-8" : "h-10 w-10"
-        )}>
-          <div className="flex items-center justify-center w-full h-full bg-primary text-primary-foreground font-bold">
-            MC
-          </div>
-        </Avatar>
-        <span className={cn(
-          "font-bold",
-          preferences.layout === "compact" ? "text-sm" : "text-base"
-        )}>Acorde</span>
+      <Link href="/" className="flex items-center">
+        <span className="font-bold text-sm sm:text-base">Acorde</span>
       </Link>
     </div>
   )

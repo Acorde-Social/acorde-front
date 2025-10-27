@@ -44,9 +44,9 @@ export function MainNav() {
   return (
     <nav
       className={cn(
-        "flex items-center space-x-4 lg:space-x-6",
-        preferences.layout === "compact" && "space-x-2 lg:space-x-4 text-sm",
-        preferences.layout === "spacious" && "space-x-6 lg:space-x-8"
+        "hidden md:flex items-center space-x-4 lg:space-x-6",
+        preferences.layout === "compact" && "md:space-x-2 lg:space-x-4 text-sm",
+        preferences.layout === "spacious" && "md:space-x-6 lg:space-x-8"
       )}
     >
       {navItems.map((item) => (

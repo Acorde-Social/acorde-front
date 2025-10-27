@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,59 +16,88 @@ import {
 import { useAuth } from "@/contexts/auth-context"
 import { useThemeCustomization } from "@/contexts/theme-context"
 import { cn } from "@/lib/utils"
+import { fixImageUrl } from "@/lib/utils"
+import { ArrowLeft } from "lucide-react"
 
 export function UserNav() {
 	const { user, logout } = useAuth()
 	const router = useRouter()
+	const pathname = usePathname()
 	const { preferences } = useThemeCustomization()
 
 	if (!user) return null
 
+	// Verificar se está visualizando outro perfil
+	const isViewingOtherProfile = pathname?.startsWith('/profile/') && pathname !== '/profile'
+
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button variant="ghost" className="relative h-10 w-10 rounded-full">
-					<Avatar className={cn(
-						"cursor-pointer transition-opacity hover:opacity-80",
-						preferences.layout === "compact" ? "h-8 w-8" : preferences.layout === "spacious" ? "h-12 w-12" : "h-10 w-10"
-					)}>
-						<AvatarImage src={user.avatarUrl || ""} alt={user.name} />
-						<AvatarFallback>{user.name[0]}</AvatarFallback>
-					</Avatar>
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-56" align="end" forceMount>
-				<DropdownMenuLabel className="font-normal">
-					<div className="flex flex-col space-y-1">
-						<p className="text-sm font-medium leading-none">{user.name}</p>
-						<p className="text-xs leading-none text-muted-foreground">
-							{user.email}
-						</p>
-					</div>
-				</DropdownMenuLabel>
-				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					<DropdownMenuItem asChild>
-						<Link href="/profile">Meu Perfil</Link>
-					</DropdownMenuItem>
-					<DropdownMenuItem asChild>
-						<Link href="/projects">Meus Projetos</Link>
-					</DropdownMenuItem>
-					<DropdownMenuItem asChild>
-						<Link href="/collaborations">Minhas Colaborações</Link>
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-				<DropdownMenuSeparator />
-				<DropdownMenuItem
-					className="text-red-600 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950"
-					onClick={() => {
-						logout()
-						router.push("/")
-					}}
+		<div className="flex items-center gap-1 sm:gap-2">
+			{/* Botão Voltar - apenas quando visualizando outro perfil */}
+			{isViewingOtherProfile && (
+				<Button
+					variant="ghost"
+					size="sm"
+					asChild
+					className="text-muted-foreground hover:text-foreground h-8 px-2"
 				>
-					Sair
-				</DropdownMenuItem>
-			</DropdownMenuContent>
-		</DropdownMenu>
+					<Link href="/profile">
+						<ArrowLeft className="h-4 w-4 sm:mr-1" />
+						<span className="hidden sm:inline">Meu Perfil</span>
+					</Link>
+				</Button>
+			)}
+
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="ghost" className="relative rounded-full p-0 h-8 w-8 sm:h-10 sm:w-10">
+						<Avatar className={cn(
+							"cursor-pointer transition-opacity hover:opacity-80 aspect-square",
+							"h-8 w-8 sm:h-10 sm:w-10",
+							preferences.layout === "compact" && "sm:h-8 sm:w-8",
+							preferences.layout === "spacious" && "sm:h-12 sm:w-12"
+						)}>
+							<AvatarImage
+								src={fixImageUrl(user.avatarUrl || "")}
+								alt={user.name}
+								className="object-cover w-full h-full"
+							/>
+							<AvatarFallback>{user.name[0]}</AvatarFallback>
+						</Avatar>
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent className="w-56" align="end" forceMount>
+					<DropdownMenuLabel className="font-normal">
+						<div className="flex flex-col space-y-1">
+							<p className="text-sm font-medium leading-none">{user.name}</p>
+							<p className="text-xs leading-none text-muted-foreground">
+								{user.email}
+							</p>
+						</div>
+					</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
+						<DropdownMenuItem asChild>
+							<Link href="/profile">Meu Perfil</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href="/projects">Meus Projetos</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href="/collaborations">Minhas Colaborações</Link>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem
+						className="text-red-600 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950"
+						onClick={() => {
+							logout()
+							router.push("/")
+						}}
+					>
+						Sair
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	)
 }
