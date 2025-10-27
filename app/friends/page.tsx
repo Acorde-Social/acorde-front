@@ -9,13 +9,10 @@ import {
 	declineFriendship,
 	removeFriendship,
 	sendFriendshipRequest,
-	type Friend,
-	type Friendship,
-	type FriendSuggestion,
 } from "@/services/friendships.service"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { UserPlus, Users, Loader2, UserMinus, Check, X, Sparkles } from "lucide-react"
