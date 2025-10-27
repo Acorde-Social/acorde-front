@@ -178,7 +178,7 @@ export function UserSearch() {
 										{results.map((user) => (
 											<Link
 												key={user.id}
-												href={`/${user.login}`}
+												href={`/public-profile/${user.login}`}
 												onClick={handleClose}
 												className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
 											>
@@ -243,7 +243,7 @@ export function UserSearch() {
 										{results.map((user) => (
 											<Link
 												key={user.id}
-												href={`/${user.login}`}
+												href={`/public-profile/${user.login}`}
 												onClick={handleClose}
 												className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
 											>
