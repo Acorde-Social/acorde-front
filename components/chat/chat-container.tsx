@@ -8,11 +8,38 @@ import { chatService } from "@/services/chat-service";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@/components/ui/avatar";
-import { Info, MoreVertical, ArrowLeft } from "lucide-react";
+import { Info, MoreVertical, ArrowLeft, Trash2, BellOff, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from "@/components/ui/dialog";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import MessageList from "./message-list";
 import MessageInput from "./message-input";
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 interface ChatContainerProps {
 	conversation: ChatConversation;
@@ -34,6 +61,10 @@ export default function ChatContainer({
 	const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
 	const [cursor, setCursor] = useState<string | undefined>(undefined);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	
+	// Estados para modais e dropdowns
+	const [showInfoDialog, setShowInfoDialog] = useState(false);
+	const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
 	// Obter mensagens iniciais da conversa
 	useEffect(() => {
@@ -218,6 +249,16 @@ export default function ChatContainer({
 		return name.substring(0, 2).toUpperCase();
 	};
 
+	// Handler para apagar conversa
+	const handleDeleteConversation = async () => {
+		// TODO: Implementar endpoint no backend para deletar conversa
+		console.log('Apagar conversa:', conversation.id);
+		setShowDeleteAlert(false);
+		// Após implementar o endpoint:
+		// await chatService.deleteConversation(conversation.id);
+		// onBack?.(); // Voltar para lista de conversas
+	};
+
 	return (
 		<div className="flex flex-col h-full">
 			{/* Cabeçalho do chat */}
@@ -262,15 +303,42 @@ export default function ChatContainer({
 					</div>
 				</div>
 
-				<div className="flex items-center flex-shrink-0">
-					<Button variant="ghost" size="icon" title="Informações da conversa">
-						<Info className="h-5 w-5" />
-					</Button>
+			<div className="flex items-center flex-shrink-0">
+				<Button 
+					variant="ghost" 
+					size="icon" 
+					onClick={() => setShowInfoDialog(true)}
+					title="Informações da conversa"
+				>
+					<Info className="h-5 w-5" />
+				</Button>
 
-					<Button variant="ghost" size="icon" title="Mais opções">
-						<MoreVertical className="h-5 w-5" />
-					</Button>
-				</div>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="ghost" size="icon" title="Mais opções">
+							<MoreVertical className="h-5 w-5" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" className="w-48">
+						<DropdownMenuItem 
+							className="text-destructive focus:text-destructive cursor-pointer"
+							onClick={() => setShowDeleteAlert(true)}
+						>
+							<Trash2 className="h-4 w-4 mr-2" />
+							Apagar conversa
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem className="cursor-pointer">
+							<BellOff className="h-4 w-4 mr-2" />
+							Silenciar notificações
+						</DropdownMenuItem>
+						<DropdownMenuItem className="cursor-pointer">
+							<Archive className="h-4 w-4 mr-2" />
+							Arquivar conversa
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
 			</div>
 
 			{/* Lista de mensagens */}
@@ -321,6 +389,96 @@ export default function ChatContainer({
 					onTyping={handleTyping}
 				/>
 			</div>
+
+			{/* Dialog de Informações */}
+			<Dialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<DialogTitle>Informações da Conversa</DialogTitle>
+					</DialogHeader>
+					<div className="space-y-4 py-4">
+						{/* Participantes */}
+						<div>
+							<h4 className="text-sm font-medium mb-3">Participantes</h4>
+							<div className="space-y-2">
+								{conversation.participants.map((participant) => (
+									<div key={participant.user.id} className="flex items-center gap-3">
+										<Avatar className="h-10 w-10 aspect-square">
+											<AvatarImage 
+												src={participant.user.avatarUrl || ''} 
+												className="object-cover w-full h-full"
+											/>
+											<AvatarFallback>
+												{participant.user.name.substring(0, 2).toUpperCase()}
+											</AvatarFallback>
+										</Avatar>
+										<div className="flex-1">
+											<p className="font-medium text-sm">{participant.user.name}</p>
+											{participant.user.login && (
+												<p className="text-xs text-muted-foreground">@{participant.user.login}</p>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+
+						{/* Informações da conversa */}
+						<div className="space-y-2">
+							<div className="flex justify-between text-sm">
+								<span className="text-muted-foreground">Criada em:</span>
+								<span className="font-medium">
+									{new Date(conversation.createdAt).toLocaleDateString('pt-BR', {
+										day: '2-digit',
+										month: 'long',
+										year: 'numeric'
+									})}
+								</span>
+							</div>
+							<div className="flex justify-between text-sm">
+								<span className="text-muted-foreground">Última atividade:</span>
+								<span className="font-medium">
+									{formatDistanceToNow(new Date(conversation.updatedAt), {
+										addSuffix: true,
+										locale: ptBR
+									})}
+								</span>
+							</div>
+							{conversation.lastMessage && (
+								<div className="flex justify-between text-sm">
+									<span className="text-muted-foreground">Total de mensagens:</span>
+									<span className="font-medium">{messages.length}</span>
+								</div>
+							)}
+						</div>
+					</div>
+					<DialogFooter>
+						<Button onClick={() => setShowInfoDialog(false)}>Fechar</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* Alert de Confirmação para Apagar */}
+			<AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Apagar conversa?</AlertDialogTitle>
+						<AlertDialogDescription>
+							Esta ação não pode ser desfeita. Todas as mensagens desta conversa 
+							serão permanentemente removidas para você.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Cancelar</AlertDialogCancel>
+						<AlertDialogAction 
+							onClick={handleDeleteConversation}
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+						>
+							Apagar
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	);
 }

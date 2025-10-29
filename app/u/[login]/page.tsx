@@ -18,6 +18,7 @@ import { getFriendshipStatus, sendFriendshipRequest, removeFriendship, type Frie
 import { useToast } from "@/hooks/use-toast"
 
 interface PublicProfile {
+	id: string
 	name: string
 	login: string
 	role: "COMPOSER" | "MUSICIAN" | "PRODUCER" | "SONGWRITER" | "VOCALIST" | "BEATMAKER" | "ENGINEER" | "ARRANGER" | "MIXER" | "DJ" | "LISTENER"
@@ -40,7 +41,7 @@ export default function PublicProfilePage() {
 	const params = useParams()
 	const router = useRouter()
 	const { user, token } = useAuth()
-	const { openChat } = useChatPopup()
+	const { openChatWithUser } = useChatPopup()
 	const { toast } = useToast()
 	const [profile, setProfile] = useState<PublicProfile | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
@@ -153,20 +154,43 @@ export default function PublicProfilePage() {
 		}
 	}
 
-	const handleSendMessage = () => {
-		if (!handleProtectedAction("enviar mensagem") || !profile) return
+	const handleSendMessage = async () => {
+		if (!handleProtectedAction("enviar mensagem") || !profile || !token) return
 
 		// Detectar se é mobile (tela < 768px)
 		const isMobile = window.innerWidth < 768
 
 		if (isMobile) {
-			// Mobile: redirecionar para página de chat
-			router.push('/chat')
-			// Após navegar, o chat deve abrir a conversa automaticamente
-			// (isso será implementado na página de chat detectando query params)
+			// Mobile: buscar ou criar conversa e redirecionar
+			try {
+				const { chatService } = await import('@/services/chat-service')
+				const conversations = await chatService.getUserConversations(token)
+				let conversation = conversations.find(conv =>
+					!conv.isGroup &&
+					conv.participants.some(p => p.user.id === profile.id)
+				)
+
+				if (!conversation) {
+					// Criar nova conversa
+					conversation = await chatService.createConversation({
+						participantIds: [profile.id],
+						isGroup: false,
+					}, token)
+				}
+
+				// Redirecionar para página de chat com a conversa selecionada
+				router.push(`/chat?conversationId=${conversation.id}`)
+			} catch (error) {
+				console.error('Erro ao abrir chat:', error)
+				toast({
+					title: "Erro",
+					description: "Não foi possível abrir o chat",
+					variant: "destructive",
+				})
+			}
 		} else {
-			// Desktop: abrir popup de chat
-			openChat(profile.login)
+			// Desktop: abrir popup de chat usando o userId diretamente
+			openChatWithUser(profile.id, profile.name)
 		}
 	}
 

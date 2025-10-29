@@ -137,19 +137,19 @@ function MessageList({ messages, currentUserId, participants, isTyping }: Messag
 							key={message.id}
 							className={`flex mb-3 ${isMine ? 'justify-end' : 'justify-start'}`}
 						>
-						<div className={`flex ${isMine ? 'flex-row-reverse' : 'flex-row'} items-end`}>
-							{showAvatar ? (
-								<Avatar className={`h-8 w-8 aspect-square ${isMine ? 'ml-2' : 'mr-2'}`}>
-									<AvatarImage
-										src={message.sender && message.sender.avatarUrl ?
-											fixImageUrl(message.sender.avatarUrl) : ''}
-										className="object-cover w-full h-full"
-									/>
-									<AvatarFallback>{getSenderInitials(message)}</AvatarFallback>
-								</Avatar>
-							) : (
-								<div className={`w-8 ${isMine ? 'ml-2' : 'mr-2'}`} />
-							)}								<div className="flex flex-col">
+							<div className={`flex ${isMine ? 'flex-row-reverse' : 'flex-row'} items-end`}>
+								{showAvatar ? (
+									<Avatar className={`h-8 w-8 aspect-square ${isMine ? 'ml-2' : 'mr-2'}`}>
+										<AvatarImage
+											src={message.sender && message.sender.avatarUrl ?
+												fixImageUrl(message.sender.avatarUrl) : ''}
+											className="object-cover w-full h-full"
+										/>
+										<AvatarFallback>{getSenderInitials(message)}</AvatarFallback>
+									</Avatar>
+								) : (
+									<div className={`w-8 ${isMine ? 'ml-2' : 'mr-2'}`} />
+								)}								<div className="flex flex-col">
 									{showAvatar && !isMine && message.sender && (
 										<span className="text-xs text-muted-foreground ml-1 mb-1">
 											{message.sender.name}

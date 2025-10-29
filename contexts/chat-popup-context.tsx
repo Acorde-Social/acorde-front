@@ -7,6 +7,7 @@ import { useAuth } from "./auth-context"
 
 interface ChatPopupContextType {
 	openChat: (userLogin: string) => Promise<void>
+	openChatWithUser: (userId: string, userName: string) => Promise<void>
 	openChatById: (conversationId: string) => Promise<void>
 	closeChat: (conversationId: string) => void
 	openChats: ChatConversation[]
@@ -58,6 +59,35 @@ export function ChatPopupProvider({ children }: { children: ReactNode }) {
 		}
 	}
 
+	const openChatWithUser = async (userId: string, userName: string) => {
+		if (!user || !token) return
+
+		try {
+			// Buscar ou criar conversa com esse usuário (sem chamar profile)
+			const conversations = await chatService.getUserConversations(token)
+			let conversation = conversations.find(conv =>
+				!conv.isGroup &&
+				conv.participants.some(p => p.user.id === userId)
+			)
+
+			if (!conversation) {
+				// Criar nova conversa
+				conversation = await chatService.createConversation({
+					participantIds: [userId],
+					isGroup: false,
+				}, token)
+			}
+
+			// Verificar se já está aberto
+			const alreadyOpen = openChats.some(c => c.id === conversation!.id)
+			if (!alreadyOpen) {
+				setOpenChats(prev => [...prev, conversation!])
+			}
+		} catch (error) {
+			console.error('Erro ao abrir chat:', error)
+		}
+	}
+
 	const openChatById = async (conversationId: string) => {
 		if (!token) return
 
@@ -85,7 +115,7 @@ export function ChatPopupProvider({ children }: { children: ReactNode }) {
 	}
 
 	return (
-		<ChatPopupContext.Provider value={{ openChat, openChatById, closeChat, openChats }}>
+		<ChatPopupContext.Provider value={{ openChat, openChatWithUser, openChatById, closeChat, openChats }}>
 			{children}
 			{/* Renderizar popups de chat flutuantes */}
 			<div className="hidden md:block">

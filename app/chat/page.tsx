@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ChatConversation } from "@/services/chat-service";
 import { chatService } from "@/services/chat-service";
@@ -14,6 +14,7 @@ import NewConversationModal from "@/components/chat/new-conversation-modal";
 export default function ChatPage() {
 	const { user, token } = useAuth();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const [conversations, setConversations] = useState<ChatConversation[]>([]);
 	const [activeConversation, setActiveConversation] = useState<ChatConversation | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -53,6 +54,17 @@ export default function ChatPage() {
 			setIsLoading(false);
 		}
 	};
+
+	// Abrir conversa específica via query param
+	useEffect(() => {
+		const conversationId = searchParams.get('conversationId');
+		if (conversationId && conversations.length > 0) {
+			const conversation = conversations.find(c => c.id === conversationId);
+			if (conversation) {
+				setActiveConversation(conversation);
+			}
+		}
+	}, [searchParams, conversations]);
 
 	const setupWebSocketListeners = () => {
 		// Ouvir por novas mensagens
