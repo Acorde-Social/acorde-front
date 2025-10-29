@@ -9,6 +9,7 @@ import { MobileNav } from "./mobile-nav"
 import { ThemeToggle } from "../theme-toggle"
 import { Notifications } from "../notifications"
 import { FriendshipNotifications } from "./friendship-notifications"
+import { ChatNotifications } from "./chat-notifications"
 import { UserNav } from "./user-nav"
 import { UserSearch } from "./user-search"
 import { cn } from "@/lib/utils"
@@ -46,6 +47,7 @@ export function Header() {
 					<ThemeToggle />
 					{user ? (
 						<>
+							<ChatNotifications />
 							<FriendshipNotifications />
 							<Notifications />
 							<UserNav />

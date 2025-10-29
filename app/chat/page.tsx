@@ -158,14 +158,18 @@ export default function ChatPage() {
 
 	return (
 		<div className="flex h-screen bg-background">
-			{/* Sidebar com lista de conversas */}
-			<div className="w-1/4 border-r border-border h-full flex flex-col">
-				<div className="p-4 border-b border-border flex justify-between items-center">
+			{/* Sidebar com lista de conversas - Mobile: full screen quando sem conversa ativa */}
+			<div className={`
+				w-full md:w-1/3 lg:w-1/4 border-r border-border h-full flex flex-col
+				${activeConversation ? 'hidden md:flex' : 'flex'}
+			`}>
+				<div className="p-4 border-b border-border flex justify-between items-center bg-card">
 					<h2 className="text-xl font-bold">Conversas</h2>
 					<Button
 						variant="ghost"
 						size="icon"
 						onClick={() => setShowNewConversationModal(true)}
+						className="hover:bg-primary/10"
 					>
 						<PlusCircle className="h-5 w-5" />
 					</Button>
@@ -177,20 +181,26 @@ export default function ChatPage() {
 						activeConversationId={activeConversation?.id}
 						onSelectConversation={handleSelectConversation}
 						isLoading={isLoading}
+						currentUserId={user?.id}
 					/>
 				</div>
 			</div>
 
-			{/* Área principal de chat */}
-			<div className="flex-1 flex flex-col">
+			{/* Área principal de chat - Mobile: full screen quando conversa ativa */}
+			<div className={`
+				flex-1 flex flex-col
+				${activeConversation ? 'flex' : 'hidden md:flex'}
+			`}>
 				{activeConversation ? (
 					<ChatContainer
 						conversation={activeConversation}
 						currentUserId={user?.id || ''}
+						onBack={() => setActiveConversation(null)}
 					/>
 				) : (
-					<div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-						<p className="text-lg mb-4">Selecione uma conversa ou inicie uma nova</p>
+					<div className="flex flex-col items-center justify-center h-full text-muted-foreground px-4">
+						<PlusCircle className="h-16 w-16 mb-4 opacity-20" />
+						<p className="text-lg mb-4 text-center">Selecione uma conversa ou inicie uma nova</p>
 						<Button
 							onClick={() => setShowNewConversationModal(true)}
 							className="flex items-center gap-2"

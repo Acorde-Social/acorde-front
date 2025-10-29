@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { ChatConversation, ChatMessage } from "@/services/chat-service";
 import { chatService } from "@/services/chat-service";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@/components/ui/avatar";
-import { Info, MoreVertical } from "lucide-react";
+import { Info, MoreVertical, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import MessageList from "./message-list";
@@ -16,11 +17,13 @@ import MessageInput from "./message-input";
 interface ChatContainerProps {
 	conversation: ChatConversation;
 	currentUserId: string;
+	onBack?: () => void;
 }
 
 export default function ChatContainer({
 	conversation,
 	currentUserId,
+	onBack,
 }: ChatContainerProps) {
 	const { user } = useAuth();
 	const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -98,7 +101,7 @@ export default function ChatContainer({
 	const handleUserTyping = (data: { userId: string; isTyping: boolean; conversationId: string }) => {
 		if (data.conversationId !== conversation.id || data.userId === currentUserId) return;
 
-		const typingParticipant = conversation.participants.find(p => p.userId === data.userId);
+		const typingParticipant = conversation.participants.find(p => p.user.id === data.userId);
 		if (!typingParticipant) return;
 
 		setIsTyping(data.isTyping);
@@ -179,10 +182,21 @@ export default function ChatContainer({
 
 		// Para conversas 1:1, mostrar o nome do outro participante
 		const otherParticipant = conversation.participants.find(
-			p => p.userId !== currentUserId
+			p => p.user.id !== currentUserId
 		);
 
 		return otherParticipant?.user.name || 'Conversa';
+	};
+
+	// Obter o login do outro participante para link do perfil
+	const getOtherParticipantLogin = () => {
+		if (conversation.isGroup) return null;
+
+		const otherParticipant = conversation.participants.find(
+			p => p.user.id !== currentUserId
+		);
+
+		return otherParticipant?.user.login || null;
 	};
 
 	// Obter o avatar para o cabeçalho da conversa
@@ -192,7 +206,7 @@ export default function ChatContainer({
 		}
 
 		const otherParticipant = conversation.participants.find(
-			p => p.userId !== currentUserId
+			p => p.user.id !== currentUserId
 		);
 
 		return otherParticipant?.user.avatarUrl;
@@ -207,24 +221,48 @@ export default function ChatContainer({
 	return (
 		<div className="flex flex-col h-full">
 			{/* Cabeçalho do chat */}
-			<div className="px-4 py-3 border-b border-border flex items-center justify-between">
-				<div className="flex items-center">
-					<Avatar className="h-10 w-10 mr-3">
-						<AvatarImage src={getDisplayAvatar() || ''} />
-						<AvatarFallback>{getAvatarInitials()}</AvatarFallback>
-					</Avatar>
+			<div className="px-4 py-3 border-b border-border flex items-center justify-between bg-card">
+				<div className="flex items-center flex-1 min-w-0">
+					{/* Botão voltar (mobile apenas) */}
+					{onBack && (
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={onBack}
+							className="mr-2 md:hidden flex-shrink-0"
+						>
+							<ArrowLeft className="h-5 w-5" />
+						</Button>
+					)}
 
-					<div>
-						<h3 className="font-medium">{getDisplayName()}</h3>
+					{getOtherParticipantLogin() ? (
+						<Link
+							href={`/u/${getOtherParticipantLogin()}`}
+							className="flex-shrink-0"
+						>
+							<Avatar className="h-10 w-10 mr-3 aspect-square hover:ring-2 hover:ring-primary transition-all">
+								<AvatarImage src={getDisplayAvatar() || ''} className="object-cover w-full h-full" />
+								<AvatarFallback>{getAvatarInitials()}</AvatarFallback>
+							</Avatar>
+						</Link>
+					) : (
+						<Avatar className="h-10 w-10 mr-3 flex-shrink-0 aspect-square">
+							<AvatarImage src={getDisplayAvatar() || ''} className="object-cover w-full h-full" />
+							<AvatarFallback>{getAvatarInitials()}</AvatarFallback>
+						</Avatar>
+					)}
+
+					<div className="min-w-0 flex-1">
+						<h3 className="font-medium truncate">{getDisplayName()}</h3>
 						{isTyping && typingUser && (
-							<p className="text-xs text-muted-foreground">
+							<p className="text-xs text-muted-foreground truncate">
 								{typingUser} está digitando...
 							</p>
 						)}
 					</div>
 				</div>
 
-				<div className="flex items-center">
+				<div className="flex items-center flex-shrink-0">
 					<Button variant="ghost" size="icon" title="Informações da conversa">
 						<Info className="h-5 w-5" />
 					</Button>

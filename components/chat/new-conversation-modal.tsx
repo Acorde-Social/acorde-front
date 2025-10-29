@@ -6,18 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { userService } from "@/services/user-service";
+import { getFriends, Friend } from "@/services/friendships.service";
+import { useAuth } from "@/contexts/auth-context";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@/components/ui/avatar";
 import { Loader2, Search, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-interface User {
-	id: string;
-	name: string;
-	avatarUrl?: string;
-}
+import { fixImageUrl } from "@/lib/utils";
 
 interface NewConversationModalProps {
 	isOpen: boolean;
@@ -30,38 +26,58 @@ export default function NewConversationModal({
 	onClose,
 	onCreateConversation,
 }: NewConversationModalProps) {
+	const { token } = useAuth();
 	const { toast } = useToast();
 	const [searchTerm, setSearchTerm] = useState('');
-	const [users, setUsers] = useState<User[]>([]);
-	const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+	const [friends, setFriends] = useState<Friend[]>([]);
+	const [filteredFriends, setFilteredFriends] = useState<Friend[]>([]);
+	const [selectedUsers, setSelectedUsers] = useState<Friend[]>([]);
 	const [isGroup, setIsGroup] = useState(false);
 	const [groupName, setGroupName] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [searching, setSearching] = useState(false);
+	const [loadingFriends, setLoadingFriends] = useState(false);
 
-	// Buscar usuários quando o termo de busca mudar
+	// Carregar amigos quando o modal abrir
+	useEffect(() => {
+		if (isOpen && token) {
+			loadFriends();
+		}
+	}, [isOpen, token]);
+
+	// Filtrar amigos quando o termo de busca mudar
 	useEffect(() => {
 		if (!searchTerm.trim()) {
-			setUsers([]);
+			setFilteredFriends(friends);
 			return;
 		}
 
-		const fetchUsers = async () => {
-			try {
-				setSearching(true);
-				const response = await userService.searchUsers(searchTerm);
-				setUsers(response.users || []);
-				setSearching(false);
-			} catch (error) {
-				console.error('Erro ao buscar usuários:', error);
-				setSearching(false);
-			}
-		};
+		const term = searchTerm.toLowerCase();
+		const filtered = friends.filter(friend =>
+			friend.name.toLowerCase().includes(term) ||
+			friend.login.toLowerCase().includes(term)
+		);
+		setFilteredFriends(filtered);
+	}, [searchTerm, friends]);
 
-		// Debounce para não fazer muitas requisições
-		const timer = setTimeout(fetchUsers, 500);
-		return () => clearTimeout(timer);
-	}, [searchTerm]);
+	const loadFriends = async () => {
+		if (!token) return;
+
+		try {
+			setLoadingFriends(true);
+			const response = await getFriends(token);
+			setFriends(response.friends);
+			setFilteredFriends(response.friends);
+		} catch (error) {
+			console.error('Erro ao buscar amigos:', error);
+			toast({
+				title: "Erro ao carregar amigos",
+				description: "Não foi possível carregar sua lista de amigos",
+				variant: "destructive",
+			});
+		} finally {
+			setLoadingFriends(false);
+		}
+	};
 
 	// Resetar estado quando o modal fechar
 	useEffect(() => {
@@ -74,10 +90,9 @@ export default function NewConversationModal({
 	}, [isOpen]);
 
 	// Adicionar usuário à seleção
-	const handleSelectUser = (user: User) => {
-		if (selectedUsers.some(u => u.id === user.id)) return;
-		setSelectedUsers(prev => [...prev, user]);
-		setSearchTerm('');
+	const handleSelectUser = (friend: Friend) => {
+		if (selectedUsers.some(u => u.id === friend.id)) return;
+		setSelectedUsers(prev => [...prev, friend]);
 	};
 
 	// Remover usuário da seleção
@@ -164,21 +179,21 @@ export default function NewConversationModal({
 					{/* Usuários selecionados */}
 					{selectedUsers.length > 0 && (
 						<div className="flex flex-wrap gap-2 mb-4">
-							{selectedUsers.map(user => (
+							{selectedUsers.map(friend => (
 								<div
-									key={user.id}
+									key={friend.id}
 									className="flex items-center bg-accent px-2 py-1 rounded-full"
 								>
-									<Avatar className="h-6 w-6 mr-1">
-										<AvatarImage src={user.avatarUrl || ''} />
-										<AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+									<Avatar className="h-6 w-6 mr-1 aspect-square">
+										<AvatarImage src={fixImageUrl(friend.avatarUrl || '')} className="object-cover w-full h-full" />
+										<AvatarFallback>{friend.name.substring(0, 2).toUpperCase()}</AvatarFallback>
 									</Avatar>
-									<span className="text-sm">{user.name}</span>
+									<span className="text-sm">{friend.name}</span>
 									<Button
 										variant="ghost"
 										size="icon"
 										className="h-6 w-6 p-0 ml-1"
-										onClick={() => handleRemoveUser(user.id)}
+										onClick={() => handleRemoveUser(friend.id)}
 									>
 										<X className="h-3 w-3" />
 									</Button>
@@ -195,39 +210,44 @@ export default function NewConversationModal({
 						<Input
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
-							placeholder="Buscar usuários"
+							placeholder="Buscar amigos..."
 							className="pl-10"
 						/>
 					</div>
 
 					{/* Resultados da busca */}
-					{searching ? (
+					{loadingFriends ? (
 						<div className="flex justify-center p-4">
 							<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
 						</div>
-					) : searchTerm && users.length > 0 ? (
+					) : filteredFriends.length > 0 ? (
 						<div className="mt-2 border rounded-md max-h-60 overflow-y-auto">
-							{users.map(user => (
+							{filteredFriends.map(friend => (
 								<div
-									key={user.id}
+									key={friend.id}
 									className="flex items-center p-2 hover:bg-accent cursor-pointer transition-colors"
-									onClick={() => handleSelectUser(user)}
+									onClick={() => handleSelectUser(friend)}
 								>
-									<Avatar className="h-8 w-8 mr-2">
-										<AvatarImage src={user.avatarUrl || ''} />
-										<AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+									<Avatar className="h-8 w-8 mr-2 aspect-square">
+										<AvatarImage src={fixImageUrl(friend.avatarUrl || '')} className="object-cover w-full h-full" />
+										<AvatarFallback>{friend.name.substring(0, 2).toUpperCase()}</AvatarFallback>
 									</Avatar>
-									<div className="overflow-hidden">
-										<p className="truncate">{user.name}</p>
+									<div className="overflow-hidden flex-1">
+										<p className="truncate font-medium">{friend.name}</p>
+										<p className="truncate text-xs text-muted-foreground">@{friend.login}</p>
 									</div>
 								</div>
 							))}
 						</div>
-					) : searchTerm ? (
-						<p className="text-sm text-muted-foreground text-center py-2">
-							Nenhum usuário encontrado
+					) : friends.length === 0 ? (
+						<p className="text-sm text-muted-foreground text-center py-4">
+							Você ainda não tem amigos. Faça acordes para começar a conversar!
 						</p>
-					) : null}
+					) : (
+						<p className="text-sm text-muted-foreground text-center py-2">
+							Nenhum amigo encontrado
+						</p>
+					)}
 
 					{/* Botões de ação */}
 					<div className="flex justify-end gap-2 mt-4">

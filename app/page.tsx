@@ -100,7 +100,7 @@ export default function Home() {
           <Card className="card-hover border border-border overflow-hidden">
             <CardHeader className="pb-2 relative">
               <div className="flex justify-center">
-                <Avatar className="h-20 w-20 border-2 border-border">
+                <Avatar className="h-20 w-20 aspect-square border-2 border-border">
                   <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} className="object-cover w-full h-full" />
                   <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
@@ -186,7 +186,7 @@ export default function Home() {
                   className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-primary/5 transition-all"
                   onClick={() => setQuickRecordMode(true)}
                 >
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-10 w-10 aspect-square">
                     <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} className="object-cover w-full h-full" />
                     <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
@@ -225,7 +225,7 @@ export default function Home() {
                   <Card key={project.id} className="card-hover overflow-hidden">
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-10 w-10 aspect-square">
                           <AvatarImage src={fixImageUrl(project.author.avatarUrl || "")} alt={project.author.name} className="object-cover w-full h-full" />
                           <AvatarFallback className="bg-primary text-primary-foreground">{project.author.name.charAt(0)}</AvatarFallback>
                         </Avatar>

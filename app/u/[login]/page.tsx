@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Music, Guitar, Calendar, Lock, UserPlus, Sparkles, UserMinus, Clock, Check, Mic, Headphones, Sliders, Volume2 } from "lucide-react"
+import { Loader2, Music, Guitar, Calendar, Lock, UserPlus, Sparkles, UserMinus, Clock, Check, Mic, Headphones, Sliders, Volume2, MessageCircle } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { useChatPopup } from "@/contexts/chat-popup-context"
 import { AuthModal } from "@/components/auth-modal"
 import { fixImageUrl } from "@/lib/utils"
 import { API_URL } from "@/lib/api-config"
@@ -37,7 +38,9 @@ interface PublicProfile {
 
 export default function PublicProfilePage() {
 	const params = useParams()
+	const router = useRouter()
 	const { user, token } = useAuth()
+	const { openChat } = useChatPopup()
 	const { toast } = useToast()
 	const [profile, setProfile] = useState<PublicProfile | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
@@ -150,6 +153,23 @@ export default function PublicProfilePage() {
 		}
 	}
 
+	const handleSendMessage = () => {
+		if (!handleProtectedAction("enviar mensagem") || !profile) return
+
+		// Detectar se é mobile (tela < 768px)
+		const isMobile = window.innerWidth < 768
+
+		if (isMobile) {
+			// Mobile: redirecionar para página de chat
+			router.push('/chat')
+			// Após navegar, o chat deve abrir a conversa automaticamente
+			// (isso será implementado na página de chat detectando query params)
+		} else {
+			// Desktop: abrir popup de chat
+			openChat(profile.login)
+		}
+	}
+
 	const renderFriendshipButton = () => {
 		if (!user || !profile) return null
 
@@ -250,7 +270,7 @@ export default function PublicProfilePage() {
 
 		const config = roleConfig[profile.role]
 		if (!config) return null // Retorna null se o role não for reconhecido
-		
+
 		const Icon = config.icon
 
 		return (
@@ -480,7 +500,8 @@ export default function PublicProfilePage() {
 								{user && (
 									<div className="flex gap-2 pt-4">
 										{renderFriendshipButton()}
-										<Button variant="outline" onClick={() => handleProtectedAction("enviar mensagem")}>
+										<Button variant="outline" onClick={handleSendMessage}>
+											<MessageCircle className="h-4 w-4 mr-2" />
 											Mensagem
 										</Button>
 									</div>

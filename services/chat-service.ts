@@ -36,6 +36,7 @@ export interface ChatParticipant {
   user: {
     id: string;
     name: string;
+    login?: string;
     avatarUrl?: string;
   };
   lastReadAt?: Date;
