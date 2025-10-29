@@ -167,8 +167,8 @@ export default function Home() {
 
         {/* Feed principal */}
         <div className="md:col-span-3 space-y-6">
-          {/* Criar nova postagem / Gravador rápido */}
-          <Card className="card-hover">
+          {/* Criar nova postagem / Gravador rápido - SOMENTE DESKTOP */}
+          <Card className="card-hover hidden md:block">
             <CardHeader>
               <CardTitle className="text-lg">Compartilhe sua música</CardTitle>
             </CardHeader>
