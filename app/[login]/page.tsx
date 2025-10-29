@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Music, Guitar, Calendar, Lock, UserPlus, Sparkles, UserMinus, Clock, Check } from "lucide-react"
+import { Loader2, Music, Guitar, Calendar, Lock, UserPlus, Sparkles, UserMinus, Clock, Check, Mic, Headphones, Sliders, Volume2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { AuthModal } from "@/components/auth-modal"
 import { fixImageUrl } from "@/lib/utils"
@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 interface PublicProfile {
 	name: string
 	login: string
-	role: "COMPOSER" | "MUSICIAN" | "PRODUCER"
+	role: "COMPOSER" | "MUSICIAN" | "PRODUCER" | "SONGWRITER" | "VOCALIST" | "BEATMAKER" | "ENGINEER" | "ARRANGER" | "MIXER" | "DJ" | "LISTENER"
 	bio?: string
 	avatarUrl?: string
 	coverImageUrl?: string
@@ -234,13 +234,23 @@ export default function PublicProfilePage() {
 	const getRoleBadge = () => {
 		if (!profile) return null
 
-		const roleConfig = {
+		const roleConfig: Record<string, { icon: any; label: string }> = {
 			COMPOSER: { icon: Music, label: "Compositor" },
 			MUSICIAN: { icon: Guitar, label: "Músico" },
 			PRODUCER: { icon: Sparkles, label: "Produtor" },
+			SONGWRITER: { icon: Music, label: "Compositor de Letras" },
+			VOCALIST: { icon: Mic, label: "Vocalista" },
+			BEATMAKER: { icon: Volume2, label: "Beatmaker" },
+			ENGINEER: { icon: Sliders, label: "Engenheiro" },
+			ARRANGER: { icon: Music, label: "Arranjador" },
+			MIXER: { icon: Sliders, label: "Mixador" },
+			DJ: { icon: Headphones, label: "DJ" },
+			LISTENER: { icon: Headphones, label: "Ouvinte" },
 		}
 
 		const config = roleConfig[profile.role]
+		if (!config) return null // Retorna null se o role não for reconhecido
+		
 		const Icon = config.icon
 
 		return (
