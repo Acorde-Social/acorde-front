@@ -52,14 +52,22 @@ export function Header() {
 						</>
 					) : (
 						<div className="flex items-center gap-1 sm:gap-2">
+							{/* Desktop/tablet: Entrar */}
 							<Button asChild variant="ghost" size="sm" className="hidden sm:flex h-8 px-2">
 								<Link href="/login">Entrar</Link>
 							</Button>
+
+							{/* Registrar / Criar Conta - mostra "Criar" no mobile */}
 							<Button asChild size="sm" className="h-8 px-3">
 								<Link href="/register">
 									<span className="hidden sm:inline">Criar Conta</span>
-									<span className="sm:hidden">Entrar</span>
+									<span className="sm:hidden">Criar</span>
 								</Link>
+							</Button>
+
+							{/* Mobile-only: Entrar (link separado para evitar confusão) */}
+							<Button asChild variant="ghost" size="sm" className="sm:hidden h-8 px-2">
+								<Link href="/login">Entrar</Link>
 							</Button>
 						</div>
 					)}

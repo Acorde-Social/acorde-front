@@ -340,14 +340,18 @@ export function AudioFeed({ userId, initialTracks }: AudioFeedProps) {
             <Card key={track.id} className="overflow-hidden card-hover">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
-                  <Link href={`/profile/${track.author.id}`}>
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={track.author.avatarUrl || ""} alt={track.author.name} />
+                  <Link href={`/u/${track.author.login}`}>
+                    <Avatar className="h-10 w-10 aspect-square">
+                      <AvatarImage
+                        src={track.author.avatarUrl || ""}
+                        alt={track.author.name}
+                        className="object-cover w-full h-full"
+                      />
                       <AvatarFallback className="bg-primary text-primary-foreground">{track.author.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Link>
                   <div>
-                    <Link href={`/profile/${track.author.id}`} className="font-medium hover:underline">
+                    <Link href={`/u/${track.author.login}`} className="font-medium hover:underline">
                       {track.author.name}
                     </Link>
                     <div className="text-xs text-muted-foreground">

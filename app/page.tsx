@@ -101,7 +101,7 @@ export default function Home() {
             <CardHeader className="pb-2 relative">
               <div className="flex justify-center">
                 <Avatar className="h-20 w-20 border-2 border-border">
-                  <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} />
+                  <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} className="object-cover w-full h-full" />
                   <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
               </div>
@@ -187,7 +187,7 @@ export default function Home() {
                   onClick={() => setQuickRecordMode(true)}
                 >
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} />
+                    <AvatarImage src={fixImageUrl(user?.avatarUrl || "")} alt={user?.name || ""} className="object-cover w-full h-full" />
                     <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-muted-foreground">Grave e compartilhe um áudio...</div>
@@ -226,7 +226,7 @@ export default function Home() {
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={fixImageUrl(project.author.avatarUrl || "")} alt={project.author.name} />
+                          <AvatarImage src={fixImageUrl(project.author.avatarUrl || "")} alt={project.author.name} className="object-cover w-full h-full" />
                           <AvatarFallback className="bg-primary text-primary-foreground">{project.author.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>

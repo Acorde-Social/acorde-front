@@ -201,11 +201,11 @@ export default function FriendsPage() {
 									<CardContent className="pt-6">
 										<div className="flex items-center justify-between">
 											<Link
-												href={`/${friend.login}`}
+												href={`/u/${friend.login}`}
 												className="flex items-center gap-4 hover:opacity-80 transition-opacity flex-1"
 											>
 												<Avatar className="h-12 w-12">
-													<AvatarImage src={friend.avatarUrl || undefined} />
+													<AvatarImage src={friend.avatarUrl || undefined} className="object-cover w-full h-full" />
 													<AvatarFallback>
 														{friend.name.slice(0, 2).toUpperCase()}
 													</AvatarFallback>
@@ -269,12 +269,13 @@ export default function FriendsPage() {
 										<CardContent className="pt-6">
 											<div className="flex items-center justify-between">
 												<Link
-													href={`/${request.requester.login}`}
+													href={`/u/${request.requester.login}`}
 													className="flex items-center gap-4 hover:opacity-80 transition-opacity flex-1"
 												>
 													<Avatar className="h-12 w-12">
 														<AvatarImage
 															src={request.requester.avatarUrl || undefined}
+															className="object-cover w-full h-full"
 														/>
 														<AvatarFallback>
 															{request.requester.name.slice(0, 2).toUpperCase()}
@@ -358,12 +359,13 @@ export default function FriendsPage() {
 									<CardContent className="pt-6">
 										<div className="flex items-center justify-between">
 											<Link
-												href={`/${suggestion.login}`}
+												href={`/u/${suggestion.login}`}
 												className="flex items-center gap-4 hover:opacity-80 transition-opacity flex-1"
 											>
 												<Avatar className="h-12 w-12">
 													<AvatarImage
 														src={suggestion.avatarUrl || undefined}
+														className="object-cover w-full h-full"
 													/>
 													<AvatarFallback>
 														{suggestion.name.slice(0, 2).toUpperCase()}
