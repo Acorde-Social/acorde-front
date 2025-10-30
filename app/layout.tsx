@@ -19,6 +19,44 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme') || 
+                               (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                  const root = document.documentElement;
+                  
+                  // Aplicar tema
+                  if (theme === 'dark') {
+                    root.classList.add('dark');
+                    root.style.colorScheme = 'dark';
+                  } else {
+                    root.classList.remove('dark');
+                    root.style.colorScheme = 'light';
+                  }
+                  
+                  // Aplicar cores CSS customizadas se existirem
+                  const savedPrefs = localStorage.getItem('theme-customization-storage');
+                  if (savedPrefs) {
+                    const prefs = JSON.parse(savedPrefs);
+                    if (prefs.state?.preferences?.primaryColor) {
+                      root.style.setProperty('--primary', prefs.state.preferences.primaryColor);
+                    }
+                    if (prefs.state?.preferences?.layout) {
+                      root.classList.add('layout-' + prefs.state.preferences.layout);
+                    }
+                  }
+                } catch (e) {
+                  console.error('Theme init error:', e);
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
         <ClientLayout>
           {children}

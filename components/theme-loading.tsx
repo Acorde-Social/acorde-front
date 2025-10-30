@@ -6,16 +6,29 @@ import { Loader2 } from "lucide-react"
 
 export function ThemeLoading() {
 	const [isChanging, setIsChanging] = useState(false)
+	const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+	useEffect(() => {
+		// Marcar que o carregamento inicial já passou após um pequeno delay
+		const timer = setTimeout(() => {
+			setIsInitialLoad(false)
+		}, 500)
+
+		return () => clearTimeout(timer)
+	}, [])
 
 	useEffect(() => {
 		const handleThemeChange = () => {
+			// Não mostrar loader no carregamento inicial
+			if (isInitialLoad) return
+
 			setIsChanging(true)
 			setTimeout(() => setIsChanging(false), 300) // Match with CSS transition duration
 		}
 
 		document.addEventListener("themeChange", handleThemeChange)
 		return () => document.removeEventListener("themeChange", handleThemeChange)
-	}, [])
+	}, [isInitialLoad])
 
 	if (!isChanging) return null
 

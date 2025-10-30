@@ -8,8 +8,15 @@ import { ThemeLoading } from "./theme-loading"
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const { preferences } = useThemeCustomization()
+  const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  React.useEffect(() => {
+    if (!mounted) return
+
     // Apply layout classes when component mounts or preferences change
     const root = document.documentElement
     root.classList.remove("layout-default", "layout-compact", "layout-spacious")
@@ -18,10 +25,10 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     // Apply primary color
     root.style.setProperty("--primary", preferences.primaryColor)
 
-    // Dispatch theme change event for loading overlay
+    // Dispatch theme change event for loading overlay (only after initial mount)
     const event = new CustomEvent("themeChange")
     document.dispatchEvent(event)
-  }, [preferences])
+  }, [preferences, mounted])
 
   return (
     <NextThemesProvider
@@ -29,6 +36,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      storageKey="theme"
       {...props}
     >
       <ThemeLoading />

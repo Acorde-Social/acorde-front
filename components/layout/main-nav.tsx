@@ -5,6 +5,13 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { useThemeCustomization } from "@/contexts/theme-context"
 import { useAuth } from "@/contexts/auth-context"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Wrench, FileAudio } from "lucide-react"
 
 export function MainNav() {
   const pathname = usePathname()
@@ -41,6 +48,8 @@ export function MainNav() {
     ] : []),
   ]
 
+  const isToolsActive = pathname.startsWith('/tools')
+
   return (
     <nav
       className={cn(
@@ -65,6 +74,36 @@ export function MainNav() {
           {item.label}
         </Link>
       ))}
+
+      {/* Menu de Ferramentas - apenas para usuários logados */}
+      {user && (
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              "flex items-center gap-1.5 transition-colors hover:text-primary outline-none",
+              isToolsActive
+                ? "text-primary font-medium"
+                : "text-muted-foreground",
+              preferences.layout === "compact" && "text-sm py-1",
+              preferences.layout === "spacious" && "text-base py-2"
+            )}
+          >
+            <Wrench className="h-4 w-4" />
+            Ferramentas
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem asChild>
+              <Link href="/tools/audio-converter" className="flex items-center gap-2 cursor-pointer">
+                <FileAudio className="h-4 w-4" />
+                <div className="flex flex-col">
+                  <span className="font-medium">Conversor de Áudio</span>
+                  <span className="text-xs text-muted-foreground">Converta para MP3</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </nav>
   )
 }

@@ -33,6 +33,7 @@ export interface CreateTrackData {
   lyrics?: string
   chords?: string
   credits?: string // JSON string
+  postDescription?: string
 }
 
 export interface CreateCollaborationData {
@@ -66,7 +67,7 @@ export interface AudioCorrectionOptions {
 
 export const TrackService = {
   // Criar nova faixa
-  async createTrack(data: CreateTrackData, audioFile: File, token: string) {
+  async createTrack(data: CreateTrackData, audioFile: File, token: string, overdubFiles?: File[], overdubDurations?: number[]) {
     const formData = new FormData()
     formData.append("name", data.name)
     formData.append("projectId", data.projectId)
@@ -82,6 +83,19 @@ export const TrackService = {
     }
     if (data.credits) {
       formData.append("credits", data.credits)
+    }
+    if (data.postDescription) {
+      formData.append("postDescription", data.postDescription)
+    }
+
+    // Anexar overdubs (se houver)
+    if (overdubFiles && overdubFiles.length > 0) {
+      for (const f of overdubFiles) {
+        formData.append('overdubs', f)
+      }
+      if (overdubDurations && overdubDurations.length > 0) {
+        formData.append('overdubDurations', JSON.stringify(overdubDurations))
+      }
     }
 
     const response = await fetch(`${API_URL}/tracks`, {

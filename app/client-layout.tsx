@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/auth-context"
@@ -10,6 +10,7 @@ import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav"
 import { useAuth } from "@/contexts/auth-context"
+import { useEffect } from "react"
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
 	const { user } = useAuth()
@@ -27,6 +28,11 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 }
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
+	// Marcar como hidratado após o primeiro render
+	useEffect(() => {
+		document.documentElement.classList.add('hydrated')
+	}, [])
+
 	return (
 		<AuthProvider>
 			<ThemeCustomizationProvider>
