@@ -61,7 +61,7 @@ export default function ChatContainer({
 	const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
 	const [cursor, setCursor] = useState<string | undefined>(undefined);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
-	
+
 	// Estados para modais e dropdowns
 	const [showInfoDialog, setShowInfoDialog] = useState(false);
 	const [showDeleteAlert, setShowDeleteAlert] = useState(false);
@@ -303,42 +303,42 @@ export default function ChatContainer({
 					</div>
 				</div>
 
-			<div className="flex items-center flex-shrink-0">
-				<Button 
-					variant="ghost" 
-					size="icon" 
-					onClick={() => setShowInfoDialog(true)}
-					title="Informações da conversa"
-				>
-					<Info className="h-5 w-5" />
-				</Button>
+				<div className="flex items-center flex-shrink-0">
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={() => setShowInfoDialog(true)}
+						title="Informações da conversa"
+					>
+						<Info className="h-5 w-5" />
+					</Button>
 
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="icon" title="Mais opções">
-							<MoreVertical className="h-5 w-5" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-48">
-						<DropdownMenuItem 
-							className="text-destructive focus:text-destructive cursor-pointer"
-							onClick={() => setShowDeleteAlert(true)}
-						>
-							<Trash2 className="h-4 w-4 mr-2" />
-							Apagar conversa
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem className="cursor-pointer">
-							<BellOff className="h-4 w-4 mr-2" />
-							Silenciar notificações
-						</DropdownMenuItem>
-						<DropdownMenuItem className="cursor-pointer">
-							<Archive className="h-4 w-4 mr-2" />
-							Arquivar conversa
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" size="icon" title="Mais opções">
+								<MoreVertical className="h-5 w-5" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-48">
+							<DropdownMenuItem
+								className="text-destructive focus:text-destructive cursor-pointer"
+								onClick={() => setShowDeleteAlert(true)}
+							>
+								<Trash2 className="h-4 w-4 mr-2" />
+								Apagar conversa
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem className="cursor-pointer">
+								<BellOff className="h-4 w-4 mr-2" />
+								Silenciar notificações
+							</DropdownMenuItem>
+							<DropdownMenuItem className="cursor-pointer">
+								<Archive className="h-4 w-4 mr-2" />
+								Arquivar conversa
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
 			{/* Lista de mensagens */}
@@ -404,8 +404,8 @@ export default function ChatContainer({
 								{conversation.participants.map((participant) => (
 									<div key={participant.user.id} className="flex items-center gap-3">
 										<Avatar className="h-10 w-10 aspect-square">
-											<AvatarImage 
-												src={participant.user.avatarUrl || ''} 
+											<AvatarImage
+												src={participant.user.avatarUrl || ''}
 												className="object-cover w-full h-full"
 											/>
 											<AvatarFallback>
@@ -464,13 +464,13 @@ export default function ChatContainer({
 					<AlertDialogHeader>
 						<AlertDialogTitle>Apagar conversa?</AlertDialogTitle>
 						<AlertDialogDescription>
-							Esta ação não pode ser desfeita. Todas as mensagens desta conversa 
+							Esta ação não pode ser desfeita. Todas as mensagens desta conversa
 							serão permanentemente removidas para você.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancelar</AlertDialogCancel>
-						<AlertDialogAction 
+						<AlertDialogAction
 							onClick={handleDeleteConversation}
 							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 						>
