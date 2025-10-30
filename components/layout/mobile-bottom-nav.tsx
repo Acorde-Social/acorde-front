@@ -59,17 +59,17 @@ export function MobileBottomNav() {
 							item.isCenter && "transform -translate-y-2"
 						)}
 					>
-					{item.isCenter ? (
-						// Botão central de criar - destaque especial
-						<div className={cn(
-							"flex items-center justify-center w-14 h-14 rounded-full transition-all duration-200 border-2",
-							item.isActive
-								? "bg-foreground dark:bg-primary text-background dark:text-primary-foreground border-foreground dark:border-primary shadow-lg shadow-foreground/30 dark:shadow-primary/50 scale-110"
-								: "bg-foreground dark:bg-primary text-background dark:text-primary-foreground border-foreground dark:border-primary hover:scale-105 shadow-md"
-						)}>
-							<item.icon className="h-7 w-7" strokeWidth={2.5} />
-						</div>
-					) : item.isAvatar ? (
+						{item.isCenter ? (
+							// Botão central de criar - destaque especial
+							<div className={cn(
+								"flex items-center justify-center w-14 h-14 rounded-full transition-all duration-200 border-2",
+								item.isActive
+									? "bg-foreground dark:bg-primary text-background dark:text-primary-foreground border-foreground dark:border-primary shadow-lg shadow-foreground/30 dark:shadow-primary/50 scale-110"
+									: "bg-foreground dark:bg-primary text-background dark:text-primary-foreground border-foreground dark:border-primary hover:scale-105 shadow-md"
+							)}>
+								<item.icon className="h-7 w-7" strokeWidth={2.5} />
+							</div>
+						) : item.isAvatar ? (
 							// Avatar do usuário
 							<div className={cn(
 								"flex flex-col items-center justify-center gap-1",

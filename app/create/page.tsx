@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { AudioRecorder } from "@/components/audio-recorder"
-import { ArrowLeft, Mic, Music2, Image as ImageIcon } from "lucide-react"
+import { AudioPostCreator } from "@/components/audio/audio-post-creator"
+import { ArrowLeft, Mic, Music2, Upload } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
@@ -43,17 +44,42 @@ export default function CreatePostPage() {
 			</div>
 
 			{/* Tabs para escolher tipo de postagem */}
-			<Tabs defaultValue="audio" value={activeTab} onValueChange={setActiveTab}>
-				<TabsList className="grid w-full grid-cols-2 mb-6">
+			<Tabs defaultValue="upload" value={activeTab} onValueChange={setActiveTab}>
+				<TabsList className="grid w-full grid-cols-3 mb-6">
+					<TabsTrigger value="upload" className="gap-2">
+						<Upload className="h-4 w-4" />
+						Upload
+					</TabsTrigger>
 					<TabsTrigger value="audio" className="gap-2">
 						<Mic className="h-4 w-4" />
-						Gravar Áudio
+						Gravar
 					</TabsTrigger>
 					<TabsTrigger value="project" className="gap-2">
 						<Music2 className="h-4 w-4" />
-						Criar Projeto
+						Projeto
 					</TabsTrigger>
 				</TabsList>
+
+				{/* Tab de Upload */}
+				<TabsContent value="upload">
+					<Card className="card-hover border-2">
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<Upload className="h-5 w-5 text-primary" />
+								Upload de Arquivo de Áudio
+							</CardTitle>
+							<CardDescription>
+								Faça upload de um arquivo de áudio e adicione letra, cifra e créditos completos.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<AudioPostCreator
+								onPostCreated={handleTrackSaved}
+								onCancel={() => router.push("/")}
+							/>
+						</CardContent>
+					</Card>
+				</TabsContent>
 
 				{/* Tab de Áudio */}
 				<TabsContent value="audio">
@@ -116,9 +142,10 @@ export default function CreatePostPage() {
 					<CardTitle className="text-lg">💡 Dicas para uma boa postagem</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-2 text-sm">
+					<p>• <strong>Upload:</strong> Envie arquivos de áudio (MP3, WAV, OGG) e adicione letra, cifra e créditos detalhados</p>
 					<p>• <strong>Áudio claro:</strong> Grave em um ambiente silencioso para melhor qualidade</p>
 					<p>• <strong>Título descritivo:</strong> Ajude outros músicos a entender sua postagem</p>
-					<p>• <strong>Use tags:</strong> Adicione gênero e instrumentos para facilitar descobertas</p>
+					<p>• <strong>Créditos:</strong> Dê reconhecimento aos colaboradores - melodia, harmonia, arranjo, etc.</p>
 					<p>• <strong>Seja autêntico:</strong> Compartilhe seu processo criativo e aprenda com a comunidade</p>
 				</CardContent>
 			</Card>

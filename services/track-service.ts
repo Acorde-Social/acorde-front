@@ -30,6 +30,9 @@ export interface CreateTrackData {
   name: string
   projectId: string
   duration: number
+  lyrics?: string
+  chords?: string
+  credits?: string // JSON string
 }
 
 export interface CreateCollaborationData {
@@ -69,6 +72,17 @@ export const TrackService = {
     formData.append("projectId", data.projectId)
     formData.append("duration", data.duration.toString())
     formData.append("file", audioFile)
+    
+    // Adicionar campos opcionais
+    if (data.lyrics) {
+      formData.append("lyrics", data.lyrics)
+    }
+    if (data.chords) {
+      formData.append("chords", data.chords)
+    }
+    if (data.credits) {
+      formData.append("credits", data.credits)
+    }
 
     const response = await fetch(`${API_URL}/tracks`, {
       method: "POST",

@@ -406,7 +406,7 @@ export function AudioRecorder({
           // Chamar o serviço para salvar o áudio simplificado
           await TrackService.createTrack(
             {
-              name: description || "Post de áudio",
+              name: description || trackName || "Post de áudio",
               projectId: "simplified", // Usamos um valor especial para identificar posts simplificados
               duration: Math.max(1, duration), // Garante que é pelo menos 1 segundo
             },
