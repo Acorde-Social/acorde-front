@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { ChatConversation } from "@/services/chat-service";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import NewConversationModal from "@/components/chat/new-conversation-modal";
 
-export default function ChatPage() {
+function ChatContent() {
 	const { user, token } = useAuth();
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -231,5 +231,13 @@ export default function ChatPage() {
 				onCreateConversation={handleCreateConversation}
 			/>
 		</div>
+	);
+}
+
+export default function ChatPage() {
+	return (
+		<Suspense fallback={<div className="flex items-center justify-center min-h-screen">Carregando...</div>}>
+			<ChatContent />
+		</Suspense>
 	);
 }
