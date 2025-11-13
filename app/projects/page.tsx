@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Music, Loader2, PlusCircle, Search, Calendar, Users, ArrowRight, RefreshCw } from "lucide-react"
+import { Music, Loader2, PlusCircle, Search, Calendar, Users, ArrowRight, RefreshCw, PlusIcon, Mic2, Mic, Mic2Icon, Music2, Music3, Music4, MicIcon } from "lucide-react"
 import { ProjectService, type Project } from "@/services/project-service"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
@@ -89,12 +89,14 @@ export default function MyProjectsPage() {
           <h1 className="text-3xl font-bold">Meus Projetos</h1>
           <p className="text-muted-foreground">Gerencie e acompanhe seus projetos musicais</p>
         </div>
+        {filteredProjects.length > 0 && (
         <Button asChild>
           <Link href="/projects/new" className="flex items-center gap-2">
             <PlusCircle className="h-4 w-4" />
             Criar Projeto
           </Link>
         </Button>
+        )}
       </div>
 
       <div className="flex gap-4">
@@ -131,7 +133,10 @@ export default function MyProjectsPage() {
                   Crie seu primeiro projeto musical para começar a colaborar com outros músicos
                 </p>
                 <Button asChild>
-                  <Link href="/projects/new">Criar Projeto</Link>
+                  <Link href="/projects/new" className="flex items-center gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Criar Projeto
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
