@@ -20,7 +20,7 @@ export function MainNav() {
 
   const navItems = [
     {
-      href: "/",
+      href: "/home",
       label: "Início",
     },
     {

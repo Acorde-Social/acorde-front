@@ -16,8 +16,8 @@ export function MobileBottomNav() {
 		{
 			icon: Home,
 			label: "Início",
-			href: "/",
-			isActive: pathname === "/"
+			href: "/home",
+			isActive: pathname === "/home"
 		},
 		{
 			icon: Search,

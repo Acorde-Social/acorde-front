@@ -18,9 +18,16 @@ import { ptBR } from "date-fns/locale"
 import { AudioFeed } from "@/components/audio/audio-feed"
 import { HowItWorks } from "@/components/how-it-works"
 import { fixImageUrl } from "@/lib/utils"
+import { redirect } from "next/navigation"
 
 export default function Home() {
   const { user, token, isLoading } = useAuth()
+  useEffect(() => {
+    if (user && !isLoading) {
+      redirect('/home')
+    }
+  }, [user, isLoading])
+
   const [projects, setProjects] = useState<Project[]>([])
   const [loadingProjects, setLoadingProjects] = useState(false)
   const [activeTab, setActiveTab] = useState("audio")  // Alterado de "all" para "audio"
