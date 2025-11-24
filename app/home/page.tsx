@@ -23,7 +23,8 @@ import {
   Heart,
   Share2,
   Play,
-  Pause
+  Pause,
+  AudioWaveform
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -183,7 +184,7 @@ export default function HomePage() {
                     {user.role}
                   </Badge>
                   <span>•</span>
-                  <span>Pronto para criar música?</span>
+                  <span>O que vai postar hoje?</span>
                 </p>
               </div>
             </div>
@@ -206,127 +207,8 @@ export default function HomePage() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar Esquerda - Stats e Ações Rápidas */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Stats Cards */}
-            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  Suas Estatísticas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.projects}</div>
-                    <div className="text-xs text-muted-foreground">Projetos</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.collaborations}</div>
-                    <div className="text-xs text-muted-foreground">Colabs</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.followers}</div>
-                    <div className="text-xs text-muted-foreground">Seguidores</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
-                    <div className="text-xs text-muted-foreground">Faixas</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Ações Rápidas */}
-            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Ações Rápidas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  onClick={() => handleQuickAction('Gravação rápida')}
-                >
-                  <Mic className="h-4 w-4 mr-3 text-primary" />
-                  Gravar Ideia
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/projects/new">
-                    <Music className="h-4 w-4 mr-3 text-primary" />
-                    Novo Projeto
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/explore">
-                    <Users className="h-4 w-4 mr-3 text-primary" />
-                    Encontrar Músicos
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/collaborations">
-                    <Guitar className="h-4 w-4 mr-3 text-primary" />
-                    Minhas Colabs
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Recomendações */}
-            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Star className="h-5 w-5 text-primary" />
-                  Recomendados
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                        RJ
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">Rafael Jazz</p>
-                      <p className="text-xs text-muted-foreground">Saxofonista</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                        BP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">Banda Progressiva</p>
-                      <p className="text-xs text-muted-foreground">Projeto</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Conteúdo Principal */}
-          <div className="lg:col-span-3 space-y-6">
+          {/* Conteúdo Principal - VEM PRIMEIRO NO MOBILE */}
+          <div className="lg:col-span-3 space-y-6 order-1 lg:order-2">
             {/* Tabs de Navegação */}
             <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
               <CardContent className="p-4">
@@ -508,6 +390,125 @@ export default function HomePage() {
                     </div>
                   </TabsContent>
                 </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar Esquerda - VEM SEGUNDO NO MOBILE */}
+          <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
+            {/* Stats Cards */}
+            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10 hidden md:block">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <AudioWaveform className="h-5 w-5 text-primary" />
+                  Minha Rede
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.projects}</div>
+                    <div className="text-xs text-muted-foreground">Projetos</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.collaborations}</div>
+                    <div className="text-xs text-muted-foreground">Colabs</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.followers}</div>
+                    <div className="text-xs text-muted-foreground">Seguidores</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
+                    <div className="text-xs text-muted-foreground">Faixas</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Ações Rápidas */}
+            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  Ações Rápidas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  onClick={() => handleQuickAction('Gravação rápida')}
+                >
+                  <Mic className="h-4 w-4 mr-3 text-primary" />
+                  Gravar Ideia
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  asChild
+                >
+                  <Link href="/projects/new">
+                    <Music className="h-4 w-4 mr-3 text-primary" />
+                    Novo Projeto
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  asChild
+                >
+                  <Link href="/explore">
+                    <Users className="h-4 w-4 mr-3 text-primary" />
+                    Encontrar Músicos
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  asChild
+                >
+                  <Link href="/collaborations">
+                    <Guitar className="h-4 w-4 mr-3 text-primary" />
+                    Minhas Colabs
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recomendações */}
+            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Star className="h-5 w-5 text-primary" />
+                  Recomendados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        RJ
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">Rafael Jazz</p>
+                      <p className="text-xs text-muted-foreground">Saxofonista</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        BP
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">Banda Progressiva</p>
+                      <p className="text-xs text-muted-foreground">Projeto</p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
