@@ -34,12 +34,12 @@ export function Header() {
 			)}>
 				<div className="flex items-center gap-2 md:gap-3">
 					<MobileNav />
-					<Link href="/" className="hidden md:block">
+					<div className="hidden md:block">
 						<span className={cn(
 							"font-bold",
 							preferences.layout === "compact" ? "text-sm" : preferences.layout === "spacious" ? "text-lg" : "text-base"
 						)}>Acorde</span>
-					</Link>
+					</div>
 					<MainNav />
 				</div>
 				<div className="flex items-center gap-1 sm:gap-2">

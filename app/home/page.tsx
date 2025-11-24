@@ -9,14 +9,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
-import { 
-  Music, 
-  Users, 
-  TrendingUp, 
-  Clock, 
-  Mic, 
-  Guitar, 
-  Headphones, 
+import {
+  Music,
+  Users,
+  TrendingUp,
+  Clock,
+  Mic,
+  Guitar,
+  Headphones,
   Star,
   Calendar,
   MessageCircle,
@@ -71,7 +71,7 @@ export default function HomePage() {
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true)
-      
+
       // Simular carregamento de dados
       setTimeout(() => {
         setFeedItems([
@@ -129,7 +129,7 @@ export default function HomePage() {
           followers: 156,
           tracks: 24
         })
-        
+
         setIsLoading(false)
       }, 1000)
     }
@@ -187,18 +187,16 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            
+
             <div className="hidden md:flex items-center gap-3">
-              <Button variant="outline" size="sm" asChild>
+              <Button
+                size="lg"
+                asChild
+                className='mt-5 bg-[#c11d36] text-white hover:bg-[#c11d36]'
+              >
                 <Link href="/studio">
                   <Mic className="h-4 w-4 mr-2" />
                   Estúdio
-                </Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/projects/new">
-                  <Music className="h-4 w-4 mr-2" />
-                  Novo Projeto
                 </Link>
               </Button>
             </div>
@@ -249,16 +247,16 @@ export default function HomePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start hover:bg-primary/5 transition-all"
                   onClick={() => handleQuickAction('Gravação rápida')}
                 >
                   <Mic className="h-4 w-4 mr-3 text-primary" />
-                  Gravar Áudio
+                  Gravar Ideia
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start hover:bg-primary/5 transition-all"
                   asChild
                 >
@@ -267,8 +265,8 @@ export default function HomePage() {
                     Novo Projeto
                   </Link>
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start hover:bg-primary/5 transition-all"
                   asChild
                 >
@@ -277,8 +275,8 @@ export default function HomePage() {
                     Encontrar Músicos
                   </Link>
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start hover:bg-primary/5 transition-all"
                   asChild
                 >
@@ -393,8 +391,8 @@ export default function HomePage() {
                                       </span>
                                       <span>•</span>
                                       <Badge variant="outline" className="text-xs">
-                                        {item.type === 'project' ? 'Projeto' : 
-                                         item.type === 'track' ? 'Faixa' : 'Colaboração'}
+                                        {item.type === 'project' ? 'Projeto' :
+                                          item.type === 'track' ? 'Faixa' : 'Colaboração'}
                                       </Badge>
                                     </div>
                                   </div>
@@ -408,7 +406,7 @@ export default function HomePage() {
                             <CardContent className="pb-3">
                               <h3 className="font-bold text-lg mb-2">{item.title}</h3>
                               <p className="text-muted-foreground mb-3">{item.description}</p>
-                              
+
                               {item.genre && (
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                                   <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs">

@@ -20,12 +20,12 @@ export function MainNav() {
 
   const navItems = [
     {
-      href: "/home",
+      href: "/",
       label: "Início",
     },
     {
       href: "/explore",
-      label: "Explorar",
+      label: "Explorar",  
     },
     {
       href: "/projects",

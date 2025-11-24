@@ -84,6 +84,14 @@ export default function Home() {
             </div>
           </section>
           <HowItWorks />
+          <div className="flex justify-center mt-6">
+          <Button asChild size="lg" className="px-8 py-3 text-base">
+            <Link href="/login">
+              <span className="hidden sm:inline">Começar</span>
+              <span className="sm:hidden">Começar</span>
+            </Link>
+          </Button>
+          </div>
         </div>
       </>
     )
