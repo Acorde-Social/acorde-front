@@ -34,6 +34,7 @@ interface AuthContextType {
   pendingVerification: boolean
   verificationEmail: string | null
   login: (identifier: string, password: string) => Promise<void>
+  loginWithToken: (token: string) => Promise<void>
   register: (userData: RegisterData) => Promise<void>
   resendVerification: (email: string) => Promise<boolean>
   logout: () => void
@@ -144,6 +145,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Login com token (OAuth)
+  const loginWithToken = async (authToken: string) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      localStorage.setItem("token", authToken)
+      setToken(authToken)
+
+      // Buscar dados do usuário com o token
+      await fetchUserProfile(authToken)
+
+      // Inicializar WebSocket
+      socketService.connect(authToken)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao autenticar")
+      localStorage.removeItem("token")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // Registro
   const register = async (userData: RegisterData) => {
     setIsLoading(true)
@@ -233,6 +256,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         pendingVerification,
         verificationEmail,
         login,
+        loginWithToken,
         register,
         resendVerification,
         logout,
