@@ -40,6 +40,7 @@ interface AuthContextType {
   logout: () => void
   clearError: () => void
   updateUserTheme: (theme: ThemePreferences) => void
+  updateUser: (userData: User) => void
 }
 
 interface RegisterData {
@@ -63,6 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingVerification, setPendingVerification] = useState(false)
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null)
   const router = useRouter()
+  const updateUser = (userData: User) => {
+    setUser(userData)
+  }
 
   // Verificar se o usuário está autenticado ao carregar a página
   useEffect(() => {
@@ -262,6 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         clearError,
         updateUserTheme,
+        updateUser,
       }}
     >
       {children}
