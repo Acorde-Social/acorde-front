@@ -24,10 +24,12 @@ import {
   Share2,
   Play,
   Pause,
-  AudioWaveform
+  AudioWaveform,
+  Camera
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { AvatarUpload } from './home-components/avatar-upload'
 
 // Tipos para os dados do feed
 interface FeedItem {
@@ -169,12 +171,8 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 border-4 border-background shadow-lg">
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-lg">
-                  {user.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+              <AvatarUpload/>
+
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                   Bem-vindo, {user.name}!
@@ -205,12 +203,138 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Conteúdo Principal - VEM PRIMEIRO NO MOBILE */}
-          <div className="lg:col-span-3 space-y-6 order-1 lg:order-2">
-            {/* Tabs de Navegação */}
+      {/* ========== CONTAINER PRINCIPAL ========== */}
+      <div className="container px-4 py-8">
+
+        {/* ========== INÍCIO DO GRID ========== */}
+        {/* Este grid cria 1 coluna no mobile e 2 colunas no desktop: [18rem 1fr] */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr] gap-6">
+
+          {/* ========== COLUNA 1 - SIDEBAR ========== */}
+          <div className="hidden lg:block absolute left-0 top-30 w-80 space-y-6 lg:pl-8">
+            {/* Stats Cards */}
+            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10 hidden md:block">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <AudioWaveform className="h-5 w-5 text-primary" />
+                  Minha Rede
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.projects}</div>
+                    <div className="text-xs text-muted-foreground">Projetos</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.collaborations}</div>
+                    <div className="text-xs text-muted-foreground">Colabs</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.followers}</div>
+                    <div className="text-xs text-muted-foreground">Seguidores</div>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
+                    <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
+                    <div className="text-xs text-muted-foreground">Faixas</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Ações Rápidas */}
             <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  Ações Rápidas
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  onClick={() => handleQuickAction('Gravação rápida')}
+                >
+                  <Mic className="h-4 w-4 mr-3 text-primary" />
+                  Gravar Ideia
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  asChild
+                >
+                  <Link href="/projects/new">
+                    <Music className="h-4 w-4 mr-3 text-primary" />
+                    Novo Projeto
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  asChild
+                >
+                  <Link href="/explore">
+                    <Users className="h-4 w-4 mr-3 text-primary" />
+                    Encontrar Músicos
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start hover:bg-primary/5 transition-all"
+                  asChild
+                >
+                  <Link href="/collaborations">
+                    <Guitar className="h-4 w-4 mr-3 text-primary" />
+                    Minhas Colabs
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recomendações */}
+            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Star className="h-5 w-5 text-primary" />
+                  Recomendados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        RJ
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">Rafael Jazz</p>
+                      <p className="text-xs text-muted-foreground">Saxofonista</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                        BP
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">Banda Progressiva</p>
+                      <p className="text-xs text-muted-foreground">Projeto</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          {/* ========== FIM DA SIDEBAR (FORA DO GRID) ========== */}
+          {/* ========== FIM DA COLUNA 1 ========== */}
+
+          {/* ========== COLUNA 2 - CONTEÚDO PRINCIPAL ========== */}
+          <div className="order-1 lg:order-2 space-y-20">
+            {/* Tabs de Navegação */}
+            <Card className="dark-card bg-background/60 backdrop-blur-sm border-primary/10">
               <CardContent className="p-4">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="grid w-full grid-cols-4">
@@ -252,7 +376,7 @@ export default function HomePage() {
                         ))
                       ) : feedItems.length > 0 ? (
                         feedItems.map((item) => (
-                          <Card key={item.id} className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
+                          <Card key={item.id} className="dark-card bg-background/60 backdrop-blur-sm border-primary/10">
                             <CardHeader className="pb-3">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -393,127 +517,15 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
+          {/* ========== FIM DA COLUNA 2 ========== */}
 
-          {/* Sidebar Esquerda - VEM SEGUNDO NO MOBILE */}
-          <div className="lg:col-span-1 space-y-6 order-2 lg:order-1">
-            {/* Stats Cards */}
-            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10 hidden md:block">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <AudioWaveform className="h-5 w-5 text-primary" />
-                  Minha Rede
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.projects}</div>
-                    <div className="text-xs text-muted-foreground">Projetos</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.collaborations}</div>
-                    <div className="text-xs text-muted-foreground">Colabs</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.followers}</div>
-                    <div className="text-xs text-muted-foreground">Seguidores</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
-                    <div className="text-xs text-muted-foreground">Faixas</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Ações Rápidas */}
-            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Ações Rápidas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  onClick={() => handleQuickAction('Gravação rápida')}
-                >
-                  <Mic className="h-4 w-4 mr-3 text-primary" />
-                  Gravar Ideia
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/projects/new">
-                    <Music className="h-4 w-4 mr-3 text-primary" />
-                    Novo Projeto
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/explore">
-                    <Users className="h-4 w-4 mr-3 text-primary" />
-                    Encontrar Músicos
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/collaborations">
-                    <Guitar className="h-4 w-4 mr-3 text-primary" />
-                    Minhas Colabs
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
 
-            {/* Recomendações */}
-            <Card className="card-hover dark-card bg-background/60 backdrop-blur-sm border-primary/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Star className="h-5 w-5 text-primary" />
-                  Recomendados
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                        RJ
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">Rafael Jazz</p>
-                      <p className="text-xs text-muted-foreground">Saxofonista</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                        BP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">Banda Progressiva</p>
-                      <p className="text-xs text-muted-foreground">Projeto</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
+        {/* ========== FIM DO GRID ========== */}
+
       </div>
-    </div>
+      {/* ========== FIM DO CONTAINER PRINCIPAL ========== */}
+    </div >
   )
 }
