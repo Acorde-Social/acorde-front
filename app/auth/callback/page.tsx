@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
 	const router = useRouter()
 	const searchParams = useSearchParams()
 	const { loginWithToken } = useAuth()
@@ -68,5 +68,20 @@ export default function AuthCallbackPage() {
 				<p className="text-muted-foreground">Autenticando...</p>
 			</div>
 		</div>
+	)
+}
+
+export default function AuthCallbackPage() {
+	return (
+		<Suspense fallback={
+			<div className="container flex h-screen w-screen flex-col items-center justify-center">
+				<div className="flex flex-col items-center space-y-4">
+					<Loader2 className="h-8 w-8 animate-spin text-primary" />
+					<p className="text-muted-foreground">Carregando...</p>
+				</div>
+			</div>
+		}>
+			<AuthCallbackContent />
+		</Suspense>
 	)
 }
