@@ -19,9 +19,18 @@ import { AudioFeed } from "@/components/audio/audio-feed"
 import { HowItWorks } from "@/components/how-it-works"
 import { fixImageUrl } from "@/lib/utils"
 import { redirect } from "next/navigation"
+import { ArrowRight } from 'lucide-react'
+import backgroundImage from '@/public/images/bg-test-3.jpg'
 
 export default function Home() {
   const { user, token, isLoading } = useAuth()
+
+  console.log('Background image debug:', {
+    backgroundImage,
+    src: backgroundImage?.src,
+    exists: !!backgroundImage
+  })
+
   useEffect(() => {
     if (user && !isLoading) {
       redirect('/home')
@@ -70,27 +79,41 @@ export default function Home() {
   if (!user && !isLoading) {
     return (
       <>
-        <div className="bg-background">
-          <section className="space-y-2 pb-1 pt-4 md:pb-2 md:pt-6 lg:py-8">
-            <div className="container flex max-w-[64rem] flex-col items-center gap-1 text-center">
-              <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-                Conectando <span className="text-primary">sua música</span>{" "}
-                com <span className="text-primary">músicos</span> do mundo inteiro!
-              </h1>
-              <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-                Compartilhe suas composições, colabore com músicos talentosos e expanda seu network musical. Tudo em uma
-                única plataforma.
-              </p>
+        {/* Container principal */}
+        <div className="bg-background relative min-h-screen">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-70"
+            style={{
+              backgroundImage: `url(${backgroundImage.src})`,
+            }}
+          />
+          {/* Overlay gradiente ESSENCIAL 
+          <div className="absolute inset-0" /> */}
+
+          {/* Conteúdo com z-index */}
+          <div className="relative z-10 min-h-screen">
+            <section className="space-y-2 pb-1 pt-4 md:pb-2 md:pt-6 lg:py-8">
+              <div className="container flex max-w-[64rem] flex-col items-center gap-1 text-center">
+                <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
+                  Conectando <span className="text-yellow-600">seu som</span>{" "}
+                  com <span className="text-primary">artistas</span> do mundo inteiro!
+                </h1>
+                <p className="max-w-[42rem] leading-normal sm:text-xl sm:leading-8 text-black-500">
+                  Compartilhe suas composições, colabore com músicos talentosos e expanda seu network musical. Tudo em uma
+                  única plataforma.
+                </p>
+              </div>
+            </section>
+            <HowItWorks />
+            <div className="flex justify-center mt-6">
+              <Button asChild size="lg" className="px-8 py-3 text-base relative z-20 bg-black hover:bg-black !border-0 !ring-0">
+                <Link href="/login">
+                  <span className="hidden sm:inline text-white">Começar</span>
+                  <span className="sm:hidden">Começar</span>
+                </Link>
+              </Button>
             </div>
-          </section>
-          <HowItWorks />
-          <div className="flex justify-center mt-6">
-          <Button asChild size="lg" className="px-8 py-3 text-base">
-            <Link href="/login">
-              <span className="hidden sm:inline">Começar</span>
-              <span className="sm:hidden">Começar</span>
-            </Link>
-          </Button>
           </div>
         </div>
       </>
