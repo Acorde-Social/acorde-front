@@ -38,5 +38,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.tsbackup-landing-redesign.bundle
+next-env.d.ts
+backup-landing-redesign.bundle
 landing-redesign-changes.patch
+.gitignore.backup
