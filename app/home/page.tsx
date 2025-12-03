@@ -30,25 +30,9 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { AvatarUpload } from './home-components/avatar-upload'
-
-// Tipos para os dados do feed
-interface FeedItem {
-  id: string
-  type: 'project' | 'track' | 'collaboration'
-  title: string
-  description: string
-  author: {
-    name: string
-    avatarUrl?: string
-    role: string
-  }
-  createdAt: Date
-  likes: number
-  comments: number
-  genre?: string
-  bpm?: number
-  key?: string
-}
+import { PostModal } from './home-components/post-modal'
+import { Pencil } from 'lucide-react'
+import { FeedItem, getMockFeedItems, getMockStats } from './data/mock-feed-data'
 
 interface Stats {
   projects: number
@@ -69,70 +53,23 @@ export default function HomePage() {
     tracks: 0
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false)
+  
+  // Estados para controle de áudio
+  const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
+  const [audioElements, setAudioElements] = useState<Record<string, HTMLAudioElement>>({})
+  const [audioProgress, setAudioProgress] = useState<Record<string, number>>({})
+  const [audioCurrentTime, setAudioCurrentTime] = useState<Record<string, string>>({})
 
-  // Dados mockados para demonstração (substituir por API real)
+  // Dados mockados
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true)
 
       // Simular carregamento de dados
       setTimeout(() => {
-        setFeedItems([
-          {
-            id: '1',
-            type: 'track',
-            title: 'Nova Melodia em Sol',
-            description: 'Acabei de finalizar essa nova composição. O que acham?',
-            author: {
-              name: 'Ana Beatriz',
-              avatarUrl: '',
-              role: 'PRODUCER'
-            },
-            createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutos atrás
-            likes: 24,
-            comments: 8,
-            genre: 'Pop',
-            bpm: 120,
-            key: 'G'
-          },
-          {
-            id: '2',
-            type: 'project',
-            title: 'Colaboração Jazz Fusion',
-            description: 'Procurando saxofonista e baterista para projeto de jazz fusion',
-            author: {
-              name: 'Carlos Santos',
-              avatarUrl: '',
-              role: 'COMPOSER'
-            },
-            createdAt: new Date(Date.now() - 1000 * 60 * 120), // 2 horas atrás
-            likes: 15,
-            comments: 12,
-            genre: 'Jazz Fusion'
-          },
-          {
-            id: '3',
-            type: 'collaboration',
-            title: 'Participação em Trilha Sonora',
-            description: 'Fui convidado para compor a trilha de um documentário!',
-            author: {
-              name: 'Marina Oliveira',
-              avatarUrl: '',
-              role: 'COMPOSER'
-            },
-            createdAt: new Date(Date.now() - 1000 * 60 * 360), // 6 horas atrás
-            likes: 42,
-            comments: 5
-          }
-        ])
-
-        setStats({
-          projects: 12,
-          collaborations: 8,
-          followers: 156,
-          tracks: 24
-        })
-
+        setFeedItems(getMockFeedItems())
+        setStats(getMockStats())
         setIsLoading(false)
       }, 1000)
     }
@@ -142,11 +79,76 @@ export default function HomePage() {
     }
   }, [user])
 
+  // Funções de controle de áudio
+  const handlePlayPause = (item: FeedItem) => {
+    if (!item.audioUrl) return
+    
+    const audioId = item.id
+    
+    if (playingAudioId === audioId) {
+      // Pausar o áudio atual
+      audioElements[audioId]?.pause()
+      setPlayingAudioId(null)
+    } else {
+      // Parar qualquer áudio tocando
+      if (playingAudioId && audioElements[playingAudioId]) {
+        audioElements[playingAudioId].pause()
+        audioElements[playingAudioId].currentTime = 0
+      }
+      
+      // Iniciar novo áudio
+      const audio = new Audio(item.audioUrl)
+      
+      audio.addEventListener('timeupdate', () => {
+        const progress = audio.currentTime / audio.duration
+        setAudioProgress(prev => ({ ...prev, [audioId]: progress }))
+        
+        // Converter tempo para formato mm:ss
+        const minutes = Math.floor(audio.currentTime / 60)
+        const seconds = Math.floor(audio.currentTime % 60)
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`
+        setAudioCurrentTime(prev => ({ ...prev, [audioId]: timeString }))
+      })
+      
+      audio.addEventListener('ended', () => {
+        setPlayingAudioId(null)
+        setAudioProgress(prev => ({ ...prev, [audioId]: 0 }))
+        setAudioCurrentTime(prev => ({ ...prev, [audioId]: '0:00' }))
+      })
+      
+      audio.play()
+      setAudioElements(prev => ({ ...prev, [audioId]: audio }))
+      setPlayingAudioId(audioId)
+    }
+  }
+
+  const handleSeek = (item: FeedItem, percentage: number) => {
+    const audio = audioElements[item.id]
+    if (audio && item.audioUrl) {
+      audio.currentTime = audio.duration * percentage
+      setAudioProgress(prev => ({ ...prev, [item.id]: percentage }))
+    }
+  }
+
+  // Cleanup dos áudios
+  useEffect(() => {
+    return () => {
+      Object.values(audioElements).forEach(audio => {
+        audio.pause()
+        audio.remove()
+      })
+    }
+  }, [audioElements])
+
   const handleQuickAction = (action: string) => {
     toast({
       title: 'Ação Rápida',
       description: `${action} iniciado com sucesso!`,
     })
+  }
+
+  const handlePostClick = () => {
+    setIsPostModalOpen(true)
   }
 
   if (!user) {
@@ -166,15 +168,21 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Modal de Postagem */}
+      <PostModal 
+        isOpen={isPostModalOpen} 
+        onClose={() => setIsPostModalOpen(false)} 
+      />
+
       {/* Header Hero com Glassmorphism */}
       <div className="relative bg-gradient-to-br from-primary/10 via-background to-background border-b">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <AvatarUpload/>
+              <AvatarUpload />
 
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-black">
                   Bem-vindo, {user.name}!
                 </h1>
                 <p className="text-muted-foreground flex items-center gap-2 mt-1">
@@ -182,7 +190,21 @@ export default function HomePage() {
                     {user.role}
                   </Badge>
                   <span>•</span>
-                  <span>O que vai postar hoje?</span>
+                  <button
+                    onClick={handlePostClick}
+                    className="text-left hover:text-primary transition-colors cursor-text relative group px-2 py-1 rounded-lg hover:bg-primary/5 transition-all"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="relative">
+                        O que vai postar hoje?
+                        <span 
+                          className="absolute -left-2 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-black"
+                          style={{ animation: 'pulse 0.9s ease-in-out infinite' }}
+                        ></span>
+                      </span>
+                      <Pencil className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                    </div>
+                  </button>
                 </p>
               </div>
             </div>
@@ -207,7 +229,6 @@ export default function HomePage() {
       <div className="container px-4 py-8">
 
         {/* ========== INÍCIO DO GRID ========== */}
-        {/* Este grid cria 1 coluna no mobile e 2 colunas no desktop: [18rem 1fr] */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr] gap-6">
 
           {/* ========== COLUNA 1 - SIDEBAR ========== */}
@@ -328,8 +349,7 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-          {/* ========== FIM DA SIDEBAR (FORA DO GRID) ========== */}
-          {/* ========== FIM DA COLUNA 1 ========== */}
+          {/* ========== FIM DA SIDEBAR ========== */}
 
           {/* ========== COLUNA 2 - CONTEÚDO PRINCIPAL ========== */}
           <div className="order-1 lg:order-2 space-y-20">
@@ -423,22 +443,52 @@ export default function HomePage() {
                                 </div>
                               )}
 
-                              {/* Player Simulado */}
-                              <div className="bg-muted/30 rounded-lg p-3 mb-3">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <Button variant="ghost" size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                                      <Play className="h-4 w-4" />
-                                    </Button>
-                                    <div className="flex-1">
-                                      <div className="h-1 bg-muted rounded-full">
-                                        <div className="h-1 bg-primary rounded-full w-1/3"></div>
+                              {/* Player de Áudio Real */}
+                              {item.audioUrl && (
+                                <div className="bg-muted/30 rounded-lg p-3 mb-3">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className={`rounded-full ${playingAudioId === item.id ? 'bg-green-500' : 'bg-primary'} hover:opacity-90`}
+                                        onClick={() => handlePlayPause(item)}
+                                      >
+                                        {playingAudioId === item.id ? (
+                                          <Pause className="h-4 w-4 text-white" />
+                                        ) : (
+                                          <Play className="h-4 w-4 text-red-600" />
+                                        )}
+                                      </Button>
+                                      
+                                      <div className="flex-1">
+                                        {/* Barra de progresso clicável */}
+                                        <div 
+                                          className="h-1 bg-muted rounded-full cursor-pointer"
+                                          onClick={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect()
+                                            const clickX = e.clientX - rect.left
+                                            const percentage = clickX / rect.width
+                                            handleSeek(item, percentage)
+                                          }}
+                                        >
+                                          <div 
+                                            className="h-1 bg-primary rounded-full transition-all"
+                                            style={{ 
+                                              width: `${(audioProgress[item.id] || item.progress || 0) * 100}%` 
+                                            }}
+                                          ></div>
+                                        </div>
                                       </div>
                                     </div>
+                                    
+                                    {/* Tempo atual / Duração total */}
+                                    <span className="text-xs text-muted-foreground">
+                                      {audioCurrentTime[item.id] || item.currentTime || '0:00'} / {item.duration || '0:00'}
+                                    </span>
                                   </div>
-                                  <span className="text-xs text-muted-foreground">2:30</span>
                                 </div>
-                              </div>
+                              )}
                             </CardContent>
 
                             <CardContent className="pt-0 border-t">
@@ -519,13 +569,11 @@ export default function HomePage() {
           </div>
           {/* ========== FIM DA COLUNA 2 ========== */}
 
-
-
         </div>
         {/* ========== FIM DO GRID ========== */}
 
       </div>
       {/* ========== FIM DO CONTAINER PRINCIPAL ========== */}
-    </div >
+    </div>
   )
 }
