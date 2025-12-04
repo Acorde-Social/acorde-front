@@ -1,6 +1,6 @@
 // Configuração da API
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
-export const API_URL = `${baseUrl}/api`
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
 // Headers padrão para requisições
 export const getAuthHeaders = (token?: string) => {
