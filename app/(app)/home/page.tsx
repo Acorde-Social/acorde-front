@@ -76,20 +76,16 @@ export default function HomePage() {
     setIsPostModalOpen(true)
   }
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <Music className="h-16 w-16 text-primary mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Acesso Restrito</h2>
-          <p className="text-muted-foreground mb-4">Faça login para acessar sua dashboard</p>
-          <Button asChild>
-            <Link href="/login">Fazer Login</Link>
-          </Button>
-        </div>
+  if (!user || isLoading) {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center">
+        <Music className="h-16 w-16 text-primary mx-auto mb-4 animate-pulse" />
+        <p className="text-muted-foreground">Carregando seu dashboard...</p>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen bg-background">
@@ -149,12 +145,11 @@ export default function HomePage() {
       </div>
 
       <div className="container px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* COLUNA ESQUERDA - SIDEBAR */}
-          <div className="lg:col-span-1 space-y-6">
-            
-            {/* Minha Rede */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr] gap-6">
+
+          {/* ========== COLUNA 1 - SIDEBAR ========== */}
+          <div className="hidden lg:block absolute left-0 top-30 w-80 space-y-6 lg:pl-8">
+            {/* Stats Cards */}
             <DarkCard>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -269,12 +264,11 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </DarkCard>
-            
           </div>
+          {/* ========== FIM DA SIDEBAR ========== */}
 
-          {/* COLUNA DIREITA - CONTEÚDO PRINCIPAL */}
-          <div className="lg:col-span-2 space-y-6">
-            
+          {/* ========== COLUNA 2 - CONTEÚDO PRINCIPAL ========== */}
+          <div className="order-1 lg:order-2 space-y-20">
             {/* Tabs de Navegação */}
             <DarkCard>
               <CardContent className="p-4">
@@ -483,8 +477,9 @@ export default function HomePage() {
                 </Tabs>
               </CardContent>
             </DarkCard>
-            
           </div>
+          {/* ========== FIM DA COLUNA 2 ========== */}
+
         </div>
       </div>
     </div>
