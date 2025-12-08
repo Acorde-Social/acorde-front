@@ -31,16 +31,15 @@ export default function Home() {
 
   return (
     <>
-      {/* Container PRIMEIRAS DUAS SEÇÕES com background */}
       <div className="relative bg-background">
-        {/* Background APENAS aqui */}
+
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-70"
           style={{ backgroundImage: `url(${backgroundImage.src})` }} 
         />
         
         <div className="relative z-10">
-          {/* Hero Section */}
+
           <section className="space-y-2 pb-1 pt-4 md:pb-2 md:pt-6 lg:py-8">
             <div className="container flex max-w-[64rem] flex-col items-center gap-1 text-center">
               <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
@@ -63,18 +62,15 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* HowItWorks - AINDA DENTRO DO BG */}
           <HowItWorks/>
           <div className="pb-32 lg:pb-48"></div>
         </div>
       </div>
 
-      {/* SEPARADOR ESTILIZADO */}
       <div className="relative h-24 overflow-hidden bg-background">
         <div className="absolute -top-12 left-0 right-0 h-24 bg-gradient-to-b from-transparent to-background"></div>
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
         
-        {/* Elemento decorativo de onda musical */}
         <div className="absolute inset-0 flex items-center justify-center">
           <svg className="w-full h-12 text-primary/10" viewBox="0 0 1200 120" preserveAspectRatio="none">
             <path 
