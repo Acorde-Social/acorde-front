@@ -55,25 +55,22 @@ export function HowItWorks() {
         </p>
       </div>
 
-      <div className="mx-auto mt-8 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto mt-8 grid max-w-5xl gap-4 grid-cols-2 md:grid-cols-4 md:gap-6">
         {steps.map((step, index) => (
           <Link key={index} href="/login" className="block h-full">
             <div className="group relative flex flex-col items-center justify-center h-full border-2 border-black/20 rounded-xl p-6 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg cursor-pointer overflow-hidden">
 
-              {/* Background Image */}
               <Image
                 src={step.image}
                 alt={step.alt}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale-[100%] brightness-10 group-hover:grayscale-0 group-hover:brightness-100 object-cover rounded-xl object-cover blur-sm transition-all duration-1000 group-hover:blur-none"
+                className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale-[100%] brightness-10 group-hover:grayscale-0 group-hover:brightness-100 rounded-xl object-cover blur-sm transition-all duration-1000 group-hover:blur-none"
                 priority={index < 2}
                 quality={85}
               />
 
-              {/* Overlay */}
               <div className="absolute inset-0 bg-black/90 rounded-xl -z-10" />
 
-              {/* Conteúdo */}
               <div className="relative z-10">
                 <div className="mb-4 flex justify-center -mt-1">{step.icon}</div>
                 <h3 className="text-lg font-bold text-yellow-300 drop-shadow-lg">{step.title}</h3>
