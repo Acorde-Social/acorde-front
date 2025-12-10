@@ -29,6 +29,8 @@ interface SuccessStory {
 
 export function SuccessStories() {
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
+  const [desktopCurrentSlide, setDesktopCurrentSlide] = useState(0)
+  const totalDesktopSlides = 3 // 9 cards ÷ 3 por slide = 3 slides
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout>()
@@ -85,6 +87,108 @@ export function SuccessStories() {
       },
       quote: 'Formamos a banda completa através da plataforma. Do baixista ao produtor, todos vieram de colaborações no Acorde.',
       tags: ['Banda', 'Indie', 'Produção Independente']
+    },
+    {
+      id: '4',
+      name: 'Rafael Costa',
+      role: 'Baterista',
+      location: 'Salvador, BA',
+      audioUrl: '/audio/demo-rafael.mp3',
+      audioTitle: 'Groove Sessions - Vol. 1',
+      genre: 'Funk & Soul',
+      duration: '3:45',
+      stats: {
+        collaborations: 7,
+        projectsCompleted: 4,
+        timeline: '5 semanas'
+      },
+      quote: 'Conectei com produtores de São Paulo sem sair de casa. As sessões remotas funcionaram perfeitamente.',
+      tags: ['Bateria', 'Groove', 'Funk']
+    },
+    {
+      id: '5',
+      name: 'Julia Fernandes',
+      role: 'Compositora',
+      location: 'Belo Horizonte, MG',
+      audioUrl: '/audio/demo-julia.mp3',
+      audioTitle: 'Atmosferas Urbanas - EP',
+      genre: 'Ambient',
+      duration: '4:30',
+      stats: {
+        collaborations: 6,
+        projectsCompleted: 3,
+        timeline: '12 semanas'
+      },
+      quote: 'Desenvolvi uma trilha completa com um pianista do Rio. O fluxo de trabalho compartilhado acelerou o processo em 60%.',
+      tags: ['Composição', 'Trilha', 'Ambient']
+    },
+    {
+      id: '6',
+      name: 'Leonardo Oliveira',
+      role: 'Baixista',
+      location: 'Recife, PE',
+      audioUrl: '/audio/demo-leonardo.mp3',
+      audioTitle: 'Fundamentos do Baixo - Série',
+      genre: 'Jazz Fusion',
+      duration: '3:15',
+      stats: {
+        collaborations: 8,
+        projectsCompleted: 5,
+        timeline: '7 semanas'
+      },
+      quote: 'Montei uma banda de jazz completa em 3 semanas. Cada músico veio com referências alinhadas ao projeto.',
+      tags: ['Baixo', 'Jazz', 'Fundamentos']
+    },
+    {
+      id: '7',
+      name: 'Fernanda Lima',
+      role: 'Violinista',
+      location: 'Curitiba, PR',
+      audioUrl: '/audio/demo-fernanda-lima.mp3',
+      audioTitle: 'Conexões Eruditas - Single',
+      genre: 'Folk Contemporâneo',
+      duration: '3:50',
+      stats: {
+        collaborations: 5,
+        projectsCompleted: 2,
+        timeline: '9 semanas'
+      },
+      quote: 'A ponte entre música erudita e popular aconteceu naturalmente. Encontrei um violonista perfeito para o projeto.',
+      tags: ['Violino', 'Erudito', 'Folk']
+    },
+    {
+      id: '8',
+      name: 'Bruno Rodrigues',
+      role: 'Saxofonista',
+      location: 'Rio de Janeiro, RJ',
+      audioUrl: '/audio/demo-bruno.mp3',
+      audioTitle: 'Improvisações no Asfalto',
+      genre: 'Jazz Brasileiro',
+      duration: '4:05',
+      stats: {
+        collaborations: 9,
+        projectsCompleted: 6,
+        timeline: '4 semanas'
+      },
+      quote: 'Gravei participações em 4 projetos diferentes no mesmo mês. A plataforma organizou todas as deadlines.',
+      tags: ['Saxofone', 'Jazz', 'Improvisação']
+    },
+    {
+      id: '9',
+      name: 'Patricia Almeida',
+      role: 'Beatmaker',
+      location: 'São Paulo, SP',
+      audioUrl: '/audio/demo-patricia.mp3',
+      audioTitle: 'Hip-Hop Sessions 2025',
+      genre: 'Hip-Hop Instrumental',
+      duration: '2:55',
+      stats: {
+        collaborations: 4,
+        projectsCompleted: 2,
+        timeline: '8 semanas'
+      },
+      quote: 'Como produtora iniciante, encontrei mentores que me guiaram no processo. A comunidade fez toda diferença.',
+      tags: ['Beatmaking', 'Hip-Hop', 'Produção']
     }
   ]
 
@@ -92,20 +196,29 @@ export function SuccessStories() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024)
     }
-    
+
     checkMobile()
     window.addEventListener('resize', checkMobile)
-    
+
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  useEffect(() => {
+    if (!isMobile) {
+      const desktopInterval = setInterval(() => {
+        setDesktopCurrentSlide((prev) => (prev + 1) % totalDesktopSlides)
+      }, 10000)
+      return () => clearInterval(desktopInterval)
+    }
+  }, [isMobile])
 
   useEffect(() => {
     if (isMobile) {
       intervalRef.current = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % totalSlides)
-      }, 5000)
+      }, 9000)
     }
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
@@ -119,6 +232,28 @@ export function SuccessStories() {
     } else {
       setPlayingAudioId(id)
     }
+  }
+
+  const desktopSlides = [
+    [successStories[0], successStories[1], successStories[2]],
+    [successStories[3], successStories[4], successStories[5]],
+    [successStories[6], successStories[7], successStories[8]]
+  ]
+
+  const goToDesktopSlide = (index: number) => {
+    setDesktopCurrentSlide(index)
+  }
+
+  const nextDesktopSlide = () => {
+      if (desktopCurrentSlide === totalDesktopSlides - 1) {
+    setDesktopCurrentSlide(0)
+  } else {
+    setDesktopCurrentSlide((prev) => prev + 1)
+  }
+}
+
+  const prevDesktopSlide = () => {
+    setDesktopCurrentSlide((prev) => (prev - 1 + totalDesktopSlides) % totalDesktopSlides)
   }
 
   const goToSlide = (index: number) => {
@@ -309,7 +444,7 @@ export function SuccessStories() {
           </svg>
         </div>
 
-        <FloatingFigures/>
+        <FloatingFigures />
 
         <div className="absolute top-0 left-0 right-0 h-80 bg-gradient-to-b from-white via-white/90 to-transparent" />
         <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(44,30,74,0.02)]" />
@@ -337,41 +472,53 @@ export function SuccessStories() {
               <div className="w-48 h-1 mx-auto bg-gradient-to-r from-transparent via-[#fcd34d] to-transparent rounded-full" />
             </div>
 
-            {/* DESKTOP: Grid normal */}
-            <div className="hidden lg:grid grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {successStories.map((story) => (
-                <div key={story.id}>
-                  {renderCard(story)}
-                </div>
-              ))}
-            </div>
-
-            {/* MOBILE: Carrossel */}
-            <div className="lg:hidden relative max-w-md mx-auto">
+            {/* DESKTOP: Carrossel*/}
+            <div className="hidden lg:block relative max-w-7xl mx-auto">
               <div className="overflow-hidden rounded-2xl">
-                <div 
-                  className="flex transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                <div
+                  className="flex transition-transform duration-1000 ease-in-out"
+                  style={{ transform: `translateX(-${desktopCurrentSlide * 100}%)` }}
                 >
-                  {successStories.map((story, index) => (
-                    <div key={story.id} className="w-full flex-shrink-0 px-4">
-                      {renderCard(story)}
+                  {desktopSlides.map((slideGroup, groupIndex) => (
+                    <div key={groupIndex} className="w-full flex-shrink-0 px-4">
+                      <div className="flex gap-8">
+                        {slideGroup.map((story) => (
+                          <div key={story.id} className="w-1/3">
+                            {renderCard(story)}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* MOBILE: Carrossel */}
+              <div className="lg:hidden relative max-w-md mx-auto">
+                <div className="overflow-hidden rounded-2xl">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                  >
+                    {successStories.map((story, index) => (
+                      <div key={story.id} className="w-full flex-shrink-0 px-4">
+                        {renderCard(story)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               {/* Indicadores (dots) */}
               <div className="flex justify-center gap-2 mt-8">
-                {successStories.map((_, index) => (
+                {desktopSlides.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentSlide 
-                        ? 'bg-[#fcd34d] w-6' 
-                        : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide
+                      ? 'bg-[#fcd34d] w-6'
+                      : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
                     aria-label={`Ir para história ${index + 1}`}
                   />
                 ))}
@@ -380,14 +527,14 @@ export function SuccessStories() {
               {/* Botões de navegação */}
               <div className="flex justify-between items-center mt-6 absolute top-1/2 left-0 right-0 -translate-y-1/2 px-2">
                 <button
-                  onClick={prevSlide}
+                  onClick={prevDesktopSlide}
                   className="p-2 rounded-full bg-white/80 shadow-lg hover:bg-white transition-colors duration-300"
                   aria-label="História anterior"
                 >
                   <ChevronLeft className="h-5 w-5 text-[#2c1e4a]" />
                 </button>
                 <button
-                  onClick={nextSlide}
+                  onClick={nextDesktopSlide}
                   className="p-2 rounded-full bg-white/80 shadow-lg hover:bg-white transition-colors duration-300"
                   aria-label="Próxima história"
                 >
