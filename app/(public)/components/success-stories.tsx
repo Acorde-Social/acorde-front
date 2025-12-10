@@ -29,12 +29,13 @@ interface SuccessStory {
 
 export function SuccessStories() {
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
-  const [desktopCurrentSlide, setDesktopCurrentSlide] = useState(0)
-  const totalDesktopSlides = 3 // 9 cards ÷ 3 por slide = 3 slides
+  const [desktopCurrentSlide, setDesktopCurrentSlide] = useState(1)
+  const totalDesktopSlides = 3
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout>()
   const totalSlides = 3
+  const [activeDot, setActiveDot] = useState(0)
 
   const successStories: SuccessStory[] = [
     {
@@ -235,9 +236,11 @@ export function SuccessStories() {
   }
 
   const desktopSlides = [
-    [successStories[0], successStories[1], successStories[2]],
-    [successStories[3], successStories[4], successStories[5]],
-    [successStories[6], successStories[7], successStories[8]]
+    [successStories[6], successStories[7], successStories[8]], 
+    [successStories[0], successStories[1], successStories[2]], 
+    [successStories[3], successStories[4], successStories[5]], 
+    [successStories[6], successStories[7], successStories[8]], 
+    [successStories[0], successStories[1], successStories[2]], 
   ]
 
   const goToDesktopSlide = (index: number) => {
@@ -245,15 +248,29 @@ export function SuccessStories() {
   }
 
   const nextDesktopSlide = () => {
-      if (desktopCurrentSlide === totalDesktopSlides - 1) {
-    setDesktopCurrentSlide(0)
-  } else {
-    setDesktopCurrentSlide((prev) => prev + 1)
+    setDesktopCurrentSlide((prev) => {
+      const next = prev + 1
+      if (next === 4) { // Chegou no clone do final
+        setTimeout(() => setDesktopCurrentSlide(1), 500)
+        setActiveDot(0)
+        return 4
+      }
+      setActiveDot(next - 1) // Atualiza dot
+      return next
+    })
   }
-}
 
   const prevDesktopSlide = () => {
-    setDesktopCurrentSlide((prev) => (prev - 1 + totalDesktopSlides) % totalDesktopSlides)
+    setDesktopCurrentSlide((prev) => {
+      const prevSlide = prev - 1
+      if (prevSlide === 0) { // Chegou no clone do início
+        setTimeout(() => setDesktopCurrentSlide(3), 500)
+        setActiveDot(2)
+        return 0
+      }
+      setActiveDot(prevSlide - 1)
+      return prevSlide
+    })
   }
 
   const goToSlide = (index: number) => {
@@ -509,17 +526,17 @@ export function SuccessStories() {
                 </div>
               </div>
 
-              {/* Indicadores (dots) */}
+              {/* Indicadores desktop (dots) */}
               <div className="flex justify-center gap-2 mt-8">
-                {desktopSlides.map((_, index) => (
+                {desktopSlides.slice(1, 4).map((_, index) => (
                   <button
                     key={index}
-                    onClick={() => goToSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide
+                    onClick={() => goToDesktopSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === desktopCurrentSlide - 1  // -1 porque slides reais começam no índice 1
                       ? 'bg-[#fcd34d] w-6'
                       : 'bg-gray-300 hover:bg-gray-400'
                       }`}
-                    aria-label={`Ir para história ${index + 1}`}
+                    aria-label={`Ir para grupo ${index + 1}`}
                   />
                 ))}
               </div>
