@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react"
 import { HowItWorks } from "@/app/(public)/components/how-it-works"
 import { redirect } from "next/navigation"
 import backgroundImage from '@/public/images/bg-test-3.jpg'
-import { SuccessStories } from "@/app/(public)/components/sucess-stories"
+import { SuccessStories } from "@/app/(public)/components/success-stories"
 import { Features } from "./components/features"
 
 export default function Home() {

@@ -227,4 +227,38 @@ html:not(.hydrated).dark [class*="text-primary"] {
     --input: 240 3.7% 15.9%;
     --ring: 355 85% 60%;
   }
+
+  /* ANIMAÇÃO */
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+      transform: translate(10px, -15px) rotate(1deg);
+    }
+
+    66% {
+      transform: translate(-5px, 10px) rotate(-1deg);
+    }
+  }
+}
+
+/* GARANTIA ABSOLUTA DE CORES CINZAS */
+[class*="floating"] div,
+[class*="Floating"] div,
+.floating-figures-container *,
+[data-floating-note] {
+  color: rgba(75, 85, 99, 0.7) !important;
+  fill: rgba(75, 85, 99, 0.7) !important;
+  stroke: rgba(75, 85, 99, 0.7) !important;
+}
+
+/* RESET DE CORES PARA EMOJIS */
+[class*="floating"] div::before,
+[class*="Floating"] div::before,
+.floating-figures-container *::before {
+  color: rgba(75, 85, 99, 0.7) !important;
 }
