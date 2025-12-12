@@ -21,7 +21,7 @@ interface SuccessStory {
   stats: {
     collaborations: number
     projectsCompleted: number
-    timeline: string
+    gravacoes: string
   }
   quote: string
   tags: string[]
@@ -50,7 +50,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 3,
         projectsCompleted: 1,
-        timeline: '6 semanas'
+        gravacoes: '19'
       },
       quote: 'Encontrei o guitarrista perfeito em 48h. O que levaria meses em grupos de WhatsApp, resolvi em um final de semana.',
       tags: ['Produção', 'Vocal', 'Composição']
@@ -67,7 +67,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 5,
         projectsCompleted: 2,
-        timeline: '8 semanas'
+        gravacoes: '42'
       },
       quote: 'A colaboração com o violinista francês transformou completamente a peça. Ferramentas de versionamento salvaram o projeto.',
       tags: ['Trilha Sonora', 'Orquestração', 'Mídia']
@@ -84,7 +84,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 4,
         projectsCompleted: 3,
-        timeline: '10 semanas'
+        gravacoes: '10'
       },
       quote: 'Formamos a banda completa através da plataforma. Do baixista ao produtor, todos vieram de colaborações no Acorde.',
       tags: ['Banda', 'Indie', 'Produção Independente']
@@ -101,7 +101,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 7,
         projectsCompleted: 4,
-        timeline: '5 semanas'
+        gravacoes: '25'
       },
       quote: 'Conectei com produtores de São Paulo sem sair de casa. As sessões remotas funcionaram perfeitamente.',
       tags: ['Bateria', 'Groove', 'Funk']
@@ -118,7 +118,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 6,
         projectsCompleted: 3,
-        timeline: '12 semanas'
+        gravacoes: '26'
       },
       quote: 'Desenvolvi uma trilha completa com um pianista do Rio. O fluxo de trabalho compartilhado acelerou o processo em 60%.',
       tags: ['Composição', 'Trilha', 'Ambient']
@@ -135,7 +135,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 8,
         projectsCompleted: 5,
-        timeline: '7 semanas'
+        gravacoes: '17'
       },
       quote: 'Montei uma banda de jazz completa em 3 semanas. Cada músico veio com referências alinhadas ao projeto.',
       tags: ['Baixo', 'Jazz', 'Fundamentos']
@@ -152,7 +152,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 5,
         projectsCompleted: 2,
-        timeline: '9 semanas'
+        gravacoes: '9'
       },
       quote: 'A ponte entre música erudita e popular aconteceu naturalmente. Encontrei um violonista perfeito para o projeto.',
       tags: ['Violino', 'Erudito', 'Folk']
@@ -169,7 +169,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 9,
         projectsCompleted: 6,
-        timeline: '4 semanas'
+        gravacoes: '31'
       },
       quote: 'Gravei participações em 4 projetos diferentes no mesmo mês. A plataforma organizou todas as deadlines.',
       tags: ['Saxofone', 'Jazz', 'Improvisação']
@@ -186,7 +186,7 @@ export function SuccessStories() {
       stats: {
         collaborations: 4,
         projectsCompleted: 2,
-        timeline: '8 semanas'
+        gravacoes: '33'
       },
       quote: 'Como produtora iniciante, encontrei mentores que me guiaram no processo. A comunidade fez toda diferença.',
       tags: ['Beatmaking', 'Hip-Hop', 'Produção']
@@ -236,11 +236,11 @@ export function SuccessStories() {
   }
 
   const desktopSlides = [
-    [successStories[6], successStories[7], successStories[8]], 
-    [successStories[0], successStories[1], successStories[2]], 
-    [successStories[3], successStories[4], successStories[5]], 
-    [successStories[6], successStories[7], successStories[8]], 
-    [successStories[0], successStories[1], successStories[2]], 
+    [successStories[6], successStories[7], successStories[8]],
+    [successStories[0], successStories[1], successStories[2]],
+    [successStories[3], successStories[4], successStories[5]],
+    [successStories[6], successStories[7], successStories[8]],
+    [successStories[0], successStories[1], successStories[2]],
   ]
 
   const goToDesktopSlide = (index: number) => {
@@ -250,12 +250,12 @@ export function SuccessStories() {
   const nextDesktopSlide = () => {
     setDesktopCurrentSlide((prev) => {
       const next = prev + 1
-      if (next === 4) { // Chegou no clone do final
+      if (next === 4) { 
         setTimeout(() => setDesktopCurrentSlide(1), 500)
         setActiveDot(0)
         return 4
       }
-      setActiveDot(next - 1) // Atualiza dot
+      setActiveDot(next - 1) 
       return next
     })
   }
@@ -263,7 +263,7 @@ export function SuccessStories() {
   const prevDesktopSlide = () => {
     setDesktopCurrentSlide((prev) => {
       const prevSlide = prev - 1
-      if (prevSlide === 0) { // Chegou no clone do início
+      if (prevSlide === 0) { 
         setTimeout(() => setDesktopCurrentSlide(3), 500)
         setActiveDot(2)
         return 0
@@ -413,17 +413,17 @@ export function SuccessStories() {
                 color: 'bg-gradient-to-br from-[#2c1e4a]/10 to-[#2c1e4a]/5'
               },
               {
-                value: story.stats.timeline,
-                label: 'Timeline',
+                value: story.stats.gravacoes,
+                label: 'Gravações',
                 color: 'bg-gradient-to-br from-[#374151]/10 to-[#374151]/5'
               }
             ].map((stat, idx) => (
-              <div key={idx} className="text-center min-w-0 break-words">
+              <div key={idx} className="text-center min-w-0 px-1">
                 <div className={`inline-flex items-center justify-center p-2 rounded-xl ${stat.color} mb-2 group-hover:scale-105 transition-transform duration-300 ${!stat.icon ? 'flex-col' : ''}`}>
                   {stat.icon && <span className={idx === 0 ? 'text-[#fcd34d]' : 'text-[#2c1e4a]'}>{stat.icon}</span>}
-                  <span className={`${!stat.icon ? 'text-xl mt-1' : 'text-2xl ml-2'} font-bold text-[#111827] break-words`}>{stat.value}</span>
+                  <span className={`${!stat.icon ? 'text-xl mt-1' : 'text-lg sm:text-xl ml-1 sm:ml-2'} font-bold text-[#111827] break-all`}>{stat.value}</span>
                 </div>
-                <span className="text-sm font-medium text-[#374151] truncate block">{stat.label}</span>
+                <span className="text-xs sm:text-sm font-medium text-[#374151] truncate block">{stat.label}</span>
               </div>
             ))}
           </div>
@@ -475,9 +475,6 @@ export function SuccessStories() {
               <div className="inline-flex items-center justify-center gap-4 mb-8">
                 <div className="relative group">
                   <div className="absolute -inset-3 bg-gradient-to-r from-[#fcd34d] to-[#fcd34d]/30 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-all duration-500" />
-                  <div className="relative h-14 w-14 bg-gradient-to-br from-white to-[#f9fafb] rounded-full flex items-center justify-center shadow-2xl shadow-[#2c1e4a]/10 border border-white/80">
-                    <TrendingUp className="h-7 w-7 text-[#2c1e4a]" />
-                  </div>
                 </div>
                 <h2 className="text-4xl font-bold tracking-tight md:text-5xl bg-gradient-to-r from-[#2c1e4a] via-[#374151] to-[#2c1e4a] bg-clip-text text-transparent">
                   Histórias de Sucesso
@@ -489,7 +486,6 @@ export function SuccessStories() {
               <div className="w-48 h-1 mx-auto bg-gradient-to-r from-transparent via-[#fcd34d] to-transparent rounded-full" />
             </div>
 
-            {/* DESKTOP: Carrossel*/}
             <div className="hidden lg:block relative max-w-7xl mx-auto">
               <div className="overflow-hidden rounded-2xl">
                 <div
@@ -510,29 +506,12 @@ export function SuccessStories() {
                 </div>
               </div>
 
-              {/* MOBILE: Carrossel */}
-              <div className="lg:hidden relative max-w-md mx-auto">
-                <div className="overflow-hidden rounded-2xl">
-                  <div
-                    className="flex transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                  >
-                    {successStories.map((story, index) => (
-                      <div key={story.id} className="w-full flex-shrink-0 px-4">
-                        {renderCard(story)}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Indicadores desktop (dots) */}
               <div className="flex justify-center gap-2 mt-8">
                 {desktopSlides.slice(1, 4).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToDesktopSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === desktopCurrentSlide - 1  // -1 porque slides reais começam no índice 1
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === desktopCurrentSlide - 1  // 
                       ? 'bg-[#fcd34d] w-6'
                       : 'bg-gray-300 hover:bg-gray-400'
                       }`}
@@ -541,7 +520,6 @@ export function SuccessStories() {
                 ))}
               </div>
 
-              {/* Botões de navegação */}
               <div className="flex justify-between items-center mt-6 absolute top-1/2 left-0 right-0 -translate-y-1/2 px-2">
                 <button
                   onClick={prevDesktopSlide}
@@ -560,7 +538,52 @@ export function SuccessStories() {
               </div>
             </div>
 
-            {/* CTA FINAL MODERNO */}
+            <div className="lg:hidden relative max-w-md mx-auto">
+              <div className="overflow-hidden rounded-2xl">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                >
+                  {successStories.slice(0, 3).map((story, index) => (
+                    <div key={story.id} className="w-full flex-shrink-0 px-4">
+                      {renderCard(story)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-2 mt-8">
+                {successStories.slice(0, 3).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentSlide
+                      ? 'bg-[#fcd34d] w-6'
+                      : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                    aria-label={`Ir para história ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              <div className="flex justify-between items-center mt-6 absolute top-1/2 left-0 right-0 -translate-y-1/2 px-2">
+                <button
+                  onClick={prevSlide}
+                  className="p-2 rounded-full bg-white/80 shadow-lg hover:bg-white transition-colors duration-300"
+                  aria-label="História anterior"
+                >
+                  <ChevronLeft className="h-5 w-5 text-[#2c1e4a]" />
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="p-2 rounded-full bg-white/80 shadow-lg hover:bg-white transition-colors duration-300"
+                  aria-label="Próxima história"
+                >
+                  <ChevronRight className="h-5 w-5 text-[#2c1e4a]" />
+                </button>
+              </div>
+            </div>
+
             <div className="text-center mt-20">
               <Button
                 className="group relative gap-4 px-10 py-7 text-lg bg-gradient-to-r from-[#fcd34d] via-[#2c1e4a] to-[#374151] text-white hover:from-[#374151] hover:via-[#2c1e4a] hover:to-[#fcd34d] transition-all duration-500 shadow-2xl hover:shadow-3xl hover:scale-105 border-2 border-white/20 rounded-2xl overflow-hidden"

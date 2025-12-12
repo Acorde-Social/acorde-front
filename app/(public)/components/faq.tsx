@@ -91,7 +91,6 @@ export function FAQ() {
             <div className="relative z-10">
                 <section className="py-16 md:py-20">
                     <div className="container px-4 md:px-6">
-                        {/* Header */}
                         <div className="mx-auto max-w-3xl text-center mb-12">
                             <div className="inline-flex items-center justify-center gap-3 mb-6">
                                 <div className="p-2 rounded-lg bg-[#2c1e4a]/5">
@@ -128,7 +127,6 @@ export function FAQ() {
                             )}
                         </div>
 
-                        {/* FAQ List */}
                         <div className="max-w-2xl mx-auto space-y-0">
                             {filteredItems.map((item) => {
                                 const isExpanded = expandedItems.includes(item.id)
@@ -169,7 +167,6 @@ export function FAQ() {
                             })}
                         </div>
 
-                        {/* CTA */}
                         <div className="text-center mt-14">
                             <div className="max-w-xl mx-auto mb-8">
                                 <h3 className="text-xl font-bold text-[#111827] mb-3">Não encontrou sua resposta?</h3>
@@ -197,7 +194,6 @@ export function FAQ() {
                                 </Button>
                             </div>
 
-                            {/* Stats */}
                             <div className="mt-10 pt-8 border-t border-[#374151]/10">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-xl mx-auto">
                                     {[

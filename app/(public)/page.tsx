@@ -10,6 +10,8 @@ import { redirect } from "next/navigation"
 import backgroundImage from '@/public/images/bg-test-3.jpg'
 import { SuccessStories } from "@/app/(public)/components/success-stories"
 import { Features } from "./components/features"
+import { Pricing } from "./components/pricing"
+import { FAQ } from "./components/faq"
 
 export default function Home() {
   const { user, isLoading } = useAuth()
@@ -91,6 +93,15 @@ export default function Home() {
       <div className="bg-gradient-to-b from-background via-background to-muted/30">
         <Features/>
       </div>
+
+      <div className="bg-gradient-to-b from-background via-background to-muted/30">
+        <Pricing/>
+      </div>
+
+      <div className="bg-gradient-to-b from-background via-background to-muted/30">
+        <FAQ/>
+      </div>
+
     </>
   )
 }

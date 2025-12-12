@@ -119,7 +119,7 @@ export function Features() {
                     muted
                     loop
                     playsInline
-                    className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale">
+                    className="absolute inset-0 w-full h-full object-cover md: object-contain opacity-20 grayscale">
                     <source src="/videos/video-test-1.mp4" type="video/mp4" />
                 </video>
 
@@ -134,9 +134,7 @@ export function Features() {
                             <div className="inline-flex items-center justify-center gap-4 mb-8">
                                 <div className="relative group">
                                     <div className="absolute -inset-3 bg-gradient-to-r from-[#fcd34d] to-[#fcd34d]/30 rounded-full opacity-20 blur-xl group-hover:opacity-30 transition-all duration-500" />
-                                    <div className="relative h-14 w-14 bg-gradient-to-br from-white to-[#f9fafb] rounded-full flex items-center justify-center shadow-2xl shadow-[#2c1e4a]/10 border border-white/80">
-                                        <Zap className="h-7 w-7 text-[#2c1e4a]" />
-                                    </div>
+                                    
                                 </div>
                                 <div>
                                     <Badge className="mb-3 bg-gradient-to-r from-[#fcd34d]/10 to-[#2c1e4a]/10 text-[#2c1e4a] border border-[#fcd34d]/20 px-4 py-1.5 rounded-full font-medium">
@@ -167,7 +165,7 @@ export function Features() {
                             ))}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
                             {features.map((feature) => (
                                 <div
                                     key={feature.id}
