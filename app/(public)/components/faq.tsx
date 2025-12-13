@@ -198,7 +198,7 @@ export function FAQ() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-xl mx-auto">
                                     {[
                                         { label: 'Resposta em 24h', value: 'Suporte rápido' },
-                                        { label: '95% satisfação', value: 'Avaliação' },
+                                        { label: '99% satisfação', value: 'Avaliação' },
                                         { label: '+50 mil', value: 'Músicos' },
                                         { label: '24/7', value: 'Comunidade' },
                                     ].map((stat, index) => (
