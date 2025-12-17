@@ -38,6 +38,4 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts*.bundle
-*.patch
-backup-*
+next-env.d.ts
