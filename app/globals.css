@@ -12,13 +12,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Prevenir flash de conteúdo não estilizado durante hidratação */
+
 html:not(.hydrated) * {
   transition: none !important;
   animation: none !important;
 }
 
-/* Garantir que as cores primary sejam aplicadas imediatamente */
 html {
   color-scheme: light;
 }
@@ -27,7 +26,6 @@ html.dark {
   color-scheme: dark;
 }
 
-/* Forçar cores corretas durante carregamento */
 html:not(.hydrated) .bg-primary,
 html:not(.hydrated) [class*="bg-primary"] {
   background-color: hsl(355, 90%, 40%) !important;
@@ -48,7 +46,6 @@ html:not(.hydrated).dark [class*="text-primary"] {
   color: hsl(355, 85%, 60%) !important;
 }
 
-/* Avatar - Garantir aspect ratio correto em todos os avatares */
 [data-radix-avatar-image] {
   aspect-ratio: 1 / 1;
   object-fit: cover;
@@ -123,12 +120,9 @@ html:not(.hydrated).dark [class*="text-primary"] {
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
     --primary: 355 90% 40%;
-    /* Vermelho escuro como nos botões */
     --primary-foreground: 0 0% 100%;
     --secondary: 355 90% 40%;
-    /* Mesma cor dos botões para cor secundária */
     --secondary-foreground: 0 0% 100%;
-    /* Texto branco para contraste */
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
     --accent: 240 4.8% 95.9%;
@@ -140,7 +134,6 @@ html:not(.hydrated).dark [class*="text-primary"] {
     --ring: 355 90% 40%;
     --radius: 0.5rem;
 
-    /* Layout Vars */
     --header-height: 4rem;
     --sidebar-width: 280px;
     --content-max-width: 1280px;
@@ -186,23 +179,18 @@ html:not(.hydrated).dark [class*="text-primary"] {
       @apply h-12;
     }
   }
-
-  /* Container styles based on layout */
   .container {
     @apply mx-auto px-[var(--content-padding)] max-w-[var(--content-max-width)];
   }
 
-  /* Card styles */
   .card {
     @apply rounded-[var(--radius)] border border-border bg-card p-[var(--card-gap)];
   }
 
-  /* Grid gaps based on layout */
   .grid {
     @apply gap-[var(--card-gap)];
   }
 
-  /* Dark theme overrides */
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -211,12 +199,9 @@ html:not(.hydrated).dark [class*="text-primary"] {
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
     --primary: 355 85% 60%;
-    /* Vermelho escuro adaptado para o tema escuro */
     --primary-foreground: 0 0% 100%;
     --secondary: 355 85% 60%;
-    /* Mesma cor dos botões para cor secundária no tema escuro */
     --secondary-foreground: 0 0% 100%;
-    /* Texto branco para contraste */
     --muted: 0 0% 15%;
     --muted-foreground: 240 5% 64.9%;
     --accent: 12 6.5% 15.1%;
@@ -227,4 +212,36 @@ html:not(.hydrated).dark [class*="text-primary"] {
     --input: 240 3.7% 15.9%;
     --ring: 355 85% 60%;
   }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+      transform: translate(10px, -15px) rotate(1deg);
+    }
+
+    66% {
+      transform: translate(-5px, 10px) rotate(-1deg);
+    }
+  }
 }
+
+[class*="floating"] div,
+[class*="Floating"] div,
+.floating-figures-container *,
+[data-floating-note] {
+  color: rgba(75, 85, 99, 0.7) !important;
+  fill: rgba(75, 85, 99, 0.7) !important;
+  stroke: rgba(75, 85, 99, 0.7) !important;
+}
+
+[class*="floating"] div::before,
+[class*="Floating"] div::before,
+.floating-figures-container *::before {
+  color: rgba(75, 85, 99, 0.7) !important;
+}
+
