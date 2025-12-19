@@ -40,7 +40,6 @@ interface AuthContextType {
   logout: () => void
   clearError: () => void
   updateUserTheme: (theme: ThemePreferences) => void
-  updateUser: (userData: User) => void
 }
 
 interface RegisterData {
@@ -64,10 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingVerification, setPendingVerification] = useState(false)
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null)
   const router = useRouter()
-  const updateUser = (userData: User) => {
-    setUser(userData)
-  }
 
+  // Verificar se o usuário está autenticado ao carregar a página
   useEffect(() => {
     const storedToken = localStorage.getItem("token")
     if (storedToken) {
@@ -77,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Inicializar WebSocket quando o token mudar
   useEffect(() => {
     if (token) {
       socketService.connect(token)
@@ -84,11 +82,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       socketService.disconnect()
     }
 
+    // Cleanup ao desmontar
     return () => {
       socketService.disconnect()
     }
   }, [token])
 
+  // Buscar perfil do usuário com o token
   const fetchUserProfile = async (authToken: string) => {
     try {
       const response = await fetch(`${API_URL}/auth/profile`, {
@@ -106,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Login
   const login = async (identifier: string, password: string) => {
     setIsLoading(true)
     setError(null)
@@ -126,10 +127,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(access_token)
       setUser(userData)
 
+      // Inicializar WebSocket após login
       socketService.connect(access_token)
 
       router.push("/")
     } catch (err) {
+      // Verificar se o erro é relacionado à verificação de email
       if (err instanceof Error && err.message.includes("verifique seu email")) {
         setPendingVerification(true)
         setVerificationEmail(identifier)
@@ -142,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Login com token (OAuth)
   const loginWithToken = async (authToken: string) => {
     setIsLoading(true)
     setError(null)
@@ -150,8 +154,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("token", authToken)
       setToken(authToken)
 
+      // Buscar dados do usuário com o token
       await fetchUserProfile(authToken)
 
+      // Inicializar WebSocket
       socketService.connect(authToken)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar")
@@ -161,6 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Registro
   const register = async (userData: RegisterData) => {
     setIsLoading(true)
     setError(null)
@@ -176,11 +183,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data = await handleApiError(response)
 
+      // Verificar se o registro retornou uma flag de verificação de email
       if (data && data.requiresEmailVerification) {
         setPendingVerification(true)
         setVerificationEmail(userData.email)
-        router.push("/verify-email/pending") 
+        router.push("/verify-email/pending") // Redirecionar para página informativa
       } else {
+        // Se não necessitar verificação (comportamento antigo), fazer login automático
         await login(userData.email, userData.password)
       }
     } catch (err) {
@@ -190,6 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Reenviar email de verificação
   const resendVerification = async (email: string) => {
     setIsLoading(true)
     setError(null)
@@ -213,6 +223,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Logout
   const logout = () => {
     localStorage.removeItem("token")
     setUser(null)
@@ -220,11 +231,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPendingVerification(false)
     setVerificationEmail(null)
 
+    // Desconectar WebSocket
     socketService.disconnect()
 
     router.push("/")
   }
 
+  // Limpar erro
   const clearError = () => setError(null)
 
   const updateUserTheme = (themeConfig: ThemePreferences) => {
@@ -249,7 +262,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         clearError,
         updateUserTheme,
-        updateUser,
       }}
     >
       {children}
