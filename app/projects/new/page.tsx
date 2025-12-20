@@ -20,9 +20,7 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { projectSchema } from "@/lib/validations"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import * as z from "zod"
 
-// Defina o tipo explicitamente usando a inferência do Zod
 type ProjectFormValues = {
   title: string
   description: string
@@ -44,7 +42,6 @@ export default function NewProjectPage() {
   const [newInstrument, setNewInstrument] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Define o formulário com tipagem explícita
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema) as any,
     defaultValues: {
@@ -151,7 +148,6 @@ export default function NewProjectPage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
 
-      // Validar tamanho do arquivo (5MB)
       if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Arquivo muito grande",
@@ -160,8 +156,6 @@ export default function NewProjectPage() {
         })
         return
       }
-
-      // Validar tipo de arquivo
       if (!file.type.startsWith("image/")) {
         toast({
           title: "Tipo de arquivo inválido",
@@ -173,7 +167,6 @@ export default function NewProjectPage() {
 
       setProjectImage(file)
 
-      // Criar preview da imagem
       const reader = new FileReader()
       reader.onload = (event) => {
         setImagePreview(event.target?.result as string)
@@ -182,7 +175,6 @@ export default function NewProjectPage() {
     }
   }
 
-  // Função que lida com a submissão do formulário
   const onSubmit = async (values: ProjectFormValues) => {
     if (!token) {
       toast({
@@ -196,7 +188,6 @@ export default function NewProjectPage() {
     setIsSubmitting(true)
 
     try {
-      // Criar um objeto FormData para enviar os dados
       const formData = new FormData()
       formData.append("title", values.title)
       if (values.description) {
@@ -206,10 +197,8 @@ export default function NewProjectPage() {
       formData.append("key", values.key)
       formData.append("bpm", values.bpm.toString())
 
-      // Sempre enviar o campo neededInstruments, mesmo que seja um array vazio
       formData.append("neededInstruments", JSON.stringify(neededInstruments))
 
-      // Adicionar a imagem se existe (importante verificar se é um arquivo válido)
       if (projectImage && projectImage instanceof File) {
         formData.append("image", projectImage)
       }
@@ -221,7 +210,6 @@ export default function NewProjectPage() {
         description: "Seu novo projeto foi criado e já está disponível.",
       })
 
-      // Redirecionar para a página do projeto
       router.push(`/projects/${newProject.id}`)
     } catch (error) {
       console.error("Erro ao criar projeto:", error)

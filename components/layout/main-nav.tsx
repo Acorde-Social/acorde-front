@@ -25,7 +25,7 @@ export function MainNav() {
     },
     {
       href: "/explore",
-      label: "Explorar",
+      label: "Explorar",  
     },
     {
       href: "/projects",

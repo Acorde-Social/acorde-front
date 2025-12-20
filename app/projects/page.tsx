@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,17 +37,15 @@ export default function MyProjectsPage() {
     fetchUserProjects()
   }, [user, token, router])
 
-  const fetchUserProjects = async () => {
+  const fetchUserProjects = useCallback(async () => {
     setLoading(true)
     try {
-      // Buscar projetos do usuário
       if (!token || !user) {
-        throw new Error("Token and user are required to fetch user projects.")
+        throw new Error("Para acessar projetos você precisa estar logado.")
       }
       const userProjects = await ProjectService.getUserProjects(token)
       setProjects(userProjects)
 
-      // Buscar projetos em que o usuário colabora
       const collaborationProjects = await ProjectService.getUserCollaborations(token)
       setCollaborations(collaborationProjects)
     } catch (error) {
@@ -60,19 +58,19 @@ export default function MyProjectsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [token, user, toast])
 
-  const filteredProjects = projects.filter(project =>
+  const filteredProjects = useMemo(() => projects.filter(project =>
     project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (project.description ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.genre.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  ), [projects, searchTerm])
 
-  const filteredCollaborations = collaborations.filter(collab =>
+  const filteredCollaborations = useMemo(() => collaborations.filter(collab =>
     collab.project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     collab.project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     collab.project.genre.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  ), [collaborations, searchTerm])
 
   if (loading) {
     return (
@@ -89,12 +87,14 @@ export default function MyProjectsPage() {
           <h1 className="text-3xl font-bold">Meus Projetos</h1>
           <p className="text-muted-foreground">Gerencie e acompanhe seus projetos musicais</p>
         </div>
+        {filteredProjects.length > 0 && (
         <Button asChild>
           <Link href="/projects/new" className="flex items-center gap-2">
             <PlusCircle className="h-4 w-4" />
             Criar Projeto
           </Link>
         </Button>
+        )}
       </div>
 
       <div className="flex gap-4">
@@ -131,7 +131,10 @@ export default function MyProjectsPage() {
                   Crie seu primeiro projeto musical para começar a colaborar com outros músicos
                 </p>
                 <Button asChild>
-                  <Link href="/projects/new">Criar Projeto</Link>
+                  <Link href="/projects/new" className="flex items-center gap-2">
+                    <PlusCircle className="h-4 w-4" />
+                    Criar Projeto
+                  </Link>
                 </Button>
               </CardContent>
             </Card>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from 'react'
-import { IFeedItem, getMockFeedItems, getMockStats } from '@/app/(app)/home/data/mock-feed-data'
+import { IFeedItem, getMockFeedItems, getMockStats } from '@/lib/mock-feed-data'
 
 interface IStats {
   projects: number

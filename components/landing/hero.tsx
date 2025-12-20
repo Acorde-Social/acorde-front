@@ -17,7 +17,7 @@ export function Hero() {
           <div className="container flex max-w-[64rem] flex-col items-center gap-1 text-center">
             <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
               Conectando <span className="text-yellow-600">seu som</span>{" "}
-              com <span className="text-primary">artistas</span> do mundo inteiro!
+              com <span className="text-black">artistas</span> do mundo inteiro!
             </h1>
             <p className="max-w-[42rem] leading-normal sm:text-xl sm:leading-8 text-foreground">
               Compartilhe suas composições, colabore com músicos talentosos e expanda seu network musical.

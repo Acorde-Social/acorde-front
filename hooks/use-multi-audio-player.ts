@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect } from 'react'
-import type { IFeedItem } from '@/app/(app)/home/data/mock-feed-data'
+import type { IFeedItem } from '@/lib/mock-feed-data'
 
 export function useMultiAudioPlayer() {
   const [playingAudioId, setPlayingAudioId] = useState<string | null>(null)
