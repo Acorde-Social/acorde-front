@@ -12,7 +12,6 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
-    
   },
   "dependencies": {
     "@hookform/resolvers": "latest",
@@ -52,7 +51,7 @@
     "cmdk": "1.0.4",
     "date-fns": "latest",
     "embla-carousel-react": "8.5.1",
-    "emoji-picker-react": "^4.12.2",
+    "emoji-picker-react": "^4.17.4",
     "input-otp": "1.4.1",
     "lamejs": "^1.2.1",
     "lucide-react": "^0.454.0",

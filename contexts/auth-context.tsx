@@ -91,10 +91,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      fetchUserProfile(storedToken);
+    console.log('🎯 useEffect do auth-context INICIADO');
+
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+    };
+
+    const cookieToken = getCookie('auth_token');
+    console.log('🍪 Token no cookie:', !!cookieToken);
+
+    const localStorageToken = localStorage.getItem('token');
+    console.log('💾 Token no localStorage:', !!localStorageToken);
+
+    if (cookieToken && !localStorageToken) {
+      console.log('🔄 Sincronizando cookie → localStorage');
+      localStorage.setItem('token', cookieToken);
+    }
+
+    const tokenToUse = localStorageToken || cookieToken;
+    console.log('🎫 Token a usar:', !!tokenToUse);
+
+    if (tokenToUse) {
+      console.log('🚀 Vai chamar fetchUserProfile');
+      fetchUserProfile(tokenToUse);
     } else {
+      console.log('❌ Sem token, setando isLoading false');
       setIsLoading(false);
     }
   }, []);
@@ -112,18 +135,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   const fetchUserProfile = async (authToken: string) => {
+    console.log('🔍 fetchUserProfile INICIANDO com token:', !!authToken);
+
     try {
-      const response = await fetch(`${API_URL}/auth/profile`, {
+      console.log('📡 Fazendo request para:', `${API_URL}/api/auth/profile`);
+
+      const fetchPromise = fetch(`${API_URL}/auth/profile`, {
         headers: getAuthHeaders(authToken),
       });
 
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          console.log('⏰ TIMEOUT: 5 segundos se passaram sem resposta');
+          reject(new Error('Timeout ao buscar perfil'));
+        }, 5000);
+      });
+
+      const response = await Promise.race([fetchPromise, timeoutPromise]);
+      console.log('✅ Response recebido, status:', response.status);
+
       const userData = await handleApiError(response);
+      console.log('👤 Dados do usuário recebidos:', userData?.id);
+
       setUser(userData);
       setToken(authToken);
     } catch (err) {
-      console.error('Erro ao buscar perfil:', err);
+      console.error('❌ Erro em fetchUserProfile:', err);
       localStorage.removeItem('token');
+      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     } finally {
+      console.log('🏁 fetchUserProfile FINALIZADO');
       setIsLoading(false);
     }
   };
@@ -133,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,12 +189,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(access_token);
       setUser(userData);
 
-      // Salvar cookie para o middleware
       document.cookie = `auth_token=${access_token}; path=/; max-age=86400; SameSite=Lax`;
 
       socketService.connect(access_token);
 
-      // Redirecionar para /home em vez de /
       router.push('/home');
     } catch (err) {
       if (err instanceof Error && err.message.includes('verifique seu email')) {
@@ -241,7 +280,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('token');
-    // Limpar cookie também
     document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     setUser(null);
     setToken(null);
