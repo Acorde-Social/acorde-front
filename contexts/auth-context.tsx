@@ -140,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log('📡 Fazendo request para:', `${API_URL}/api/auth/profile`);
 
-      const fetchPromise = fetch(`${API_URL}/auth/profile`, {
+      const fetchPromise = fetch(`${API_URL}api/auth/profile`, {
         headers: getAuthHeaders(authToken),
       });
 
