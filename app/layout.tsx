@@ -42,9 +42,7 @@ export default function RootLayout({
                   const savedPrefs = localStorage.getItem('theme-customization-storage');
                   if (savedPrefs) {
                     const prefs = JSON.parse(savedPrefs);
-                    if (prefs.state?.preferences?.primaryColor) {
-                      root.style.setProperty('--primary', prefs.state.preferences.primaryColor);
-                    }
+                    
                     if (prefs.state?.preferences?.layout) {
                       root.classList.add('layout-' + prefs.state.preferences.layout);
                     }
@@ -57,7 +55,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.className)}>
+      <body className={cn("min-h-screen bg-muted font-sans antialiased", inter.className)}>
         <ClientLayout>
           {children}
         </ClientLayout>

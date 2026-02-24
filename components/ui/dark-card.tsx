@@ -10,7 +10,7 @@ export function DarkCard({
   return (
     <Card
       className={cn(
-        "dark-card bg-background/60 backdrop-blur-sm border-primary/10",
+        "dark-card bg-background/60 backdrop-blur-sm border-secondary/50",
         className
       )}
       {...props}

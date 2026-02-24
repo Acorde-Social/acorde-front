@@ -1,14 +1,15 @@
-'use client'
 
-import { useEffect } from 'react'
-import { useAuth } from '@/contexts/auth-context'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent,CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useToast } from '@/hooks/use-toast'
-import Link from 'next/link'
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 import {
   Music,
   Users,
@@ -23,243 +24,336 @@ import {
   Play,
   Pause,
   AudioWaveform,
-} from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { AvatarUpload } from '@/components/home/avatar-upload'
-import { PostModal } from '@/components/home/post-modal'
-import { Pencil } from 'lucide-react'
-import { useMultiAudioPlayer } from '@/hooks/use-multi-audio-player'
-import { useFeed } from '@/hooks/use-feed'
-import { useUI } from '@/hooks/use-ui'
-import { DarkCard } from "@/components/ui/dark-card"
+  Plus,
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { AvatarUpload } from '@/components/home/avatar-upload';
+import { PostModal } from '@/components/home/post-modal';
+import { Pencil } from 'lucide-react';
+import { useMultiAudioPlayer } from '@/hooks/use-multi-audio-player';
+import { useFeed } from '@/hooks/use-feed';
+import { useUI } from '@/hooks/use-ui';
+import { DarkCard } from '@/components/ui/dark-card';
 
 interface IStats {
-  projects: number
-  collaborations: number
-  followers: number
-  tracks: number
+  projects: number;
+  collaborations: number;
+  followers: number;
+  tracks: number;
 }
 
 export default function HomePage() {
-  const { user, token } = useAuth()
-  const { toast } = useToast()
-  const {
-    playingAudioId,
-    audioProgress,
-    audioCurrentTime,
-    handlePlayPause,
-    handleSeek
-  } = useMultiAudioPlayer()
 
-  const { feedItems, stats, isLoading, loadFeed } = useFeed()
-  const { activeTab, setActiveTab, isPostModalOpen, setIsPostModalOpen } = useUI()
+  const { user, token } = useAuth();
+  const { toast } = useToast();
+
+  const { playingAudioId, audioProgress, audioCurrentTime, handlePlayPause, handleSeek } =
+    useMultiAudioPlayer();
+
+  const { feedItems, stats, isLoading, loadFeed } = useFeed();
+
+  const { activeTab, setActiveTab, isPostModalOpen, setIsPostModalOpen } = useUI();
+
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
-      loadFeed()
+      loadFeed();
     }
-  }, [user, loadFeed])
+  }, [user, loadFeed]);
 
   const handleQuickAction = (action: string) => {
     toast({
       title: 'Ação Rápida',
       description: `${action} iniciado com sucesso!`,
-    })
-  }
+    });
+  };
 
   const handlePostClick = () => {
-    setIsPostModalOpen(true)
-  }
+    setIsPostModalOpen(true);
+  };
 
   if (!user || isLoading) {
-  return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="text-center">
-        <Music className="h-16 w-16 text-primary mx-auto mb-4 animate-pulse" />
-        <p className="text-muted-foreground">Carregando seu dashboard...</p>
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Music className="h-16 w-16 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Carregando seu dashboard...</p>
+        </div>
       </div>
-    </div>
-  )
-}
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <PostModal
-        isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-      />
-
-      <div className="relative bg-gradient-to-br from-primary/10 via-background to-background border-b">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <AvatarUpload />
-
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-black">
-                  Bem-vindo, {user.name}!
-                </h1>
-                <div className="text-muted-foreground flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="bg-primary/5">
-                    {user.role}
-                  </Badge>
-                  <span>•</span>
-                  <button
-                    onClick={handlePostClick}
-                    className="text-left hover:text-primary transition-colors cursor-text relative group px-2 py-1 rounded-lg hover:bg-primary/5 transition-all"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="relative">
-                        O que vai postar hoje?
-                        <span
-                          className="absolute -left-2 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-black"
-                          style={{ animation: 'pulse 0.9s ease-in-out infinite' }}
-                        ></span>
-                      </span>
-                      <Pencil className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+      <PostModal isOpen={isPostModalOpen} onClose={() => setIsPostModalOpen(false)} />
+      <div className="py-8 px-4 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 lg:gap-12">
+          <div className="hidden lg:block fixed left-0 top-30 h-full z-40">
+            <div className="w-16 bg-background/80 h-[60%]">
+              <div className="space-y-4">
+                <div
+                  className="relative"
+                  onMouseEnter={() => setExpandedCard('profile')}
+                  onMouseLeave={() => setExpandedCard(null)}
+                >
+                  <div className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
+                    <AvatarUpload showCamera={false} />
+                  </div>
+                  {expandedCard === 'profile' && (
+                    <div className="absolute left-full top-0 ml-10 w-80">
+                      <DarkCard className="w-[90%] lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+                        <div className="flex flex-col p-6 gap-4">
+                          <div className="flex items-center gap-4 lg:flex-col">
+                            <AvatarUpload showCamera={true}/>
+                            <div>
+                              <h1 className="text-3xl lg:text-xl xl:text-xl 2xl:text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-black">
+                                {user.name}!
+                              </h1>
+                              <div className="text-muted-foreground flex flex-col items-center gap-1 mt-1 lg:items-center">
+                                <Badge variant="outline" className="bg-primary/5 mt-2">
+                                  {user.role}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="hidden md:flex justify-center w-full">
+                            <Button
+                              size="lg"
+                              asChild
+                              className="mt-4 lg:mt-4 xl:mt-6 2xl:mt-2 bg-secondary text-primary-light hover:bg-secondary/90"
+                            >
+                              <Link href="/studio">
+                                <Mic className="h-4 w-4 mr-2" />
+                                Estúdio
+                              </Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </DarkCard>
                     </div>
+                  )}
+                </div>
+
+                <div
+                  className="relative"
+                  onMouseEnter={() => setExpandedCard('create-post')}
+                  onMouseLeave={() => setExpandedCard(null)}
+                >
+                  <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
+                    <Plus className="h-6 w-6 text-secondary mx-auto" />
                   </button>
+
+                  {expandedCard === 'create-post' && (
+                    <div className="absolute left-full top-0 ml-10 w-80">
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <Plus className="h-5 w-5 text-secondary" />
+                            Criar Post
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <button
+                            onClick={handlePostClick}
+                            className="w-full text-left hover:text-primary transition-colors cursor-text relative group p-4 rounded-lg hover:bg-primary/5 border border-dashed border-secondary/30"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-10 w-10">
+                                <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+                                <AvatarFallback className="bg-primary text-primary-foreground">
+                                  {user?.name?.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="relative text-muted-foreground group-hover:text-primary transition-colors">
+                                    O que vai postar hoje?
+                                    <span
+                                      className="absolute -left-2 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary"
+                                      style={{ animation: 'pulse 0.9s ease-in-out infinite' }}
+                                    ></span>
+                                  </span>
+                                  <Plus className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Compartilhe uma ideia, projeto ou colaboração
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        </CardContent>
+                      </DarkCard>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className="relative"
+                  onMouseEnter={() => setExpandedCard('network')}
+                  onMouseLeave={() => setExpandedCard(null)}
+                >
+                  <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
+                    <AudioWaveform className="h-6 w-6 text-secondary mx-auto" />
+                  </button>
+
+                  {expandedCard === 'network' && (
+                    <div className="absolute left-full top-0 ml-10 w-80">
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <AudioWaveform className="h-5 w-5 text-secondary" />
+                            Minha Rede
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
+                              <div className="text-2xl font-bold text-primary">
+                                {stats.projects}
+                              </div>
+                              <div className="text-xs text-muted-foreground">Projetos</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
+                              <div className="text-2xl font-bold text-primary">
+                                {stats.collaborations}
+                              </div>
+                              <div className="text-xs text-muted-foreground">Colabs</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
+                              <div className="text-2xl font-bold text-primary">
+                                {stats.followers}
+                              </div>
+                              <div className="text-xs text-muted-foreground">Seguidores</div>
+                            </div>
+                            <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
+                              <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
+                              <div className="text-xs text-muted-foreground">Faixas</div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </DarkCard>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className="relative"
+                  onMouseEnter={() => setExpandedCard('actions')}
+                  onMouseLeave={() => setExpandedCard(null)}
+                >
+                  <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
+                    <Clock className="h-6 w-6 text-secondary mx-auto" />
+                  </button>
+
+                  {expandedCard === 'actions' && (
+                    <div className="absolute left-full top-0 ml-10 w-80">
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[80%]">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <Clock className="h-5 w-5 text-secondary" />
+                            Ações Rápidas
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary"
+                            onClick={() => handleQuickAction('Gravação rápida')}
+                          >
+                            <Mic className="h-4 w-4 mr-3 text-secondary" />
+                            Gravar Ideia
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary"
+                            asChild
+                          >
+                            <Link href="/projects/new">
+                              <Music className="h-4 w-4 mr-3 text-secondary" />
+                              Novo Projeto
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary"
+                            asChild
+                          >
+                            <Link href="/explore">
+                              <Users className="h-4 w-4 mr-3 text-secondary" />
+                              Encontrar Músicos
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start hover:bg-primary/5 font-bold bg-muted/20 text-secondary"
+                            asChild
+                          >
+                            <Link href="/collaborations">
+                              <Guitar className="h-4 w-4 mr-3 text-secondary" />
+                              Minhas Colabs
+                            </Link>
+                          </Button>
+                        </CardContent>
+                      </DarkCard>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className="relative"
+                  onMouseEnter={() => setExpandedCard('recommended')}
+                  onMouseLeave={() => setExpandedCard(null)}
+                >
+                  <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
+                    <Star className="h-6 w-6 text-secondary mx-auto" />
+                  </button>
+
+                  {expandedCard === 'recommended' && (
+                    <div className="absolute left-full top-0 ml-10 w-80">
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[80%]">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <Star className="h-5 w-5 text-secondary" />
+                            Recomendados
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                                  RJ
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">Rafael Jazz</p>
+                                <p className="text-xs text-muted-foreground">Saxofonista</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                                  BP
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">Banda Progressiva</p>
+                                <p className="text-xs text-muted-foreground">Projeto</p>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </DarkCard>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-
-            <div className="hidden md:flex items-center gap-3">
-              <Button
-                size="lg"
-                asChild
-                className='mt-5 bg-[#c11d36] text-white hover:bg-[#c11d36]'
-              >
-                <Link href="/studio">
-                  <Mic className="h-4 w-4 mr-2" />
-                  Estúdio
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr] gap-6">
-
-          <div className="hidden lg:block absolute left-0 top-30 w-80 space-y-6 lg:pl-8">
-
-            <DarkCard>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <AudioWaveform className="h-5 w-5 text-primary" />
-                  Minha Rede
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.projects}</div>
-                    <div className="text-xs text-muted-foreground">Projetos</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.collaborations}</div>
-                    <div className="text-xs text-muted-foreground">Colabs</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.followers}</div>
-                    <div className="text-xs text-muted-foreground">Seguidores</div>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-primary/5 border border-primary/10">
-                    <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
-                    <div className="text-xs text-muted-foreground">Faixas</div>
-                  </div>
-                </div>
-              </CardContent>
-            </DarkCard>
-
-            <DarkCard>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Ações Rápidas
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  onClick={() => handleQuickAction('Gravação rápida')}
-                >
-                  <Mic className="h-4 w-4 mr-3 text-primary" />
-                  Gravar Ideia
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/projects/new">
-                    <Music className="h-4 w-4 mr-3 text-primary" />
-                    Novo Projeto
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/explore">
-                    <Users className="h-4 w-4 mr-3 text-primary" />
-                    Encontrar Músicos
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start hover:bg-primary/5 transition-all"
-                  asChild
-                >
-                  <Link href="/collaborations">
-                    <Guitar className="h-4 w-4 mr-3 text-primary" />
-                    Minhas Colabs
-                  </Link>
-                </Button>
-              </CardContent>
-            </DarkCard>
-
-            <DarkCard>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Star className="h-5 w-5 text-primary" />
-                  Recomendados
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                        RJ
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">Rafael Jazz</p>
-                      <p className="text-xs text-muted-foreground">Saxofonista</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                        BP
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">Banda Progressiva</p>
-                      <p className="text-xs text-muted-foreground">Projeto</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </DarkCard>
           </div>
 
-          <div className="order-1 lg:order-2 space-y-20">
+          <div className="space-y-80 max-w-2xl mx-auto lg:ml-[25%] lg:mx-0 xl:ml-[30%] 2xl:ml-[35%]">
             <DarkCard>
               <CardContent className="p-4">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -305,7 +399,10 @@ export default function HomePage() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <Avatar className="h-10 w-10">
-                                    <AvatarImage src={item.author.avatarUrl} alt={item.author.name} />
+                                    <AvatarImage
+                                      src={item.author.avatarUrl}
+                                      alt={item.author.name}
+                                    />
                                     <AvatarFallback className="bg-primary text-primary-foreground">
                                       {item.author.name.charAt(0)}
                                     </AvatarFallback>
@@ -316,13 +413,16 @@ export default function HomePage() {
                                       <span>
                                         {formatDistanceToNow(item.createdAt, {
                                           addSuffix: true,
-                                          locale: ptBR
+                                          locale: ptBR,
                                         })}
                                       </span>
                                       <span>•</span>
                                       <Badge variant="outline" className="text-xs">
-                                        {item.type === 'project' ? 'Projeto' :
-                                          item.type === 'track' ? 'Faixa' : 'Colaboração'}
+                                        {item.type === 'project'
+                                          ? 'Projeto'
+                                          : item.type === 'track'
+                                            ? 'Faixa'
+                                            : 'Colaboração'}
                                       </Badge>
                                     </div>
                                   </div>
@@ -332,11 +432,9 @@ export default function HomePage() {
                                 </Button>
                               </div>
                             </CardHeader>
-
                             <CardContent className="pb-3">
                               <h3 className="font-bold text-lg mb-2">{item.title}</h3>
                               <p className="text-muted-foreground mb-3">{item.description}</p>
-
                               {item.genre && (
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                                   <span className="bg-primary/10 text-primary px-2 py-1 rounded text-xs">
@@ -346,7 +444,6 @@ export default function HomePage() {
                                   {item.key && <span>{item.key}</span>}
                                 </div>
                               )}
-
                               {item.audioUrl && (
                                 <div className="bg-muted/30 rounded-lg p-3 mb-3">
                                   <div className="flex items-center justify-between">
@@ -360,46 +457,52 @@ export default function HomePage() {
                                         {playingAudioId === item.id ? (
                                           <Pause className="h-4 w-4 text-white" />
                                         ) : (
-                                          <Play className="h-4 w-4 text-red-600" />
+                                          <Play className="h-4 w-4 text-primary" />
                                         )}
                                       </Button>
-
                                       <div className="flex-1">
                                         <div
                                           className="h-1 bg-muted rounded-full cursor-pointer"
                                           onClick={(e) => {
-                                            const rect = e.currentTarget.getBoundingClientRect()
-                                            const clickX = e.clientX - rect.left
-                                            const percentage = clickX / rect.width
-                                            handleSeek(item, percentage)
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            const clickX = e.clientX - rect.left;
+                                            const percentage = clickX / rect.width;
+                                            handleSeek(item, percentage);
                                           }}
                                         >
                                           <div
                                             className="h-1 bg-primary rounded-full transition-all"
                                             style={{
-                                              width: `${(audioProgress[item.id] || item.progress || 0) * 100}%`
+                                              width: `${(audioProgress[item.id] || item.progress || 0) * 100}%`,
                                             }}
                                           ></div>
                                         </div>
                                       </div>
                                     </div>
-
                                     <span className="text-xs text-muted-foreground">
-                                      {audioCurrentTime[item.id] || item.currentTime || '0:00'} / {item.duration || '0:00'}
+                                      {audioCurrentTime[item.id] || item.currentTime || '0:00'} /{' '}
+                                      {item.duration || '0:00'}
                                     </span>
                                   </div>
                                 </div>
                               )}
                             </CardContent>
-
                             <CardContent className="pt-0 border-t">
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                  <Button variant="ghost" size="sm" className="gap-2 hover:text-primary">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="gap-2 hover:text-primary"
+                                  >
                                     <Heart className="h-4 w-4" />
                                     <span>{item.likes}</span>
                                   </Button>
-                                  <Button variant="ghost" size="sm" className="gap-2 hover:text-primary">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="gap-2 hover:text-primary"
+                                  >
                                     <MessageCircle className="h-4 w-4" />
                                     <span>{item.comments}</span>
                                   </Button>
@@ -438,7 +541,6 @@ export default function HomePage() {
                       </Button>
                     </div>
                   </TabsContent>
-
                   <TabsContent value="collaborations">
                     <div className="text-center py-12">
                       <Users className="h-16 w-16 text-primary mx-auto mb-4 opacity-50" />
@@ -451,7 +553,6 @@ export default function HomePage() {
                       </Button>
                     </div>
                   </TabsContent>
-
                   <TabsContent value="discover">
                     <div className="text-center py-12">
                       <Star className="h-16 w-16 text-primary mx-auto mb-4 opacity-50" />
@@ -471,5 +572,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

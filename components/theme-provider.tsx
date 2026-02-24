@@ -17,15 +17,10 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   React.useEffect(() => {
     if (!mounted) return
 
-    // Apply layout classes when component mounts or preferences change
     const root = document.documentElement
     root.classList.remove("layout-default", "layout-compact", "layout-spacious")
     root.classList.add(`layout-${preferences.layout}`)
 
-    // Apply primary color
-    root.style.setProperty("--primary", preferences.primaryColor)
-
-    // Dispatch theme change event for loading overlay (only after initial mount)
     const event = new CustomEvent("themeChange")
     document.dispatchEvent(event)
   }, [preferences, mounted])
