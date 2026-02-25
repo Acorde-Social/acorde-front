@@ -149,7 +149,7 @@ export async function getPendingFriendships(token: string): Promise<Friendship[]
  * Listar todos os amigos + counts de pending e suggestions
  */
 export async function getFriends(token: string): Promise<FriendsResponse> {
-	const response = await fetch(`${API_URL}/users/friendships`, {
+	const response = await fetch(`${API_URL}/api/users/friendships`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -166,7 +166,7 @@ export async function getFriends(token: string): Promise<FriendsResponse> {
  * Verificar status de amizade com outro usuário
  */
 export async function getFriendshipStatus(token: string, login: string): Promise<FriendshipStatus> {
-	const response = await fetch(`${API_URL}/users/friendships/status/${login}`, {
+	const response = await fetch(`${API_URL}/api/users/friendships/status/${login}`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},
@@ -183,7 +183,7 @@ export async function getFriendshipStatus(token: string, login: string): Promise
  * Obter sugestões de amizade
  */
 export async function getFriendshipSuggestions(token: string, limit: number = 10): Promise<FriendSuggestion[]> {
-	const response = await fetch(`${API_URL}/users/friendships/suggestions?limit=${limit}`, {
+	const response = await fetch(`${API_URL}/api/users/friendships/suggestions?limit=${limit}`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},

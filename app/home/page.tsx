@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -35,6 +34,7 @@ import { useMultiAudioPlayer } from '@/hooks/use-multi-audio-player';
 import { useFeed } from '@/hooks/use-feed';
 import { useUI } from '@/hooks/use-ui';
 import { DarkCard } from '@/components/ui/dark-card';
+import { FloatingFigures } from '@/components/home/FloatingFigures';
 
 interface IStats {
   projects: number;
@@ -44,7 +44,6 @@ interface IStats {
 }
 
 export default function HomePage() {
-
   const { user, token } = useAuth();
   const { toast } = useToast();
 
@@ -86,12 +85,32 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10" />
+      <div className="absolute inset-0 opacity-[0.03]">
+        <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1200 400">
+          <defs>
+            <pattern id="cta-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+              <circle cx="30" cy="30" r="1" fill="#2c1e4a" opacity="0.2" />
+              <circle cx="60" cy="30" r="1" fill="#fcd34d" opacity="0.2" />
+              <circle cx="30" cy="60" r="1" fill="#374151" opacity="0.2" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#cta-pattern)" />
+        </svg>
+      </div>
+      <div className="absolute inset-0">
+        <div className="scale-175 opacity-50">
+          <FloatingFigures />
+        </div>
+      </div>
+
+      <div className='relative z-10'>
       <PostModal isOpen={isPostModalOpen} onClose={() => setIsPostModalOpen(false)} />
       <div className="py-8 px-4 lg:px-8">
         <div className="grid grid-cols-1 gap-6 lg:gap-12">
           <div className="hidden lg:block fixed left-0 top-30 h-full z-40">
-            <div className="w-16 bg-background/80 h-[60%]">
+            <div className="w-16 h-[60%]">
               <div className="space-y-4">
                 <div
                   className="relative"
@@ -106,7 +125,7 @@ export default function HomePage() {
                       <DarkCard className="w-[90%] lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
                         <div className="flex flex-col p-6 gap-4">
                           <div className="flex items-center gap-4 lg:flex-col">
-                            <AvatarUpload showCamera={true}/>
+                            <AvatarUpload showCamera={true} />
                             <div>
                               <h1 className="text-3xl lg:text-xl xl:text-xl 2xl:text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-black">
                                 {user.name}!
@@ -570,6 +589,7 @@ export default function HomePage() {
             </DarkCard>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

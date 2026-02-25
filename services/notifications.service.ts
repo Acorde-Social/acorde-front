@@ -66,7 +66,7 @@ export async function getNotifications(
  * Contar notificações não lidas
  */
 export async function getNotificationCount(token: string): Promise<NotificationCount> {
-	const response = await fetch(`${API_URL}/users/notifications/count`, {
+	const response = await fetch(`${API_URL}/api/users/notifications/count`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
 		},

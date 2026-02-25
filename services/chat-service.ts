@@ -83,7 +83,7 @@ class ChatService {
         throw new Error('Token de autenticação não encontrado');
       }
       
-      const response = await axios.get(`${API_URL}/chat/conversations`, {
+      const response = await axios.get(`${API_URL}/api/chat/conversations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -114,7 +114,7 @@ class ChatService {
         participantIds: uniqueParticipantIds,
       };
       
-      const response = await axios.post(`${API_URL}/chat/conversations`, payload, {
+      const response = await axios.post(`${API_URL}/api/chat/conversations`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
@@ -159,7 +159,7 @@ class ChatService {
         throw new Error('Token de autenticação não encontrado');
       }
       
-      let url = `${API_URL}/chat/conversations/${conversationId}/messages?limit=${limit}`;
+      let url = `${API_URL}/api/chat/conversations/${conversationId}/messages?limit=${limit}`;
       
       if (cursor) {
         url += `&cursor=${cursor}`;
@@ -184,7 +184,7 @@ class ChatService {
       }
       
       const response = await axios.post(
-        `${API_URL}/chat/conversations/${data.conversationId}/messages`,
+        `${API_URL}/api/chat/conversations/${data.conversationId}/messages`,
         data,
         {
           headers: { Authorization: `Bearer ${token}` },

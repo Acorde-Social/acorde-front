@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { API_URL, getAuthHeaders, handleApiError } from "@/lib/api-config";
+import { API_URL, getAuthHeaders, handleApiError } from '@/lib/api-config';
 import { getAuthToken } from '@/utils/auth';
-import type { User } from "@/types";
+import type { User } from '@/types';
 
 // Interface para resultado da busca de usuários
 export interface SearchUsersResult {
@@ -24,7 +24,7 @@ class UserServiceClass {
 
       return await response.json();
     } catch (error) {
-      console.error("Erro ao buscar usuário por ID:", error);
+      console.error('Erro ao buscar usuário por ID:', error);
       throw error; // Re-throw para ser tratado pelo chamador
     }
   }
@@ -37,7 +37,7 @@ class UserServiceClass {
         params: { q: searchTerm, limit },
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
@@ -52,7 +52,7 @@ class UserServiceClass {
       const response = await axios.patch(`${API_URL}/users/profile`, userData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       return response.data;
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
@@ -65,11 +65,11 @@ class UserServiceClass {
     try {
       const token = getAuthToken();
       if (!token) return null;
-      
+
       const response = await axios.get(`${API_URL}/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar perfil do usuário atual:', error);
@@ -83,14 +83,14 @@ class UserServiceClass {
       const token = getAuthToken();
       const formData = new FormData();
       formData.append('avatar', file);
-      
-      const response = await axios.post(`${API_URL}/users/avatar`, formData, {
+
+      const response = await axios.patch(`${API_URL}/api/users/profile`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-      
+
       return response.data.avatarUrl;
     } catch (error) {
       console.error('Erro ao atualizar avatar:', error);
