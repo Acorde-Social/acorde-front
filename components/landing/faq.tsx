@@ -5,7 +5,7 @@ import { Search, ChevronDown, ChevronUp, HelpCircle, Headphones, Users } from 'l
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FAQ_ITEMS } from './faq-data';
-import { FloatingFigures } from './FloatingFigures'
+import { FloatingFigures } from '../common/FloatingFigures'
 
 const statsData = [
   { label: 'Resposta em 24h', value: 'Suporte rápido' },

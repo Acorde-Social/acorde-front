@@ -9,15 +9,31 @@ import { userService } from '@/services/user-service';
 
 interface IAvatarUpload {
   onUploadComplete?: () => void;
-  showCamera?: boolean;  
+  showCamera?: boolean;
 }
 
-export function AvatarUpload({ onUploadComplete, showCamera = true }: IAvatarUpload) { 
+export function AvatarUpload({ onUploadComplete, showCamera = true }: IAvatarUpload) {
   const { updateUser, user } = useAuth();
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) return; // <-- adicione esta linha
+
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const avatarUrl = await userService.updateAvatar(file);
+      updateUser({ ...user, avatarUrl });
+      toast({ title: 'Sucesso', description: 'Avatar atualizado!' });
+      onUploadComplete?.();
+    } catch (error) {
+      toast({ title: 'Erro', description: 'Falha ao atualizar avatar', variant: 'destructive' });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   if (!user) return null;
@@ -34,7 +50,7 @@ export function AvatarUpload({ onUploadComplete, showCamera = true }: IAvatarUpl
           {user.name.charAt(0)}
         </AvatarFallback>
       </Avatar>
-      
+
       {showCamera && (
         <div
           className={`absolute inset-0 flex items-center justify-center transition-opacity ${

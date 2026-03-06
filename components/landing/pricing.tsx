@@ -4,7 +4,7 @@ import { Check, X, Zap, Music, Users, Star, Crown, TrendingUp, Headphones, Mic, 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { FloatingFigures } from './FloatingFigures'
+import { FloatingFigures } from '../common/FloatingFigures'
 import { useState, useEffect, useRef } from 'react'
 
 interface PlanFeature {

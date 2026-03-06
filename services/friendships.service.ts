@@ -1,197 +1,369 @@
 import { API_URL } from "@/lib/api-config"
+import { getAuthToken } from "@/utils/auth"
+import { notification } from "@/lib/notification"
 
 export interface FriendshipUser {
-	id: string
-	name: string
-	login: string
-	avatarUrl: string | null
-	role: string
+  id: string
+  name: string
+  login: string
+  avatarUrl: string | null
+  role: string
 }
 
 export interface Friendship {
-	id: string
-	requesterId: string
-	addresseeId: string
-	status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED"
-	createdAt: string
-	updatedAt: string
-	requester?: FriendshipUser
-	addressee?: FriendshipUser
+  id: string
+  requesterId: string
+  addresseeId: string
+  status: "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED"
+  createdAt: string
+  updatedAt: string
+  requester?: FriendshipUser
+  addressee?: FriendshipUser
 }
 
 export interface FriendshipStatus {
-	status: "NONE" | "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED" | "SELF" | "NOT_FOUND"
-	friendshipId: string | null
-	isRequester?: boolean
+  status: "NONE" | "PENDING" | "ACCEPTED" | "DECLINED" | "BLOCKED" | "SELF" | "NOT_FOUND"
+  friendshipId: string | null
+  isRequester?: boolean
 }
 
 export interface Friend {
-	friendshipId: string
-	id: string
-	name: string
-	login: string
-	avatarUrl: string | null
-	role: string
+  friendshipId: string
+  id: string
+  name: string
+  login: string
+  avatarUrl: string | null
+  role: string
 }
 
 export interface FriendsResponse {
-	friends: Friend[]
-	pendingCount: number
-	suggestionsCount: number
+  friends: Friend[]
+  pendingCount: number
+  suggestionsCount: number
 }
 
 export interface FriendSuggestion {
-	id: string
-	name: string
-	login: string
-	avatarUrl: string | null
-	role: string
-	bio?: string
-	instruments?: string[]
+  id: string
+  name: string
+  login: string
+  avatarUrl: string | null
+  role: string
+  bio?: string
+  instruments?: string[]
 }
 
-/**
- * Enviar pedido de amizade (fazer acorde)
- */
-export async function sendFriendshipRequest(token: string, addresseeLogin: string): Promise<Friendship> {
-	const response = await fetch(`${API_URL}/users/friendships`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
-		},
-		body: JSON.stringify({ addresseeLogin }),
-	})
+class FriendshipService {
+  async sendFriendshipRequest(addresseeLogin: string, customToken?: string): Promise<Friendship | null> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para enviar pedidos")
+        return null
+      }
 
-	if (!response.ok) {
-		const error = await response.json()
-		throw new Error(error.message || "Erro ao enviar pedido de amizade")
-	}
+      if (!addresseeLogin) {
+        notification.error("Login do usuário não fornecido")
+        return null
+      }
 
-	return response.json()
+      const response = await fetch(`${API_URL}/api/users/friendships`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ addresseeLogin }),
+      })
+
+      if (response.status === 404) {
+        notification.error("Usuário não encontrado")
+        return null
+      }
+
+      if (response.status === 400) {
+        const error = await response.json()
+        notification.error(error.message || "Não foi possível enviar o pedido")
+        return null
+      }
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return null
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao enviar pedido de amizade")
+        return null
+      }
+
+      notification.success("Pedido de amizade enviado!")
+      return await response.json()
+      
+    } catch (error) {
+      notification.error("Erro ao enviar pedido. Tente novamente.")
+      return null
+    }
+  }
+
+  async acceptFriendship(friendshipId: string, customToken?: string): Promise<Friendship | null> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para aceitar pedidos")
+        return null
+      }
+
+      if (!friendshipId) {
+        notification.error("ID da amizade não fornecido")
+        return null
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships/${friendshipId}/accept`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 404) {
+        notification.error("Pedido não encontrado")
+        return null
+      }
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return null
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao aceitar pedido")
+        return null
+      }
+
+      notification.success("Pedido aceito! Agora vocês são amigos.")
+      return await response.json()
+      
+    } catch (error) {
+      notification.error("Erro ao aceitar pedido. Tente novamente.")
+      return null
+    }
+  }
+
+  async declineFriendship(friendshipId: string, customToken?: string): Promise<boolean> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para recusar pedidos")
+        return false
+      }
+
+      if (!friendshipId) {
+        notification.error("ID da amizade não fornecido")
+        return false
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships/${friendshipId}/decline`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 404) {
+        notification.error("Pedido não encontrado")
+        return false
+      }
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return false
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao recusar pedido")
+        return false
+      }
+
+      notification.success("Pedido recusado")
+      return true
+      
+    } catch (error) {
+      notification.error("Erro ao recusar pedido. Tente novamente.")
+      return false
+    }
+  }
+
+  async removeFriendship(friendshipId: string, customToken?: string): Promise<boolean> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para remover amizade")
+        return false
+      }
+
+      if (!friendshipId) {
+        notification.error("ID da amizade não fornecido")
+        return false
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships/${friendshipId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 404) {
+        notification.error("Amizade não encontrada")
+        return false
+      }
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return false
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao remover amizade")
+        return false
+      }
+
+      notification.success("Amizade removida")
+      return true
+      
+    } catch (error) {
+      notification.error("Erro ao remover amizade. Tente novamente.")
+      return false
+    }
+  }
+
+  async getPendingFriendships(customToken?: string): Promise<Friendship[]> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para ver pedidos")
+        return []
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships/pending`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return []
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao buscar pedidos pendentes")
+        return []
+      }
+
+      return await response.json()
+      
+    } catch (error) {
+      notification.error("Erro ao carregar pedidos. Tente novamente.")
+      return []
+    }
+  }
+
+  async getFriends(customToken?: string): Promise<FriendsResponse | null> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para ver amigos")
+        return null
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return null
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao buscar amigos")
+        return null
+      }
+
+      return await response.json()
+      
+    } catch (error) {
+      notification.error("Erro ao carregar amigos. Tente novamente.")
+      return null
+    }
+  }
+
+  async getFriendshipStatus(login: string, customToken?: string): Promise<FriendshipStatus | null> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        return null
+      }
+
+      if (!login) {
+        return null
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships/status/${login}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 401) {
+        return null
+      }
+
+      if (!response.ok) {
+        return null
+      }
+
+      return await response.json()
+      
+    } catch (error) {
+      return null
+    }
+  }
+
+  async getFriendshipSuggestions(limit: number = 10, customToken?: string): Promise<FriendSuggestion[]> {
+    try {
+      const token = customToken || getAuthToken()
+      if (!token) {
+        notification.error("Você precisa estar logado para ver sugestões")
+        return []
+      }
+
+      const response = await fetch(`${API_URL}/api/users/friendships/suggestions?limit=${limit}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 401) {
+        notification.error("Sessão expirada. Faça login novamente.")
+        return []
+      }
+
+      if (!response.ok) {
+        notification.error("Erro ao buscar sugestões")
+        return []
+      }
+
+      return await response.json()
+      
+    } catch (error) {
+      notification.error("Erro ao carregar sugestões. Tente novamente.")
+      return []
+    }
+  }
 }
 
-/**
- * Aceitar pedido de amizade
- */
-export async function acceptFriendship(token: string, friendshipId: string): Promise<Friendship> {
-	const response = await fetch(`${API_URL}/users/friendships/${friendshipId}/accept`, {
-		method: "PATCH",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		const error = await response.json()
-		throw new Error(error.message || "Erro ao aceitar pedido")
-	}
-
-	return response.json()
-}
-
-/**
- * Recusar pedido de amizade
- */
-export async function declineFriendship(token: string, friendshipId: string): Promise<{ message: string }> {
-	const response = await fetch(`${API_URL}/users/friendships/${friendshipId}/decline`, {
-		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		const error = await response.json()
-		throw new Error(error.message || "Erro ao recusar pedido")
-	}
-
-	return response.json()
-}
-
-/**
- * Remover amizade
- */
-export async function removeFriendship(token: string, friendshipId: string): Promise<{ message: string }> {
-	const response = await fetch(`${API_URL}/users/friendships/${friendshipId}`, {
-		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		const error = await response.json()
-		throw new Error(error.message || "Erro ao remover amizade")
-	}
-
-	return response.json()
-}
-
-/**
- * Listar pedidos de amizade pendentes (recebidos)
- */
-export async function getPendingFriendships(token: string): Promise<Friendship[]> {
-	const response = await fetch(`${API_URL}/users/friendships/pending`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		throw new Error("Erro ao buscar pedidos pendentes")
-	}
-
-	return response.json()
-}
-
-/**
- * Listar todos os amigos + counts de pending e suggestions
- */
-export async function getFriends(token: string): Promise<FriendsResponse> {
-	const response = await fetch(`${API_URL}/users/friendships`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		throw new Error("Erro ao buscar amigos")
-	}
-
-	return response.json()
-}
-
-/**
- * Verificar status de amizade com outro usuário
- */
-export async function getFriendshipStatus(token: string, login: string): Promise<FriendshipStatus> {
-	const response = await fetch(`${API_URL}/users/friendships/status/${login}`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		throw new Error("Erro ao verificar status de amizade")
-	}
-
-	return response.json()
-}
-
-/**
- * Obter sugestões de amizade
- */
-export async function getFriendshipSuggestions(token: string, limit: number = 10): Promise<FriendSuggestion[]> {
-	const response = await fetch(`${API_URL}/users/friendships/suggestions?limit=${limit}`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
-	if (!response.ok) {
-		throw new Error("Erro ao buscar sugestões")
-	}
-
-	return response.json()
-}
+export const friendshipService = new FriendshipService()
