@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { FloatingFigures } from './FloatingFigures'
+import { FloatingFigures } from '../common/FloatingFigures'
 
 interface ISuccessStory {
   id: string

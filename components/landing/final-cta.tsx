@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles, Users, TrendingUp, Music, CheckCircle } from 'luc
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { FloatingFigures } from './FloatingFigures';
+import { FloatingFigures } from '../common/FloatingFigures';
 import type { LucideIcon } from 'lucide-react';
 
 interface IStat {

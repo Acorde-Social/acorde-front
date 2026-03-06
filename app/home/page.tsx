@@ -34,7 +34,7 @@ import { useMultiAudioPlayer } from '@/hooks/use-multi-audio-player';
 import { useFeed } from '@/hooks/use-feed';
 import { useUI } from '@/hooks/use-ui';
 import { DarkCard } from '@/components/ui/dark-card';
-import { FloatingFigures } from '@/components/home/FloatingFigures';
+import { FloatingFigures } from '@/components/common/FloatingFigures';
 
 interface IStats {
   projects: number;

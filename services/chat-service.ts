@@ -2,8 +2,8 @@ import axios from 'axios';
 import { API_URL } from '@/lib/api-config';
 import { getAuthToken } from '@/utils/auth';
 import { io, Socket } from 'socket.io-client';
+import { notification } from '@/lib/notification';
 
-// Tipos de chat
 export interface ChatAttachment {
   id: string;
   fileUrl: string;
@@ -75,78 +75,68 @@ class ChatService {
   private socket: Socket | null = null;
   private listeners: Map<string, ((data: any) => void)[]> = new Map();
 
-  // Obtém as conversas do usuário
   async getUserConversations(customToken?: string): Promise<ChatConversation[]> {
     try {
       const token = customToken || getAuthToken();
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        notification.error('Você precisa estar logado para ver conversas');
+        return [];
       }
       
       const response = await axios.get(`${API_URL}/api/chat/conversations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
-    } catch (error) {
-      console.error('Erro ao obter conversas:', error);
-      throw error;
+      
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        notification.error('Sessão expirada. Faça login novamente.');
+      } else {
+        notification.error('Erro ao carregar conversas. Tente novamente.');
+      }
+      return [];
     }
   }
 
-  // Cria uma nova conversa
-  async createConversation(data: CreateConversationDTO, customToken?: string): Promise<ChatConversation> {
+  async createConversation(data: CreateConversationDTO, customToken?: string): Promise<ChatConversation | null> {
     try {
       const token = customToken || getAuthToken();
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        notification.error('Você precisa estar logado para criar conversas');
+        return null;
       }
       
-      // Validar entrada
       if (!data.participantIds || data.participantIds.length === 0) {
-        throw new Error('É necessário especificar pelo menos um participante');
+        notification.error('Selecione pelo menos um participante');
+        return null;
       }
       
-      // Remover duplicados (caso haja)
       const uniqueParticipantIds = Array.from(new Set(data.participantIds));
-      
-      const payload = {
-        ...data,
-        participantIds: uniqueParticipantIds,
-      };
+      const payload = { ...data, participantIds: uniqueParticipantIds };
       
       const response = await axios.post(`${API_URL}/api/chat/conversations`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      notification.success('Conversa criada com sucesso!');
       return response.data;
+      
     } catch (error: any) {
-      console.error('Erro ao criar conversa:', error);
-      
-      // Verificar se é um erro do axios para extrair mais informações
-      if (error.response) {
-        // O servidor respondeu com um status de erro
-        const status = error.response.status;
-        const data = error.response.data;
-        
-        // Mensagens específicas com base no código de erro
-        if (status === 400) {
-          throw new Error(data.message || 'Dados inválidos para criar conversa');
-        } else if (status === 401) {
-          throw new Error('Você não está autenticado para criar esta conversa');
-        } else if (status === 403) {
-          throw new Error('Você não tem permissão para criar esta conversa');
-        } else if (status === 404) {
-          throw new Error('Um ou mais usuários não foram encontrados');
-        } else if (status === 500) {
-          throw new Error('Erro no servidor. Tente novamente mais tarde.');
-        }
+      if (error.response?.status === 400) {
+        notification.error('Dados inválidos para criar conversa');
+      } else if (error.response?.status === 401) {
+        notification.error('Sessão expirada. Faça login novamente.');
+      } else if (error.response?.status === 403) {
+        notification.error('Sem permissão para criar esta conversa');
+      } else if (error.response?.status === 404) {
+        notification.error('Um ou mais usuários não foram encontrados');
+      } else {
+        notification.error('Erro ao criar conversa. Tente novamente.');
       }
-      
-      // Se não for um erro do axios ou não tiver informações específicas
-      throw error;
+      return null;
     }
   }
 
-  // Obtém mensagens de uma conversa com paginação
   async getConversationMessages(
     conversationId: string,
     limit = 50,
@@ -156,80 +146,131 @@ class ChatService {
     try {
       const token = customToken || getAuthToken();
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        notification.error('Você precisa estar logado para ver mensagens');
+        return [];
+      }
+
+      if (!conversationId) {
+        notification.error('ID da conversa não fornecido');
+        return [];
       }
       
       let url = `${API_URL}/api/chat/conversations/${conversationId}/messages?limit=${limit}`;
-      
-      if (cursor) {
-        url += `&cursor=${cursor}`;
-      }
+      if (cursor) url += `&cursor=${cursor}`;
       
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return response.data;
-    } catch (error) {
-      console.error('Erro ao obter mensagens:', error);
-      throw error;
+      
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        notification.error('Sessão expirada. Faça login novamente.');
+      } else if (error.response?.status === 403) {
+        notification.error('Você não tem acesso a esta conversa');
+      } else if (error.response?.status === 404) {
+        notification.error('Conversa não encontrada');
+      } else {
+        notification.error('Erro ao carregar mensagens. Tente novamente.');
+      }
+      return [];
     }
   }
 
-  // Envia uma mensagem (texto, áudio ou vídeo)
-  async sendMessage(data: CreateMessageDTO, customToken?: string): Promise<ChatMessage> {
+  async sendMessage(data: CreateMessageDTO, customToken?: string): Promise<ChatMessage | null> {
     try {
       const token = customToken || getAuthToken();
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        notification.error('Você precisa estar logado para enviar mensagens');
+        return null;
+      }
+
+      if (!data.conversationId) {
+        notification.error('ID da conversa não fornecido');
+        return null;
+      }
+
+      if (!data.content && !data.attachment) {
+        notification.error('Mensagem não pode estar vazia');
+        return null;
       }
       
       const response = await axios.post(
         `${API_URL}/api/chat/conversations/${data.conversationId}/messages`,
         data,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      
       return response.data;
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
-      throw error;
+      
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        notification.error('Sessão expirada. Faça login novamente.');
+      } else if (error.response?.status === 403) {
+        notification.error('Você não pode enviar mensagens nesta conversa');
+      } else if (error.response?.status === 404) {
+        notification.error('Conversa não encontrada');
+      } else {
+        notification.error('Erro ao enviar mensagem. Tente novamente.');
+      }
+      return null;
     }
   }
 
-  // Marca a conversa como lida
-  async markConversationAsRead(conversationId: string, customToken?: string): Promise<void> {
+  async markConversationAsRead(conversationId: string, customToken?: string): Promise<boolean> {
     try {
       const token = customToken || getAuthToken();
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        return false;
+      }
+
+      if (!conversationId) {
+        return false;
       }
       
       await axios.post(
-        `${API_URL}/chat/conversations/${conversationId}/read`,
+        `${API_URL}/api/chat/conversations/${conversationId}/read`,
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-    } catch (error) {
-      console.error('Erro ao marcar conversa como lida:', error);
-      throw error;
+      
+      return true;
+      
+    } catch (error: any) {
+      return false;
     }
   }
 
-  // Upload de arquivos (áudio, vídeo, imagem)
-  async uploadAttachment(file: File, customToken?: string): Promise<string> {
+  async uploadAttachment(file: File, customToken?: string): Promise<string | null> {
     try {
       const token = customToken || getAuthToken();
       if (!token) {
-        throw new Error('Token de autenticação não encontrado');
+        notification.error('Você precisa estar logado para enviar arquivos');
+        return null;
+      }
+
+      if (!file) {
+        notification.error('Nenhum arquivo selecionado');
+        return null;
+      }
+
+      const allowedTypes = ['audio/', 'video/', 'image/'];
+      const isValidType = allowedTypes.some(type => file.type.startsWith(type));
+      
+      if (!isValidType) {
+        notification.error('Tipo de arquivo não suportado');
+        return null;
+      }
+
+      if (file.size > 10 * 1024 * 1024) { 
+        notification.error('Arquivo muito grande. Máximo 10MB.');
+        return null;
       }
       
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await axios.post(`${API_URL}/uploads/chat`, formData, {
+      const response = await axios.post(`${API_URL}/api/uploads/chat`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
@@ -237,35 +278,38 @@ class ChatService {
       });
       
       return response.data.fileUrl;
-    } catch (error) {
-      console.error('Erro ao fazer upload de arquivo:', error);
-      throw error;
+      
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        notification.error('Sessão expirada. Faça login novamente.');
+      } else if (error.response?.status === 413) {
+        notification.error('Arquivo muito grande.');
+      } else {
+        notification.error('Erro ao enviar arquivo. Tente novamente.');
+      }
+      return null;
     }
   }
 
-  // WebSocket para comunicação em tempo real
   connectToWebSocket(userId: string, token: string) {
-    if (this.socket && this.socket.connected) {
-      return;
+    try {
+      if (this.socket && this.socket.connected) return;
+
+      this.socket = io(`${API_URL.replace('/api', '')}`, {
+        auth: { token, userId },
+      });
+
+      this.socket.on('connect_error', (err) => {
+        notification.error('Erro na conexão em tempo real');
+      });
+
+      this.socket.on('connect', () => {
+        this.setupEventListeners();
+      });
+
+    } catch (error) {
+      notification.error('Erro ao conectar ao chat');
     }
-
-    this.socket = io(`${API_URL.replace('/api', '')}`, {
-      auth: {
-        token,
-        userId,
-      },
-    });
-
-    this.socket.on('connect', () => {
-      console.log('Conectado ao WebSocket do chat');
-    });
-
-    this.socket.on('disconnect', () => {
-      console.log('Desconectado do WebSocket do chat');
-    });
-    
-    // Configurar eventos padrão
-    this.setupEventListeners();
   }
 
   disconnectFromWebSocket() {
@@ -278,77 +322,51 @@ class ChatService {
   private setupEventListeners() {
     if (!this.socket) return;
 
-    // Registrar callbacks para eventos do socket
-    this.socket.on('new_message', (data) => {
-      this.notifyListeners('new_message', data);
-    });
-
-    this.socket.on('user_typing', (data) => {
-      this.notifyListeners('user_typing', data);
-    });
-
-    this.socket.on('messages_read', (data) => {
-      this.notifyListeners('messages_read', data);
-    });
+    this.socket.on('new_message', (data) => this.notifyListeners('new_message', data));
+    this.socket.on('user_typing', (data) => this.notifyListeners('user_typing', data));
+    this.socket.on('messages_read', (data) => this.notifyListeners('messages_read', data));
   }
 
-  // Método para adicionar listeners de eventos
   on(event: string, callback: (data: any) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, []);
-    }
-    
+    if (!this.listeners.has(event)) this.listeners.set(event, []);
     this.listeners.get(event)?.push(callback);
   }
 
-  // Método para remover listeners de eventos
   off(event: string, callback: (data: any) => void) {
-    if (!this.listeners.has(event)) return;
-    
     const callbacks = this.listeners.get(event) || [];
     const index = callbacks.indexOf(callback);
-    
-    if (index > -1) {
-      callbacks.splice(index, 1);
-    }
+    if (index > -1) callbacks.splice(index, 1);
   }
 
-  // Método para notificar todos os listeners de um evento
   private notifyListeners(event: string, data: any) {
     const callbacks = this.listeners.get(event) || [];
     callbacks.forEach(callback => callback(data));
   }
 
-  // Métodos para enviar eventos via WebSocket
   joinConversation(conversationId: string) {
-    if (this.socket) {
-      this.socket.emit('join_conversation', { conversationId });
-    }
+    if (this.socket) this.socket.emit('join_conversation', { conversationId });
   }
 
   leaveConversation(conversationId: string) {
-    if (this.socket) {
-      this.socket.emit('leave_conversation', { conversationId });
-    }
+    if (this.socket) this.socket.emit('leave_conversation', { conversationId });
   }
 
   sendTypingStatus(conversationId: string, isTyping: boolean) {
-    if (this.socket) {
-      this.socket.emit('typing', { conversationId, isTyping });
-    }
+    if (this.socket) this.socket.emit('typing', { conversationId, isTyping });
   }
 
-  // Envia mensagem via WebSocket para ter resposta imediata
-  sendMessageSocket(data: CreateMessageDTO): Promise<ChatMessage> {
-    return new Promise((resolve, reject) => {
+  sendMessageSocket(data: CreateMessageDTO): Promise<ChatMessage | null> {
+    return new Promise((resolve) => {
       if (!this.socket) {
-        reject(new Error('WebSocket não está conectado'));
+        notification.error('Conexão perdida. Tente novamente.');
+        resolve(null);
         return;
       }
 
       this.socket.emit('send_message', data, (response: any) => {
         if (response.error) {
-          reject(new Error(response.error));
+          notification.error('Erro ao enviar mensagem');
+          resolve(null);
         } else {
           resolve(response);
         }
@@ -356,19 +374,15 @@ class ChatService {
     });
   }
 
-  markAsReadSocket(conversationId: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+  markAsReadSocket(conversationId: string): Promise<boolean> {
+    return new Promise((resolve) => {
       if (!this.socket) {
-        reject(new Error('WebSocket não está conectado'));
+        resolve(false);
         return;
       }
 
       this.socket.emit('mark_as_read', { conversationId }, (response: any) => {
-        if (response.error) {
-          reject(new Error(response.error));
-        } else {
-          resolve();
-        }
+        resolve(!response.error);
       });
     });
   }
