@@ -27,12 +27,10 @@ export function UserNav() {
 
 	if (!user) return null
 
-	// Verificar se está visualizando outro perfil
 	const isViewingOtherProfile = pathname?.startsWith('/profile/') && pathname !== '/profile'
 
 	return (
 		<div className="flex items-center gap-1 sm:gap-2">
-			{/* Botão Voltar - apenas quando visualizando outro perfil */}
 			{isViewingOtherProfile && (
 				<Button
 					variant="ghost"
@@ -88,7 +86,7 @@ export function UserNav() {
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem
-						className="text-red-600 focus:bg-red-50 focus:text-red-600 dark:focus:bg-red-950"
+						className="text-warning focus:bg-warning/10 focus:text-warning dark:focus:bg-warning/20"
 						onClick={() => {
 							logout()
 							router.push("/")

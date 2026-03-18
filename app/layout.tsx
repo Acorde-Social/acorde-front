@@ -5,8 +5,10 @@ import "./globals.css"
 import { ClientLayout } from "./client-layout"
 
 const inter = Inter({ subsets: ["latin"] })
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
 export const metadata: Metadata = {
+  metadataBase: new URL(appUrl),
   title: "Acorde - Conectando Compositores e Músicos",
   description: "Plataforma para colaboração musical entre compositores e músicos",
   generator: 'v0.dev'
@@ -25,11 +27,10 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  const theme = localStorage.getItem('theme') || 
+                  const theme = localStorage.getItem('theme') ||
                                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                   const root = document.documentElement;
-                  
-                  // Aplicar tema
+
                   if (theme === 'dark') {
                     root.classList.add('dark');
                     root.style.colorScheme = 'dark';
@@ -37,18 +38,16 @@ export default function RootLayout({
                     root.classList.remove('dark');
                     root.style.colorScheme = 'light';
                   }
-                  
-                  // Aplicar cores CSS customizadas se existirem
+
                   const savedPrefs = localStorage.getItem('theme-customization-storage');
                   if (savedPrefs) {
                     const prefs = JSON.parse(savedPrefs);
-                    
+
                     if (prefs.state?.preferences?.layout) {
                       root.classList.add('layout-' + prefs.state.preferences.layout);
                     }
                   }
                 } catch (e) {
-                  console.error('Theme init error:', e);
                 }
               })();
             `,

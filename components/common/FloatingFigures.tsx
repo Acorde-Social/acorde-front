@@ -20,10 +20,10 @@ export function FloatingFigures() {
 
   useEffect(() => {
     setMounted(true)
-    
+
     const symbols = ['♩', '♪', '♫', '♬', '𝄞', '𝄢', '♭', '♮', '♯', '🎵', '🎶']
     const notesCount = Math.min(30, Math.floor(window.innerWidth * window.innerHeight / 10000))
-    
+
     const newNotes = Array.from({ length: notesCount }, (_, i) => ({
       id: i,
       symbol: symbols[Math.floor(Math.random() * symbols.length)],
@@ -33,9 +33,9 @@ export function FloatingFigures() {
       x: Math.random() * 100,
       y: Math.random() * 100,
       rotation: Math.random() * 15 - 7.5,
-      opacity: 0.3 + Math.random() * 0.5
+            opacity: 0.34 + Math.random() * 0.5
     }))
-    
+
     setNotes(newNotes)
 
     const handleResize = () => {
@@ -50,7 +50,7 @@ export function FloatingFigures() {
           x: Math.random() * 100,
           y: Math.random() * 100,
           rotation: Math.random() * 15 - 7.5,
-          opacity: 0.3 + Math.random() * 0.5
+          opacity: 0.34 + Math.random() * 0.5
         }))
         setNotes(resizedNotes)
       }
@@ -63,11 +63,10 @@ export function FloatingFigures() {
   if (!mounted) return null
 
   return (
-    <div 
-      className="absolute inset-0 overflow-hidden pointer-events-none"
-      style={{ 
-        filter: 'grayscale(100%)',
-        mixBlendMode: 'multiply'
+    <div
+      className="floating-figures-container absolute inset-0 overflow-hidden pointer-events-none"
+      style={{
+        mixBlendMode: 'normal'
       }}
     >
       {notes.map((note) => (
@@ -80,7 +79,6 @@ export function FloatingFigures() {
             fontSize: `${note.size}px`,
             animation: `float ${note.speed}s infinite ease-in-out`,
             animationDelay: `${note.delay}s`,
-            color: 'rgba(75, 85, 99, 0.7)',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
             transform: `rotate(${note.rotation}deg)`,
             opacity: note.opacity,

@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 
-// Simple Audio Mixer Component for Collaboration Review
 interface CollaborationMixerProps {
   originalTrack: string;
   collaborationTrack: string;
@@ -75,8 +74,8 @@ const CollaborationMixer = ({ originalTrack, collaborationTrack }: Collaboration
       originalAudio.currentTime = 0
       collaborationAudio.currentTime = 0
 
-      originalAudio.play().catch(console.error)
-      collaborationAudio.play().catch(console.error)
+      originalAudio.play().catch(() => {})
+      collaborationAudio.play().catch(() => {})
       setIsPlaying(true)
 
       const checkPlaybackEnd = setInterval(() => {
@@ -164,9 +163,13 @@ export default function ReceivedCollaborationsPage() {
   const [actionInProgress, setActionInProgress] = useState<string | null>(null)
   const { toast } = useToast()
   const router = useRouter()
-  const { user, token } = useAuth()
+  const { user, token, isLoading: authLoading } = useAuth()
 
   useEffect(() => {
+    if (authLoading) {
+      return
+    }
+
     if (!user || !token) {
       router.push("/login")
       return
@@ -177,7 +180,6 @@ export default function ReceivedCollaborationsPage() {
         const data = await CollaborationService.getReceivedAudioCollaborations(token)
         setCollaborations(data)
       } catch (error) {
-        console.error("Error fetching received collaborations:", error)
         toast({
           title: "Error",
           description: "Could not load received collaborations. Please try again later.",
@@ -189,11 +191,10 @@ export default function ReceivedCollaborationsPage() {
     }
 
     fetchCollaborations()
-  }, [user, token, router, toast])
+  }, [authLoading, user, token, router, toast])
 
   const getFullAudioUrl = (url: string) => {
     if (!url) return ""
-    // Return full URL if already absolute, otherwise prepend API URL
     return url.startsWith("http") ? url : `${API_URL}/${url}`
   }
 
@@ -204,7 +205,7 @@ export default function ReceivedCollaborationsPage() {
       case "ACCEPTED":
         return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Aceita</Badge>
       case "REJECTED":
-        return <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">Rejeitada</Badge>
+        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">Rejeitada</Badge>
       default:
         return <Badge variant="outline">Desconhecido</Badge>
     }
@@ -217,7 +218,6 @@ export default function ReceivedCollaborationsPage() {
     try {
       await CollaborationService.updateAudioCollaborationStatus(id, "ACCEPTED", token)
 
-      // Update state to reflect the status change
       setCollaborations(collaborations.map(collab =>
         collab.id === id ? { ...collab, status: "ACCEPTED" } : collab
       ))
@@ -227,7 +227,6 @@ export default function ReceivedCollaborationsPage() {
         description: "A colaboração foi aceita com sucesso.",
       })
     } catch (error) {
-      console.error("Erro ao aceitar colaboração:", error)
       toast({
         title: "Erro",
         description: "Não foi possível aceitar a colaboração. Tente novamente mais tarde.",
@@ -245,7 +244,6 @@ export default function ReceivedCollaborationsPage() {
     try {
       await CollaborationService.updateAudioCollaborationStatus(id, "REJECTED", token)
 
-      // Update state to reflect the status change
       setCollaborations(collaborations.map(collab =>
         collab.id === id ? { ...collab, status: "REJECTED" } : collab
       ))
@@ -255,7 +253,6 @@ export default function ReceivedCollaborationsPage() {
         description: "A colaboração foi rejeitada.",
       })
     } catch (error) {
-      console.error("Erro ao rejeitar colaboração:", error)
       toast({
         title: "Erro",
         description: "Não foi possível rejeitar a colaboração. Tente novamente mais tarde.",
@@ -278,7 +275,6 @@ export default function ReceivedCollaborationsPage() {
         description: "A colaboração foi removida com sucesso.",
       })
     } catch (error) {
-      console.error("Erro ao excluir colaboração:", error)
       toast({
         title: "Erro",
         description: "Não foi possível excluir a colaboração. Tente novamente mais tarde.",
@@ -420,7 +416,6 @@ export default function ReceivedCollaborationsPage() {
                       </div>
                     </div>
 
-                    {/* Mixer para testar as duas faixas juntas */}
                     <div className="mt-6">
                       <CollaborationMixer
                         originalTrack={getFullAudioUrl(collab.track.audioUrl)}

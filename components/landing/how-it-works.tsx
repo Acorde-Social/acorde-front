@@ -39,25 +39,25 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="container py-10 md:py-16">
-      <div className="mx-auto max-w-[58rem] space-y-2 text-center">
-        <h2 className="text-3xl font-bold leading-tight tracking-tighter md:text-4xl">
+    <section className="container py-8 md:py-12 lg:py-16">
+      <div className="mx-auto max-w-[58rem] space-y-2 text-center px-2">
+        <h2 className="text-2xl font-bold leading-tight tracking-tighter sm:text-3xl md:text-4xl">
           Como funciona
         </h2>
-        <p className="text-foreground md:text-xl text-center">
+        <p className="text-foreground text-sm sm:text-base md:text-xl text-center">
           Transforme suas ideias musicais em realidade com nossa plataforma de colaboração
         </p>
       </div>
 
-      <div className="mx-auto mt-8 grid max-w-5xl gap-4 grid-cols-2 md:grid-cols-4 md:gap-6">
+      <div className="mx-auto mt-6 grid max-w-5xl gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 md:gap-5 lg:gap-6">
         {steps.map((step, index) => (
           <Link key={index} href="/login" className="block h-full">
-            <div className="group relative flex flex-col items-center justify-center h-full border-2 border-black/20 rounded-xl p-6 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg cursor-pointer overflow-hidden">
+            <div className="group relative flex min-h-[220px] sm:min-h-[240px] flex-col items-center justify-center h-full border-2 border-black/20 rounded-xl p-4 sm:p-5 lg:p-6 text-center transition-all duration-300 hover:border-black hover:-translate-y-1 hover:shadow-lg cursor-pointer overflow-hidden">
               <Image
                 src={step.image}
                 alt={step.alt}
                 fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale-[100%] brightness-10 group-hover:grayscale-0 group-hover:brightness-100 rounded-xl blur-sm transition-all duration-1000 group-hover:blur-none"
+                className="object-cover transition-all duration-1000 group-hover:scale-105 grayscale-[100%] brightness-10 group-hover:grayscale-0 group-hover:brightness-100 rounded-xl blur-sm group-hover:blur-none"
                 priority={index < 2}
                 quality={85}
               />
@@ -65,9 +65,9 @@ export function HowItWorks() {
               <div className="absolute inset-0 bg-black/90 rounded-xl -z-10" />
 
               <div className="relative z-10">
-                <div className="mb-4 flex justify-center -mt-1">{step.icon}</div>
-                <h3 className="text-lg font-bold text-yellow-300 drop-shadow-lg">{step.title}</h3>
-                <p className="mt-2 text-base text-white drop-shadow-md leading-relaxed">
+                <div className="mb-3 sm:mb-4 flex justify-center -mt-1 scale-90 sm:scale-100">{step.icon}</div>
+                <h3 className="text-base sm:text-lg font-bold text-yellow-300 drop-shadow-lg">{step.title}</h3>
+                <p className="mt-2 text-sm sm:text-base text-white drop-shadow-md leading-relaxed">
                   {step.description}
                 </p>
               </div>

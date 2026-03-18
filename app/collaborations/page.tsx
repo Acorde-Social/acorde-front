@@ -7,19 +7,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowRight, Clock, Loader2, SendHorizonal, UserRound } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 import { CollaborationService } from "@/services/collaboration-service"
 import Link from "next/link"
+import { FloatingFigures } from "@/components/common/FloatingFigures"
+import { WaveformBackground } from "@/components/common/WaveformBackground"
 
 export default function CollaborationsPage() {
   const [sentCount, setSentCount] = useState(0)
   const [receivedCount, setReceivedCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
   const router = useRouter()
-  const { user, token } = useAuth()
+  const { user, token, isLoading: authLoading } = useAuth()
 
   useEffect(() => {
+    if (authLoading) {
+      return
+    }
+
     if (!user || !token) {
       router.push("/login")
       return
@@ -27,26 +31,21 @@ export default function CollaborationsPage() {
 
     const fetchCollaborationCounts = async () => {
       try {
-        // Obter contagens de colaborações enviadas e recebidas
         const sent = await CollaborationService.getUserAudioCollaborations(token)
         const received = await CollaborationService.getReceivedAudioCollaborations(token)
-        
+
         setSentCount(sent.length)
         setReceivedCount(received.length)
       } catch (error) {
-        console.error("Erro ao buscar colaborações:", error)
-        toast({
-          title: "Erro",
-          description: "Não foi possível carregar suas colaborações. Tente novamente mais tarde.",
-          variant: "destructive",
-        })
+        setSentCount(0)
+        setReceivedCount(0)
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchCollaborationCounts()
-  }, [user, token, router, toast])
+  }, [authLoading, user, token, router])
 
   if (isLoading) {
     return (
@@ -59,8 +58,17 @@ export default function CollaborationsPage() {
   }
 
   return (
-    <div className="px-4 py-6 space-y-6">
-      <Card>
+    <div className="bg-background relative overflow-hidden min-h-screen">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10 dark:from-[#0f0c18] dark:via-[#3b2010]/15 dark:to-[#2c1e4a]/25 pointer-events-none" />
+      <WaveformBackground />
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="scale-175 opacity-60 dark:opacity-65">
+          <FloatingFigures />
+        </div>
+      </div>
+
+      <div className="relative z-10 px-4 py-6 space-y-6">
+        <Card>
         <CardHeader>
           <CardTitle>Colaborações</CardTitle>
           <CardDescription>
@@ -69,7 +77,6 @@ export default function CollaborationsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Card de colaborações enviadas */}
             <Card className="overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -103,7 +110,6 @@ export default function CollaborationsPage() {
               </div>
             </Card>
 
-            {/* Card de colaborações recebidas */}
             <Card className="overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -140,7 +146,6 @@ export default function CollaborationsPage() {
         </CardContent>
       </Card>
 
-      {/* Informações adicionais */}
       <Card>
         <CardHeader>
           <CardTitle>Como funcionam as colaborações?</CardTitle>
@@ -148,10 +153,10 @@ export default function CollaborationsPage() {
         <CardContent>
           <div className="space-y-4">
             <p>
-              As colaborações permitem que você contribua com faixas de áudio para projetos e 
+              As colaborações permitem que você contribua com faixas de áudio para projetos e
               faixas de outros usuários, criando assim músicas colaborativas.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <div className="border rounded-md p-4">
                 <h3 className="font-medium mb-2">1. Envie uma colaboração</h3>
@@ -159,14 +164,14 @@ export default function CollaborationsPage() {
                   Grave uma faixa de áudio sobre uma já existente e envie ao autor original.
                 </p>
               </div>
-              
+
               <div className="border rounded-md p-4">
                 <h3 className="font-medium mb-2">2. Aguarde aprovação</h3>
                 <p className="text-sm text-muted-foreground">
                   O autor original irá revisar e decidir se aceita ou rejeita sua contribuição.
                 </p>
               </div>
-              
+
               <div className="border rounded-md p-4">
                 <h3 className="font-medium mb-2">3. Colaboração concluída</h3>
                 <p className="text-sm text-muted-foreground">
@@ -176,7 +181,8 @@ export default function CollaborationsPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }

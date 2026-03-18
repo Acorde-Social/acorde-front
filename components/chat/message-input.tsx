@@ -26,7 +26,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-	// Hook para gravação de áudio
 	const {
 		startRecording,
 		stopRecording,
@@ -35,19 +34,15 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		audioURL
 	} = useAudioRecorder();
 
-	// Monitorar o estado de gravação de áudio
 	useEffect(() => {
 		setIsRecording(audioIsRecording);
 	}, [audioIsRecording]);
 
-	// Quando o audioBlob estiver disponível, criar arquivo e anexar
 	useEffect(() => {
 		if (audioBlob && !audioIsRecording) {
-			// Determinar o tipo de arquivo adequado com base no navegador
 			const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
 			const extension = mimeType === 'audio/webm' ? '.webm' : '.ogg';
 
-			// Criar arquivo com o tipo correto
 			const fileName = `audio_${Date.now()}${extension}`;
 			const audioFile = new File([audioBlob], fileName, { type: mimeType });
 
@@ -55,23 +50,19 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		}
 	}, [audioBlob, audioIsRecording]);
 
-	// Ativar resize automático do textarea
 	useEffect(() => {
 		if (textareaRef.current) {
 			textareaRef.current.style.height = 'auto';
-			const newHeight = Math.min(textareaRef.current.scrollHeight, 100); // Limitando altura máxima
+			const newHeight = Math.min(textareaRef.current.scrollHeight, 100);
 			textareaRef.current.style.height = `${newHeight}px`;
 		}
 	}, [message]);
 
-	// Manipular mudanças no textarea, com detecção de digitação
 	const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setMessage(e.target.value);
 
-		// Enviar evento de digitação
 		onTyping(true);
 
-		// Reiniciar timeout para parar o evento de digitação
 		if (typingTimeout) {
 			clearTimeout(typingTimeout);
 		}
@@ -83,7 +74,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		setTypingTimeout(timeout);
 	};
 
-	// Enviar mensagem quando Enter for pressionado (sem shift)
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
@@ -91,11 +81,9 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		}
 	};
 
-	// Lidar com clique no botão de anexo
 	const handleAttachmentClick = (type: 'image' | 'video' | 'file') => {
 		if (!fileInputRef.current) return;
 
-		// Definir os tipos de arquivo aceitos com base no tipo selecionado
 		switch (type) {
 			case 'image':
 				fileInputRef.current.accept = 'image/*';
@@ -111,9 +99,7 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		fileInputRef.current.click();
 	};
 
-	// Processar o arquivo anexado
 	const handleAttachment = (file: File) => {
-		// Validar tamanho do arquivo (max 100MB)
 		if (file.size > 100 * 1024 * 1024) {
 			toast({
 				title: "Arquivo muito grande",
@@ -126,7 +112,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		setAttachment(file);
 		setAttachmentType(file.type);
 
-		// Criar preview para imagens, vídeos e áudios
 		if (file.type.startsWith('image/')) {
 			const reader = new FileReader();
 			reader.onload = (e) => {
@@ -139,51 +124,41 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 		}
 	};
 
-	// Lidar com seleção de arquivo
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
 		handleAttachment(file);
 
-		// Resetar o input para permitir selecionar o mesmo arquivo novamente
 		e.target.value = '';
 	};
 
-	// Remover anexo
 	const handleRemoveAttachment = () => {
 		setAttachment(null);
 		setAttachmentPreview(null);
 		setAttachmentType(null);
 
-		// Limpar URLs de objeto se houver
 		if (attachmentPreview && !attachmentPreview.startsWith('data:')) {
 			URL.revokeObjectURL(attachmentPreview);
 		}
 	};
 
-	// Iniciar gravação de áudio
 	const handleStartRecording = () => {
 		startRecording();
 	};
 
-	// Parar gravação de áudio
 	const handleStopRecording = () => {
 		stopRecording();
 	};
 
-	// Enviar mensagem
 	const handleSendMessage = async () => {
-		// Verificar se há mensagem ou anexo
 		if (!message.trim() && !attachment) return;
 
 		try {
 			setLoading(true);
 
-			// Enviar mensagem
 			await onSendMessage(message.trim(), attachment || undefined);
 
-			// Limpar campos
 			setMessage('');
 			if (textareaRef.current) {
 				textareaRef.current.style.height = 'auto';
@@ -192,12 +167,10 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 			setAttachmentPreview(null);
 			setAttachmentType(null);
 
-			// Limpar URLs de objeto se houver
 			if (attachmentPreview && !attachmentPreview.startsWith('data:')) {
 				URL.revokeObjectURL(attachmentPreview);
 			}
 		} catch (error) {
-			console.error('Erro ao enviar mensagem:', error);
 			toast({
 				title: "Erro ao enviar mensagem",
 				description: "Tente novamente mais tarde",
@@ -210,7 +183,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 
 	return (
 		<div className="w-full">
-			{/* Preview de anexo */}
 			{attachment && (
 				<div className="mb-2 p-2 border border-border rounded-md bg-accent/30 relative">
 					<Button
@@ -268,7 +240,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 				</div>
 			)}
 
-			{/* Estado de gravação */}
 			{isRecording && (
 				<div className="mb-2 p-2 border border-border rounded-md bg-red-500/10 flex items-center">
 					<div className="h-3 w-3 rounded-full bg-red-500 animate-pulse mr-2" />
@@ -284,9 +255,7 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 				</div>
 			)}
 
-			{/* Input de mensagem redesenhado */}
 			<div className="flex items-center border border-input bg-background rounded-full px-3 py-1">
-				{/* Seletor de Emojis */}
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
@@ -310,7 +279,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 					</PopoverContent>
 				</Popover>
 
-				{/* Área expandida para texto */}
 				<Textarea
 					ref={textareaRef}
 					value={message}
@@ -322,9 +290,7 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 					rows={1}
 				/>
 
-				{/* Menu de 3 pontos com todas as ações */}
 				<div className="flex items-center space-x-1">
-					{/* Botão de enviar mensagem */}
 					<Button
 						variant="ghost"
 						size="icon"
@@ -339,7 +305,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 						)}
 					</Button>
 
-					{/* Menu de ações */}
 					<Popover>
 						<PopoverTrigger asChild>
 							<Button
@@ -357,7 +322,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 						</PopoverTrigger>
 						<PopoverContent className="w-52 p-2" side="top" align="end">
 							<div className="flex flex-col space-y-1">
-								{/* Opção para gravar áudio */}
 								<Button
 									variant="ghost"
 									className="flex justify-start"
@@ -368,7 +332,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 									<span>Gravar áudio</span>
 								</Button>
 
-								{/* Opção para anexar imagem */}
 								<Button
 									variant="ghost"
 									className="flex justify-start"
@@ -378,7 +341,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 									<span>Enviar imagem</span>
 								</Button>
 
-								{/* Opção para anexar vídeo */}
 								<Button
 									variant="ghost"
 									className="flex justify-start"
@@ -388,7 +350,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 									<span>Enviar vídeo</span>
 								</Button>
 
-								{/* Opção para anexar arquivo */}
 								<Button
 									variant="ghost"
 									className="flex justify-start"
@@ -403,7 +364,6 @@ export default function MessageInput({ onSendMessage, onTyping }: MessageInputPr
 				</div>
 			</div>
 
-			{/* Input de arquivo oculto */}
 			<input
 				type="file"
 				ref={fileInputRef}

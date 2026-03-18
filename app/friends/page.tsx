@@ -19,11 +19,10 @@ import { UserPlus, Users, Loader2, UserMinus, Check, X, Sparkles } from "lucide-
 import Link from "next/link"
 
 export default function FriendsPage() {
-	const { user, token } = useAuth()
+	const { user, token, isLoading: authLoading } = useAuth()
 	const router = useRouter()
 	const { toast } = useToast()
 
-	// Usar hook com cache compartilhado - fetchFullLists=true para carregar listas completas
 	const {
 		friends,
 		pending: pendingRequests,
@@ -35,11 +34,15 @@ export default function FriendsPage() {
 	const [processingIds, setProcessingIds] = useState<Set<string>>(new Set())
 
 	useEffect(() => {
+		if (authLoading) {
+			return
+		}
+
 		if (!user || !token) {
 			router.push("/login")
 			return
 		}
-	}, [user, token, router])
+	}, [authLoading, user, token, router])
 
 	const handleAccept = async (friendshipId: string) => {
 		if (!token) return

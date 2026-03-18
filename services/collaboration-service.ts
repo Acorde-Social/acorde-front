@@ -8,12 +8,10 @@ export interface CreateCollaborationData {
 }
 
 export const CollaborationService = {
-  // Solicitar colaboração em um projeto
   async requestCollaboration(data: CreateCollaborationData, token: string): Promise<Collaboration> {
     const { projectId } = data;
-    
-    // Usando o novo endpoint específico para projetos
-    const response = await fetch(`${API_URL}/collaborations/project/${projectId}`, {
+
+    const response = await fetch(`${API_URL}/api/collaborations/project/${projectId}`, {
       method: "POST",
       headers: getAuthHeaders(token),
     })
@@ -21,9 +19,8 @@ export const CollaborationService = {
     return handleApiError(response)
   },
 
-  // Aceitar colaboração
   async acceptCollaboration(id: string, token: string): Promise<Collaboration> {
-    const response = await fetch(`${API_URL}/collaborations/${id}/status`, {
+    const response = await fetch(`${API_URL}/api/collaborations/${id}/status`, {
       method: "PATCH",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ status: "ACCEPTED" }),
@@ -32,9 +29,8 @@ export const CollaborationService = {
     return handleApiError(response)
   },
 
-  // Rejeitar colaboração
   async rejectCollaboration(id: string, token: string): Promise<Collaboration> {
-    const response = await fetch(`${API_URL}/collaborations/${id}/status`, {
+    const response = await fetch(`${API_URL}/api/collaborations/${id}/status`, {
       method: "PATCH",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ status: "REJECTED" }),
@@ -42,10 +38,9 @@ export const CollaborationService = {
 
     return handleApiError(response)
   },
-  
-  // Marcar colaboração como concluída
+
   async completeCollaboration(id: string, token: string): Promise<Collaboration> {
-    const response = await fetch(`${API_URL}/collaborations/${id}/status`, {
+    const response = await fetch(`${API_URL}/api/collaborations/${id}/status`, {
       method: "PATCH",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ status: "COMPLETED" }),
@@ -54,64 +49,57 @@ export const CollaborationService = {
     return handleApiError(response)
   },
 
-  // Cancelar/remover solicitação de colaboração
   async cancelCollaboration(id: string, token: string): Promise<void> {
-    const response = await fetch(`${API_URL}/collaborations/${id}`, {
+    const response = await fetch(`${API_URL}/api/collaborations/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
   },
-  
-  // Obter colaborações de um projeto
+
   async getProjectCollaborations(projectId: string, token?: string): Promise<Collaboration[]> {
-    const response = await fetch(`${API_URL}/collaborations/project/${projectId}`, {
+    const response = await fetch(`${API_URL}/api/collaborations/project/${projectId}`, {
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
   },
-  
-  // Obter colaborações do usuário atual
+
   async getUserCollaborations(token: string): Promise<Collaboration[]> {
-    const response = await fetch(`${API_URL}/collaborations/user`, {
+    const response = await fetch(`${API_URL}/api/collaborations/user`, {
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
   },
-  
-  // Obter colaborações de áudio do usuário atual (enviadas)
+
   async getUserAudioCollaborations(token: string): Promise<any[]> {
-    const response = await fetch(`${API_URL}/collaborations/audio`, {
+    const response = await fetch(`${API_URL}/api/collaborations/audio`, {
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
   },
-  
-  // Obter colaborações de áudio recebidas pelo usuário atual
+
   async getReceivedAudioCollaborations(token: string): Promise<any[]> {
-    const response = await fetch(`${API_URL}/collaborations/audio/received`, {
+    const response = await fetch(`${API_URL}/api/collaborations/audio/received`, {
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
   },
-  
-  // Obter detalhes de uma colaboração de áudio
+
   async getAudioCollaboration(id: string, token: string): Promise<any> {
-    const response = await fetch(`${API_URL}/collaborations/audio/${id}`, {
+    const response = await fetch(`${API_URL}/api/collaborations/audio/${id}`, {
       headers: getAuthHeaders(token),
     })
 
     return handleApiError(response)
   },
-  
-  // Atualizar status de uma colaboração de áudio (aceitar ou rejeitar)
+
   async updateAudioCollaborationStatus(id: string, status: string, token: string): Promise<any> {
-    const response = await fetch(`${API_URL}/collaborations/audio/${id}/status`, {
+    const response = await fetch(`${API_URL}/api/collaborations/audio/${id}/status`, {
       method: "PATCH",
       headers: getAuthHeaders(token),
       body: JSON.stringify({ status }),
@@ -119,10 +107,9 @@ export const CollaborationService = {
 
     return handleApiError(response)
   },
-  
-  // Remover uma colaboração de áudio
+
   async removeAudioCollaboration(id: string, token: string): Promise<void> {
-    const response = await fetch(`${API_URL}/collaborations/audio/${id}`, {
+    const response = await fetch(`${API_URL}/api/collaborations/audio/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(token),
     })

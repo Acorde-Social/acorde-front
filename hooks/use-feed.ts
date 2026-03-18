@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useCallback } from 'react'
-import { IFeedItem, getMockFeedItems, getMockStats } from '@/lib/mock-feed-data'
+import { useState, useEffect } from 'react'
+import { fetchPaginatedFeed, getMockStats } from '@/lib/mock-feed-data'
+import { usePaginatedFeed } from './use-paginated-feed'
 
 interface IStats {
   projects: number
@@ -17,24 +18,23 @@ const initialValues: IStats = {
   tracks: 0
 }
 
-export function useFeed() {
-  const [feedItems, setFeedItems] = useState<IFeedItem[]>([])
-  const [stats, setStats] = useState<IStats>(initialValues)
-  const [isLoading, setIsLoading] = useState(true)
+export function useFeed(enabled: boolean = true) {
+  const result = usePaginatedFeed(fetchPaginatedFeed, { enabled });
+  const [stats, setStats] = useState(initialValues)
+  const isInitialLoading = result.loading && result.items.length === 0
+  const isLoadingMore = result.loading && result.items.length > 0
 
-  const loadFeed = useCallback(() => {
-    setIsLoading(true)
-    setTimeout(() => {
-      setFeedItems(getMockFeedItems())
-      setStats(getMockStats())
-      setIsLoading(false)
-    }, 1000)
+  useEffect(() => {
+    setStats(getMockStats())
   }, [])
 
   return {
-    feedItems,
-    stats,
-    isLoading,
-    loadFeed
+    feedItems: result.items,
+    stats: stats,
+    isLoading: result.loading,
+    isInitialLoading,
+    isLoadingMore,
+    hasMore: result.hasMore,
+    loadMore: result.loadMore
   }
 }

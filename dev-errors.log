@@ -1,0 +1,1471 @@
+yarn run v1.22.22
+warning ..\package.json: No license field
+$ next dev
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+  ▲ Next.js 14.2.16
+  - Local:        http://localhost:3002
+  - Environments: .env.local, .env.development
+  - Experiments (use with caution):
+    · webpackBuildWorker
+    · parallelServerCompiles
+    · parallelServerBuildTraces
+
+ ✓ Starting...
+ ✓ Ready in 1821ms
+ ✓ Compiled /middleware in 118ms (72 modules)
+ ○ Compiling /home ...
+Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ⚠ ./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+ GET /home 200 in 3995ms
+ ⚠ ./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+ GET /home 200 in 33ms
+ ⚠ ./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+ ⚠ ./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+ GET /landing 200 in 914ms
+ ⚠ ./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+ ⚠ ./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'acceptFriendship' is not exported from '@/services/friendships.service' (imported as 'acceptFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'declineFriendship' is not exported from '@/services/friendships.service' (imported as 'declineFriendship').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/layout/friendship-notifications.tsx
+Attempted import error: 'sendFriendshipRequest' is not exported from '@/services/friendships.service' (imported as 'sendFriendshipRequest').
+
+Import trace for requested module:
+./components/layout/friendship-notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'getNotifications' is not exported from '@/services/notifications.service' (imported as 'getNotifications').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markNotificationAsRead' is not exported from '@/services/notifications.service' (imported as 'markNotificationAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'markAllNotificationsAsRead' is not exported from '@/services/notifications.service' (imported as 'markAllNotificationsAsRead').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./components/notifications.tsx
+Attempted import error: 'deleteNotification' is not exported from '@/services/notifications.service' (imported as 'deleteNotification').
+
+Import trace for requested module:
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getPendingFriendships' is not exported from '@/services/friendships.service' (imported as 'getPendingFriendships').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriendshipSuggestions' is not exported from '@/services/friendships.service' (imported as 'getFriendshipSuggestions').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-friendships-data.ts
+Attempted import error: 'getFriends' is not exported from '@/services/friendships.service' (imported as 'getFriends').
+
+Import trace for requested module:
+./hooks/use-friendships-data.ts
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+
+./hooks/use-notification-counts.ts
+Attempted import error: 'getNotificationCount' is not exported from '@/services/notifications.service' (imported as 'getNotificationCount').
+
+Import trace for requested module:
+./hooks/use-notification-counts.ts
+./components/notifications.tsx
+./components/layout/header.tsx
+./app/client-layout.tsx
+ ✓ Compiled /login in 907ms (2544 modules)
+ ✓ Compiled in 529ms (2544 modules)

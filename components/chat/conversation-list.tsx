@@ -16,7 +16,7 @@ interface ConversationListProps {
 	activeConversationId?: string;
 	onSelectConversation: (conversation: ChatConversation) => void;
 	isLoading: boolean;
-	currentUserId?: string; // Adicionar ID do usuário atual
+	currentUserId?: string;
 }
 
 export default function ConversationList({
@@ -26,31 +26,26 @@ export default function ConversationList({
 	isLoading,
 	currentUserId,
 }: ConversationListProps) {
-	// Retorna o nome de exibição para uma conversa (nome do grupo ou nome do outro participante)
 	const getDisplayName = (conversation: ChatConversation) => {
 		if (conversation.isGroup) {
 			return conversation.name || 'Grupo sem nome';
 		}
-		// Retorna o nome do outro participante
 		const otherParticipant = conversation.participants.find(
 			(p) => p.user.id !== currentUserId
 		);
 		return otherParticipant?.user?.name || 'Usuário desconhecido';
 	};
 
-	// Retorna a imagem para exibição (avatar do grupo ou do outro participante)
 	const getDisplayAvatar = (conversation: ChatConversation) => {
 		if (conversation.isGroup) {
-			return null; // Pode ser uma imagem de grupo padrão
+			return null;
 		}
-		// Retorna o avatar do outro participante
 		const otherParticipant = conversation.participants.find(
 			(p) => p.user.id !== currentUserId
 		);
 		return otherParticipant?.user?.avatarUrl || null;
 	};
 
-	// Retorna o login do outro participante para criar o link do perfil
 	const getOtherParticipantLogin = (conversation: ChatConversation) => {
 		if (conversation.isGroup) {
 			return null;
@@ -61,13 +56,11 @@ export default function ConversationList({
 		return otherParticipant?.user?.login || null;
 	};
 
-	// Retorna as iniciais para o fallback do avatar
 	const getAvatarInitials = (conversation: ChatConversation) => {
 		const name = getDisplayName(conversation);
 		return name.substring(0, 2).toUpperCase();
 	};
 
-	// Formata o tempo para exibição
 	const formatTime = (date: Date) => {
 		return formatDistanceToNow(new Date(date), {
 			addSuffix: true,
@@ -95,7 +88,7 @@ export default function ConversationList({
 		return (
 			<div className="flex flex-col items-center justify-center h-full p-4 text-muted-foreground">
 				<p className="text-center">Nenhuma conversa encontrada</p>
-				<p className="text-center text-sm">Inicie uma nova conversa usando o botão acima</p>
+				<p className="text-center text-sm">Inicie uma nova conversa usando o botão ao lado</p>
 			</div>
 		);
 	}
