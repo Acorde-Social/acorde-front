@@ -35,7 +35,6 @@ export function Notifications() {
   const [isMobile, setIsMobile] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Detectar mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024)
@@ -45,7 +44,6 @@ export function Notifications() {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  // Fechar ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -57,7 +55,6 @@ export function Notifications() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Buscar notificações quando abrir - APENAS uma vez ao abrir no desktop E não estiver na página /notifications
   useEffect(() => {
     if (isOpen && !isMobile && token && pathname !== "/notifications") {
       fetchNotifications()
@@ -72,7 +69,6 @@ export function Notifications() {
       const data = await getNotifications(token, 20, false)
       setNotifications(data)
     } catch (error) {
-      console.error("Error fetching notifications:", error)
     } finally {
       setIsLoading(false)
     }
@@ -80,11 +76,9 @@ export function Notifications() {
 
   const handleClick = () => {
     if (isMobile || pathname === "/notifications") {
-      // No mobile ou se já estiver na página, redireciona/mantém na página
       router.push("/notifications")
       setIsOpen(false)
     } else {
-      // No desktop em outras páginas, abre o dropdown
       setIsOpen(!isOpen)
     }
   }
@@ -98,7 +92,7 @@ export function Notifications() {
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
       )
-      refetchCounts() // Atualizar contador
+      refetchCounts()
     } catch (error) {
       toast({
         title: "Erro",
@@ -120,7 +114,7 @@ export function Notifications() {
     try {
       await markAllNotificationsAsRead(token)
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
-      refetchCounts() // Atualizar contador
+      refetchCounts()
       toast({
         title: "Sucesso",
         description: "Todas as notificações foram marcadas como lidas",
@@ -144,7 +138,7 @@ export function Notifications() {
     try {
       await deleteNotification(token, notificationId)
       setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
-      refetchCounts() // Atualizar contador
+      refetchCounts()
     } catch (error) {
       toast({
         title: "Erro",
@@ -164,7 +158,7 @@ export function Notifications() {
     switch (type) {
       case "TRACK_LIKE":
       case "COMMENT_LIKE":
-        return <Heart className="h-4 w-4 text-red-500" />
+        return <Heart className="h-4 w-4 text-warning" />
       case "COMMENT_NEW":
         return <MessageCircle className="h-4 w-4 text-blue-500" />
       case "COLLABORATION_INVITE":
@@ -181,7 +175,6 @@ export function Notifications() {
 
   return (
     <div ref={dropdownRef} className="relative">
-      {/* Botão de notificações */}
       <Button
         variant="ghost"
         size="icon"
@@ -197,10 +190,8 @@ export function Notifications() {
         <span className="sr-only">Notificações</span>
       </Button>
 
-      {/* Dropdown - apenas desktop */}
       {isOpen && !isMobile && (
         <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-background border border-border rounded-lg shadow-xl overflow-hidden z-50">
-          {/* Header */}
           <div className="p-4 border-b border-border/50 flex items-center justify-between">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <Bell className="h-5 w-5 text-primary" />
@@ -219,7 +210,6 @@ export function Notifications() {
             )}
           </div>
 
-          {/* Content */}
           <ScrollArea className="max-h-[500px]">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">

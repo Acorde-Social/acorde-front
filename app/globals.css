@@ -27,22 +27,22 @@ html.dark {
 
 html:not(.hydrated) .bg-primary,
 html:not(.hydrated) [class*="bg-primary"] {
-  background-color: #CA8A04 !important;
+  background-color: hsl(var(--warning)) !important;
 }
 
 html:not(.hydrated).dark .bg-primary,
 html:not(.hydrated).dark [class*="bg-primary"] {
-  background-color: #fcd34d !important;
+  background-color: hsl(var(--warning)) !important;
 }
 
 html:not(.hydrated) .text-primary,
 html:not(.hydrated) [class*="text-primary"] {
-  color: #CA8A04 !important;
+  color: hsl(var(--warning)) !important;
 }
 
 html:not(.hydrated).dark .text-primary,
 html:not(.hydrated).dark [class*="text-primary"] {
-  color: #fcd34d !important;
+  color: hsl(var(--warning)) !important;
 }
 
 [data-radix-avatar-image] {
@@ -112,34 +112,37 @@ html:not(.hydrated).dark [class*="text-primary"] {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;       
-    --foreground: 240 10% 3.9%;     
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    
-    
-    --primary: 0 0% 3.9%%;           
-    --primary-light: 55 100% 50%;     
+
+
+    --primary: 0 0% 3.9%;
+    --primary-light: 55 100% 50%;
     --primary-foreground: 0 0% 100%;
-    
-    --secondary: 260 42% 20%;        
+
+    --secondary: 260 42% 20%;
     --secondary-foreground: 0 0% 100%;
-    
-    --accent: 42 82% 62%;            
+
+    --accent: 42 82% 62%;
     --accent-foreground: 240 10% 3.9%;
-    
-    --muted: 240 4.8% 95.9%;         
-    --muted-foreground: 215 14% 34%;  
-    
-    --destructive: 0 0% 50%;         
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 215 14% 34%;
+
+    --destructive: 0 0% 50%;
     --destructive-foreground: 0 0% 100%;
-    
+
+    --warning: 42 96% 40%;
+    --warning-foreground: 0 0% 100%;
+
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 42 96% 42%;              
-    
+    --ring: 42 96% 42%;
+
     --radius: 0.5rem;
 
     --header-height: 4rem;
@@ -187,7 +190,7 @@ html:not(.hydrated).dark [class*="text-primary"] {
       @apply h-12;
     }
   }
-  
+
   .container {
     @apply mx-auto px-[var(--content-padding)] max-w-[var(--content-max-width)];
   }
@@ -201,32 +204,35 @@ html:not(.hydrated).dark [class*="text-primary"] {
   }
 
   .dark {
-    --background: 0 0% 3.9%;       
-    --foreground: 0 0% 98%;          
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
     --card: 0 0% 3.9%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    
-    
-    --primary: 42 95% 55%;           
+
+
+    --primary: 42 95% 55%;
     --primary-foreground: 0 0% 100%;
-    
-    --secondary: 260 50% 30%;         
+
+    --secondary: 260 50% 30%;
     --secondary-foreground: 0 0% 100%;
-    
-    --accent: 42 90% 65%;             
+
+    --accent: 42 90% 65%;
     --accent-foreground: 0 0% 100%;
-    
-    --muted: 0 0% 15%;               
-    --muted-foreground: 215 14% 70%;  
-    
-    --destructive: 0 0% 20%;          
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 215 14% 70%;
+
+    --destructive: 0 0% 20%;
     --destructive-foreground: 0 0% 98%;
-    
+
+    --warning: 42 95% 55%;
+    --warning-foreground: 0 0% 100%;
+
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 42 95% 55%;                
+    --ring: 42 95% 55%;
   }
 
   @keyframes float {
@@ -250,13 +256,28 @@ html:not(.hydrated).dark [class*="text-primary"] {
 [class*="Floating"] div,
 .floating-figures-container *,
 [data-floating-note] {
-  color: rgba(75, 85, 99, 0.7) !important;
-  fill: rgba(75, 85, 99, 0.7) !important;
-  stroke: rgba(75, 85, 99, 0.7) !important;
+  color: hsl(var(--foreground) / 0.2) !important;
+  fill: hsl(var(--foreground) / 0.2) !important;
+  stroke: hsl(var(--foreground) / 0.2) !important;
+}
+
+.dark [class*="floating"] div,
+.dark [class*="Floating"] div,
+.dark .floating-figures-container *,
+.dark [data-floating-note] {
+  color: hsl(var(--foreground) / 0.5) !important;
+  fill: hsl(var(--foreground) / 0.5) !important;
+  stroke: hsl(var(--foreground) / 0.5) !important;
 }
 
 [class*="floating"] div::before,
 [class*="Floating"] div::before,
 .floating-figures-container *::before {
-  color: rgba(75, 85, 99, 0.7) !important;
+  color: hsl(var(--foreground) / 0.2) !important;
+}
+
+.dark [class*="floating"] div::before,
+.dark [class*="Floating"] div::before,
+.dark .floating-figures-container *::before {
+  color: hsl(var(--foreground) / 0.5) !important;
 }

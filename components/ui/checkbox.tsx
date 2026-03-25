@@ -26,9 +26,9 @@ const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
         style={{
           width: '20px',
           height: '20px',
-          border: '2px solid #c41e3a',
+          border: '2px solid hsl(var(--warning))',
           borderRadius: '4px',
-          backgroundColor: checked ? '#c41e3a' : '#ffffff',
+          backgroundColor: checked ? 'hsl(var(--warning))' : 'hsl(var(--background))',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -43,7 +43,7 @@ const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
             style={{
               width: '16px',
               height: '16px',
-              color: '#ffffff',
+              color: 'hsl(var(--warning-foreground))',
               strokeWidth: 4
             }}
           />

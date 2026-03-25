@@ -12,26 +12,24 @@ import { Slider } from "@/components/ui/slider"
 import { Headphones, Music, Search, Users, Loader2, RefreshCw, AlertTriangle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { ProjectService, type Project, type ProjectFilter } from "@/services/project-service" // Ensure Project type is imported correctly if needed elsewhere, but service defines its own
-import { useToast } from "@/hooks/use-toast"
+import { ProjectService, type Project, type ProjectFilter } from "@/services/project-service"
 import { useAsync } from "@/hooks/use-async"
 import { AsyncBoundary } from "@/components/async-boundary"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { fixImageUrl } from "@/lib/utils"
-import { useAuth } from "@/contexts/auth-context" // Import useAuth
+import { useAuth } from "@/contexts/auth-context"
+import { FloatingFigures } from "@/components/common/FloatingFigures"
+import { WaveformBackground } from "@/components/common/WaveformBackground"
 
 export default function ExplorePage() {
-  const [projects, setProjects] = useState<Project[]>([]) // Use Project type from service
+  const [projects, setProjects] = useState<Project[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("recent")
-  const { toast } = useToast()
-  const { user, token } = useAuth() // Get user and token from context
+  const { user, token } = useAuth()
 
-  // Filtros
   const [filters, setFilters] = useState<ProjectFilter>({})
   const [bpmRange, setBpmRange] = useState<number[]>([40, 180])
 
-  // Usar o hook useAsync para gerenciar o estado de carregamento e erros
   const {
     loading,
     error,
@@ -41,24 +39,14 @@ export default function ExplorePage() {
     onSuccess: (data) => {
       setProjects(data)
     },
-    onError: (error) => {
-      toast({
-        title: "Erro ao carregar projetos",
-        description: error.message || "Não foi possível carregar os projetos. Tente novamente mais tarde.",
-        variant: "destructive",
-      })
-    },
+    onError: () => {},
   })
 
-  // Função para buscar projetos
   const loadProjects = useCallback(async () => {
-    // Pass the token to getProjects
     return ProjectService.getProjects(filters, token || "")
-  }, [filters, token]) // Add token to dependency array
+  }, [filters, token])
 
-  // Carregar projetos ao montar o componente
   useEffect(() => {
-    // Flag para controlar se o componente está montado
     let mounted = true;
 
     const doFetchProjects = async () => {
@@ -66,18 +54,16 @@ export default function ExplorePage() {
         try {
           await fetchProjects(() => ProjectService.getProjects(filters, token || ""));
         } catch (err) {
-          console.error("Erro ao carregar projetos:", err);
         }
       }
     };
 
     doFetchProjects();
 
-    // Cleanup para evitar atualizações de estado após desmontagem
     return () => {
       mounted = false;
     };
-  }, [filters, token]); // Remova fetchProjects e loadProjects das dependências
+  }, [filters, token]);
 
   const applyFilters = () => {
     const updatedFilters: ProjectFilter = {
@@ -86,13 +72,11 @@ export default function ExplorePage() {
       maxBpm: bpmRange[1],
     }
     setFilters(updatedFilters)
-    // Pass the token to getProjects
     fetchProjects(() => ProjectService.getProjects(updatedFilters, token || ""))
   }
 
   const handleRetry = () => {
     reset()
-    // Pass the correct loadProjects function
     fetchProjects(loadProjects)
   }
 
@@ -109,17 +93,25 @@ export default function ExplorePage() {
       } else if (sortBy === "popular") {
         return (b._count?.collaborations || 0) - (a._count?.collaborations || 0)
       } else {
-        // "needs" - projetos que precisam de músicos
         return (b.neededInstruments?.length || 0) - (a.neededInstruments?.length || 0)
       }
     })
 
   return (
     <ErrorBoundary>
-      <div className="px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6">Explorar Projetos</h1>
+      <div className="bg-background relative overflow-hidden min-h-screen">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10 dark:from-[#0f0c18] dark:via-[#3b2010]/15 dark:to-[#2c1e4a]/25 pointer-events-none" />
+        <WaveformBackground />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="scale-175 opacity-60 dark:opacity-65">
+            <FloatingFigures />
+          </div>
+        </div>
 
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="relative z-10 px-4 py-6">
+          <h1 className="text-3xl font-bold mb-6">Explorar Projetos</h1>
+
+          <div className="flex flex-col md:flex-row gap-6">
           <div className="w-full md:w-64 space-y-6">
             <Card>
               <CardHeader>
@@ -250,7 +242,9 @@ export default function ExplorePage() {
                   <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
                   <h3 className="text-lg font-medium mb-2">Erro ao carregar projetos</h3>
                   <p className="text-muted-foreground mb-6">
-                    {error?.message || "Não foi possível carregar os projetos. Tente novamente mais tarde."}
+                    {error?.message?.includes("Cannot GET")
+                      ? "Não foi possível carregar os projetos. Tente novamente mais tarde."
+                      : error?.message || "Não foi possível carregar os projetos. Tente novamente mais tarde."}
                   </p>
                   <Button onClick={handleRetry} className="gap-2">
                     <RefreshCw className="h-4 w-4" />
@@ -261,7 +255,7 @@ export default function ExplorePage() {
             >
               {filteredProjects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProjects.map((project: Project) => ( // Explicitly type project here if needed
+                  {filteredProjects.map((project: Project) => (
                     <Card key={project.id} className="overflow-hidden">
                       <div className="relative h-48 w-full">
                         <Image
@@ -282,7 +276,6 @@ export default function ExplorePage() {
                         <CardTitle className="line-clamp-1">{project.title}</CardTitle>
                         <div className="flex items-center space-x-2">
                           <Avatar className="h-8 w-8">
-                            {/* Ensure author object and avatarUrl exist before accessing */}
                             <AvatarImage src={fixImageUrl(project.author?.avatarUrl || "")} alt={project.author?.name || "User"} />
                             <AvatarFallback>{project.author?.name?.charAt(0) || "U"}</AvatarFallback>
                           </Avatar>
@@ -323,6 +316,7 @@ export default function ExplorePage() {
               )}
             </AsyncBoundary>
           </div>
+        </div>
         </div>
       </div>
     </ErrorBoundary>

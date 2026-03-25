@@ -17,12 +17,11 @@ export default function AudioDebugPage() {
 
   const testAudioPath = async () => {
     if (!audioPath) return
-    
+
     setIsLoading(true)
     setTestResults([])
-    
+
     try {
-      // Gerar todas as variações possíveis de caminho
       const pathVariations = [
         audioPath,
         audioPath.startsWith('/') ? audioPath.slice(1) : `/${audioPath}`,
@@ -30,20 +29,17 @@ export default function AudioDebugPage() {
         audioPath.startsWith('/uploads/') ? audioPath : `/uploads/${audioPath}`
       ]
 
-      // Adicionar variação com prefixo tracks se não estiver presente
       if (!audioPath.includes('tracks/')) {
         pathVariations.push(`tracks/${audioPath.split('/').pop() || audioPath}`)
       }
-      
-      // Adicionar URL completa para cada variação
+
       const fullPaths = pathVariations.map(path => {
-        return { 
+        return {
           original: path,
           full: getFullAudioUrl(path)
         }
       })
-      
-      // Testar cada caminho
+
       const results = await Promise.all(
         fullPaths.map(async ({ original, full }) => {
           try {
@@ -65,10 +61,9 @@ export default function AudioDebugPage() {
           }
         })
       )
-      
+
       setTestResults(results)
-      
-      // Verificar resultado
+
       const anySuccess = results.some(r => r.exists)
       if (anySuccess) {
         toast({
@@ -92,13 +87,10 @@ export default function AudioDebugPage() {
       setIsLoading(false)
     }
   }
-  
-  // Função para criar um player de áudio para testar a reprodução
+
   const testAudioPlayback = (url: string) => {
-    // Criamos um elemento de áudio
     const audio = new Audio(url)
-    
-    // Adicionamos tratadores de eventos
+
     audio.addEventListener('canplaythrough', () => {
       toast({
         title: 'Áudio carregado com sucesso',
@@ -112,7 +104,7 @@ export default function AudioDebugPage() {
         })
       })
     })
-    
+
     audio.addEventListener('error', (e) => {
       const error = (e.target as HTMLMediaElement).error
       toast({
@@ -121,8 +113,7 @@ export default function AudioDebugPage() {
         variant: 'destructive'
       })
     })
-    
-    // Iniciar carregamento
+
     audio.load()
   }
 
@@ -140,33 +131,33 @@ export default function AudioDebugPage() {
           <div className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="audioPath">Caminho do arquivo de áudio</Label>
-              <Input 
-                id="audioPath" 
-                placeholder="Ex: tracks/corrected_1234567890.mp3" 
-                value={audioPath} 
-                onChange={(e) => setAudioPath(e.target.value)} 
+              <Input
+                id="audioPath"
+                placeholder="Ex: tracks/corrected_1234567890.mp3"
+                value={audioPath}
+                onChange={(e) => setAudioPath(e.target.value)}
               />
               <p className="text-sm text-muted-foreground">
                 Digite apenas o caminho relativo ou URL completa
               </p>
             </div>
-            
-            <Button 
-              onClick={testAudioPath} 
+
+            <Button
+              onClick={testAudioPath}
               disabled={isLoading || !audioPath}
               className="w-full"
             >
               {isLoading ? 'Testando...' : 'Testar Caminho'}
             </Button>
-            
+
             {testResults.length > 0 && (
               <div className="mt-4 space-y-4 border rounded-md p-4">
                 <h3 className="text-lg font-medium">Resultados</h3>
                 <div className="space-y-3">
                   {testResults.map((result, index) => (
-                    <div 
+                    <div
                       key={index}
-                      className={`p-3 rounded-md ${result.exists ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} border`}
+                      className={`p-3 rounded-md ${result.exists ? 'bg-green-50 border-green-200' : 'bg-warning/10 border-warning/30'} border`}
                     >
                       <p className="font-medium">
                         {result.exists ? '✅' : '❌'} {result.path}
@@ -175,13 +166,13 @@ export default function AudioDebugPage() {
                         URL completa: {result.fullPath}
                       </p>
                       {result.error && (
-                        <p className="text-sm text-red-600 mt-1">
+                        <p className="text-sm text-warning mt-1">
                           {result.error}
                         </p>
                       )}
                       {result.exists && (
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           className="mt-2"
                           onClick={() => testAudioPlayback(result.fullPath)}
@@ -203,7 +194,7 @@ export default function AudioDebugPage() {
           </p>
         </CardFooter>
       </Card>
-      
+
       <Card className="w-full max-w-3xl mx-auto mt-6">
         <CardHeader>
           <CardTitle>Informações de Configuração</CardTitle>

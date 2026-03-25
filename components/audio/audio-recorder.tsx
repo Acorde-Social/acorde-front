@@ -32,8 +32,8 @@ interface AudioRecorderProps {
   simplified?: boolean
   onCancel?: () => void
   existingTrackUrl?: string
-  collaborationMode?: boolean  // Indica se estamos gravando uma colaboração
-  originalTrackId?: string     // ID do áudio original que estamos colaborando
+  collaborationMode?: boolean
+  originalTrackId?: string
 }
 
 export function AudioRecorder({
@@ -57,7 +57,7 @@ export function AudioRecorder({
   const [isMetronomeActive, setIsMetronomeActive] = useState(false)
   const [isTunerActive, setIsTunerActive] = useState(false)
   const [bpm, setBpm] = useState(100)
-  const [isOverdubMode, setIsOverdubMode] = useState(collaborationMode) // Ativar overdub por padrão no modo colaboração
+  const [isOverdubMode, setIsOverdubMode] = useState(collaborationMode)
   const [recordingStatus, setRecordingStatus] = useState<"idle" | "recording" | "paused" | "finished">("idle")
   const [elapsedTime, setElapsedTime] = useState(0)
   const [showEditor, setShowEditor] = useState(false)
@@ -94,9 +94,7 @@ export function AudioRecorder({
         .then((blob) => {
           setAudioBlob(blob)
         })
-        .catch((error) => {
-          console.error("Erro ao converter URL para Blob:", error)
-        })
+        .catch(() => {})
     } else {
       setAudioBlob(null)
     }
@@ -121,17 +119,13 @@ export function AudioRecorder({
     }
   }, [existingTrackUrl, isOverdubMode]);
 
-  // Configurar visualização de áudio de forma simples
   useEffect(() => {
     if (isRecording) {
       try {
-        // Método simples para criar o visualizador de forma de onda
         navigator.mediaDevices.getUserMedia({ audio: true })
           .then((stream) => {
-            // Armazenar a stream para referência
             streamRef.current = stream;
 
-            // Criar contexto de áudio se não existir
             if (!audioContextRef.current) {
               audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
             }
@@ -145,15 +139,10 @@ export function AudioRecorder({
             const source = audioContextRef.current.createMediaStreamSource(stream);
             source.connect(analyserRef.current);
 
-            // Iniciar animação
             animateWaveform();
           })
-          .catch(err => {
-            console.log("Erro ao acessar microfone para visualização:", err);
-            // Continuar com a gravação mesmo sem visualização
-          });
+          .catch(() => {});
       } catch (err) {
-        console.error("Erro ao configurar visualizador:", err);
       }
     }
 
@@ -263,7 +252,6 @@ export function AudioRecorder({
       }, 1000);
 
     } catch (err) {
-      console.error("Erro ao iniciar gravação:", err);
       setRecordingStatus("idle");
       toast({
         title: "Erro ao acessar microfone",
@@ -274,7 +262,6 @@ export function AudioRecorder({
   }, [isOverdubMode, existingTrackUrl, startRecording, toast]);
 
   const handleStopRecording = useCallback(() => {
-    console.log("Gravação finalizada, atualizando status para finished");
     setRecordingStatus("finished");
     stopRecording();
 
@@ -287,17 +274,13 @@ export function AudioRecorder({
       clearInterval(timerRef.current);
     }
 
-    // Mostra um toast para indicar que o botão de edição está disponível
     toast({
       title: "Gravação finalizada",
       description: "Você pode usar o botão 'Editar Áudio' para ajustar seu áudio antes de salvar.",
     });
 
-    // Garantir que o recordingStatus está realmente setado como "finished"
     setTimeout(() => {
-      console.log("Estado atual:", recordingStatus);
       if (recordingStatus !== "finished") {
-        console.log("Estado não foi atualizado, forçando atualização");
         setRecordingStatus("finished");
       }
     }, 300);
@@ -318,16 +301,12 @@ export function AudioRecorder({
     try {
       const audioFile = new File([audioBlob], `${trackName}.wav`, { type: "audio/wav" })
 
-      // Método alternativo para obter duração mais confiável
       const getDuration = async (blob: Blob): Promise<number> => {
         return new Promise((resolve) => {
-          // Cria um elemento de áudio temporário
           const audio = new Audio();
           audio.preload = 'metadata';
 
-          // Manipula eventos
           const onLoadedMetadata = () => {
-            // Se a duração for Infinity ou NaN, use o tempo gravado como fallback
             const duration = isFinite(audio.duration) ? audio.duration : elapsedTime;
             URL.revokeObjectURL(audio.src);
             audio.removeEventListener('loadedmetadata', onLoadedMetadata);
@@ -335,37 +314,29 @@ export function AudioRecorder({
             resolve(duration);
           };
 
-          // Se não conseguir carregar os metadados em 2 segundos, usa o tempo de gravação
           const timeoutId = setTimeout(() => {
             audio.removeEventListener('loadedmetadata', onLoadedMetadata);
             audio.remove();
             URL.revokeObjectURL(audio.src);
-            console.warn("Falha ao obter duração dos metadados, usando tempo de gravação");
             resolve(elapsedTime || 0);
           }, 2000);
 
           audio.addEventListener('loadedmetadata', onLoadedMetadata);
           audio.addEventListener('error', () => {
             clearTimeout(timeoutId);
-            console.warn("Erro ao carregar áudio para duração, usando tempo de gravação");
             URL.revokeObjectURL(audio.src);
             resolve(elapsedTime || 0);
           });
 
-          // Cria URL temporária do blob
           audio.src = URL.createObjectURL(blob);
           audio.load();
         });
       };
 
-      // Obtém a duração usando o método confiável
       const duration = await getDuration(audioBlob);
-      console.log("Duração detectada:", duration);
 
-      // Modo de colaboração (adicionar áudio a um track existente)
       if (collaborationMode && originalTrackId) {
         try {
-          // Chamar serviço para enviar colaboração
           await TrackService.createCollaboration(
             {
               trackId: originalTrackId,
@@ -392,7 +363,6 @@ export function AudioRecorder({
             onTrackSaved()
           }
         } catch (error) {
-          console.error("Erro ao enviar colaboração:", error);
           toast({
             title: "Erro ao enviar colaboração",
             description: "Não foi possível enviar sua colaboração. Tente novamente mais tarde.",
@@ -400,15 +370,13 @@ export function AudioRecorder({
           });
         }
       }
-      // Modo simplificado (post de áudio)
       else if (simplified) {
         try {
-          // Chamar o serviço para salvar o áudio simplificado
           await TrackService.createTrack(
             {
               name: description || trackName || "Post de áudio",
-              projectId: "simplified", // Usamos um valor especial para identificar posts simplificados
-              duration: Math.max(1, duration), // Garante que é pelo menos 1 segundo
+              projectId: "simplified",
+              duration: Math.max(1, duration),
             },
             audioFile,
             token,
@@ -429,7 +397,6 @@ export function AudioRecorder({
             onTrackSaved()
           }
         } catch (error) {
-          console.error("Erro ao publicar áudio:", error);
           toast({
             title: "Erro ao publicar áudio",
             description: "Não foi possível publicar sua gravação. Tente novamente mais tarde.",
@@ -437,14 +404,13 @@ export function AudioRecorder({
           });
         }
       }
-      // Modo de projeto (adicionar faixa a um projeto)
       else if (projectId) {
         try {
           await TrackService.createTrack(
             {
               name: trackName,
               projectId,
-              duration: Math.max(1, duration), // Garante que é pelo menos 1 segundo
+              duration: Math.max(1, duration),
             },
             audioFile,
             token,
@@ -464,7 +430,6 @@ export function AudioRecorder({
             onTrackSaved()
           }
         } catch (error) {
-          console.error("Erro ao salvar faixa:", error)
           toast({
             title: "Erro ao salvar faixa",
             description: "Não foi possível salvar sua gravação. Tente novamente mais tarde.",
@@ -473,7 +438,6 @@ export function AudioRecorder({
         }
       }
     } catch (error) {
-      console.error("Erro ao salvar faixa:", error)
       toast({
         title: "Erro ao salvar faixa",
         description: "Não foi possível salvar sua gravação. Tente novamente mais tarde.",
@@ -490,31 +454,22 @@ export function AudioRecorder({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Função para formatar URLs de áudio corretamente
   const getFullAudioUrl = (url: string) => {
-    // Se já for uma URL completa, retorna como está
     if (url.startsWith('http')) return url;
 
-    // Garante que tenhamos a base URL
     const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
 
-    // Trata diferentes formatos de caminhos
     if (url.startsWith('/uploads/')) {
-      // Caminho começa com /uploads/
       return `${baseUrl}${url}`;
     } else if (url.startsWith('uploads/')) {
-      // Caminho começa sem barra
       return `${baseUrl}/${url}`;
     } else if (url.startsWith('tracks/')) {
-      // Caminho começa com tracks/ (caso comum do erro)
       return `${baseUrl}/uploads/${url}`;
     } else {
-      // Outros casos, adiciona /uploads/ se necessário
       return `${baseUrl}/uploads/${url}`;
     }
   };
 
-  // Renderiza o seletor de dispositivos de áudio
   const renderDeviceSelector = () => {
     if (availableDevices.length === 0) return null;
 
@@ -542,18 +497,13 @@ export function AudioRecorder({
 
   const handleSaveProcessedAudio = async (processedBlob: Blob) => {
     setAudioBlob(processedBlob);
-    // Create a new object URL from the processed blob
     const newAudioURL = URL.createObjectURL(processedBlob);
 
-    // Update audio URL reference for playback
     if (audioURL) {
-      // Revogar URL anterior para evitar vazamentos de memória
       URL.revokeObjectURL(audioURL);
     }
 
-    // Update the audio player URL
     if (existingTrackRef.current) {
-      // Garantir que a URL esteja formatada corretamente
       existingTrackRef.current.src = newAudioURL;
       existingTrackRef.current.load();
     }
@@ -563,14 +513,12 @@ export function AudioRecorder({
       description: 'As alterações foram aplicadas e estão prontas para serem salvas.'
     });
 
-    // Close the editor
     setShowEditor(false);
   };
 
-  // When recording is finished, show the editor option
   useEffect(() => {
     if (recordingStatus === "finished" && audioURL) {
-      setShowEditor(false);  // Don't show automatically, let user choose
+      setShowEditor(false);
     }
   }, [recordingStatus, audioURL]);
 
@@ -581,7 +529,7 @@ export function AudioRecorder({
           {!simplified && (
             <div className="flex justify-center">
               <div className="relative h-32 w-32 rounded-full bg-muted flex items-center justify-center">
-                <Mic className={`h-16 w-16 ${isRecording ? "text-red-500 animate-pulse" : "text-muted-foreground"}`} />
+                <Mic className={`h-16 w-16 ${isRecording ? "text-warning animate-pulse" : "text-muted-foreground"}`} />
                 {isRecording && (
                   <Badge variant="destructive" className="absolute -right-2 -top-2 animate-pulse">
                     REC
@@ -591,7 +539,6 @@ export function AudioRecorder({
             </div>
           )}
 
-          {/* Recording controls and state - Only show if not in editing mode */}
           {!showEditor && (
             <div className="space-y-4">
               {audioURL && (
@@ -688,14 +635,13 @@ export function AudioRecorder({
 
           {isRecording && !showEditor && (
             <div className="flex items-center justify-center py-2">
-              <div className="flex items-center space-x-2 bg-red-500/10 text-red-500 px-3 py-1 rounded-full animate-pulse">
-                <span className="h-2 w-2 rounded-full bg-red-500"></span>
+              <div className="flex items-center space-x-2 bg-warning/10 text-warning px-3 py-1 rounded-full animate-pulse">
+                <span className="h-2 w-2 rounded-full bg-warning"></span>
                 <span className="text-sm font-medium">Gravando - {formatTime(elapsedTime)}</span>
               </div>
             </div>
           )}
 
-          {/* Audio Editor - Will be shown when editing mode is active */}
           {showEditor && audioURL && (
             <div className="mt-4">
               <AudioEditor
@@ -746,7 +692,6 @@ export function AudioRecorder({
                       </Button>
                     )}
 
-                    {/* Button to edit audio - Destacado visualmente */}
                     {recordingStatus === "finished" && (
                       <Button
                         variant="outline"
@@ -759,7 +704,6 @@ export function AudioRecorder({
                       </Button>
                     )}
 
-                    {/* Botão para salvar colaboração */}
                     {collaborationMode && originalTrackId && (
                       <Button
                         variant="secondary"
@@ -782,7 +726,6 @@ export function AudioRecorder({
                       </Button>
                     )}
 
-                    {/* Botão para salvar em projeto */}
                     {projectId && !simplified && !collaborationMode && (
                       <Button
                         variant="secondary"
@@ -805,7 +748,6 @@ export function AudioRecorder({
                       </Button>
                     )}
 
-                    {/* Botão para publicar post simplificado */}
                     {simplified && (
                       <Button
                         variant="secondary"
@@ -828,7 +770,6 @@ export function AudioRecorder({
                       </Button>
                     )}
 
-                    {/* Botão de cancelar */}
                     {(simplified || collaborationMode) && onCancel && (
                       <Button variant="outline" size="lg" onClick={onCancel} className="flex items-center gap-2">
                         Cancelar
@@ -847,7 +788,7 @@ export function AudioRecorder({
                     </Badge>
                   )}
                 </div>
-                <div className={`h-24 bg-muted rounded-md flex items-center justify-center overflow-hidden ${isRecording ? 'border-2 border-red-500' : ''}`}>
+                <div className={`h-24 bg-muted rounded-md flex items-center justify-center overflow-hidden ${isRecording ? 'border-2 border-warning' : ''}`}>
                   {isRecording || audioURL ? (
                     <canvas ref={canvasRef} width={600} height={100} className="w-full h-full" />
                   ) : (

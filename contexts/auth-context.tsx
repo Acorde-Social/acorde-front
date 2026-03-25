@@ -86,6 +86,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingVerification, setPendingVerification] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState<string | null>(null);
   const router = useRouter();
+
+  const clearStoredAuth = () => {
+    localStorage.removeItem('token');
+    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    setUser(null);
+    setToken(null);
+  };
+
   const updateUser = (userData: User) => {
     setUser(userData);
   };
@@ -97,21 +105,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (parts.length === 2) return parts.pop()?.split(';').shift();
     };
 
-    const cookieToken = getCookie('auth_token');
-
-    const localStorageToken = localStorage.getItem('token');
-
-    if (cookieToken && !localStorageToken) {
-      localStorage.setItem('token', cookieToken);
-    }
-
-    const tokenToUse = localStorageToken || cookieToken;
-
-    if (tokenToUse) {
-      fetchUserProfile(tokenToUse);
-    } else {
+    const safetyTimeout = setTimeout(() => {
       setIsLoading(false);
-    }
+    }, 8000);
+
+    const initializeAuth = async () => {
+      try {
+        const cookieToken = getCookie('auth_token');
+        const localStorageToken = localStorage.getItem('token');
+
+        if (cookieToken && !localStorageToken) {
+          localStorage.setItem('token', cookieToken);
+        }
+
+        if (localStorageToken && !cookieToken) {
+          document.cookie = `auth_token=${localStorageToken}; path=/; max-age=86400; SameSite=Lax`;
+        }
+
+        const tokenToUse = localStorageToken || cookieToken;
+
+        if (tokenToUse) {
+          await fetchUserProfile(tokenToUse);
+        } else {
+          setIsLoading(false);
+        }
+      } catch (err) {
+        clearStoredAuth();
+        setIsLoading(false);
+      } finally {
+        clearTimeout(safetyTimeout);
+      }
+    };
+
+    void initializeAuth();
+
+    return () => {
+      clearTimeout(safetyTimeout);
+    };
   }, []);
 
   useEffect(() => {
@@ -120,11 +150,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       socketService.disconnect();
     }
+  }, [token]);
 
+  useEffect(() => {
     return () => {
       socketService.disconnect();
     };
-  }, [token]);
+  }, []);
 
   const fetchUserProfile = async (authToken: string) => {
 
@@ -147,8 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       setToken(authToken);
     } catch (err) {
-      localStorage.removeItem('token');
-      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      clearStoredAuth();
     } finally {
       setIsLoading(false);
     }
@@ -176,8 +207,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       document.cookie = `auth_token=${access_token}; path=/; max-age=86400; SameSite=Lax`;
 
-      socketService.connect(access_token);
-
       router.push('/home');
     } catch (err) {
       if (err instanceof Error && err.message.includes('verifique seu email')) {
@@ -202,7 +231,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       await fetchUserProfile(authToken);
 
-      socketService.connect(authToken);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao autenticar');
       localStorage.removeItem('token');
@@ -264,10 +292,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    setUser(null);
-    setToken(null);
+    clearStoredAuth();
     setPendingVerification(false);
     setVerificationEmail(null);
 

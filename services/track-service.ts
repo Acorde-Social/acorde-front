@@ -2,26 +2,18 @@
 
 import { API_URL, getAuthHeaders, handleApiError } from "@/lib/api-config"
 
-// Função utilitária para construir URLs completas
 export const getFullAudioUrl = (url: string) => {
-  // Se já for uma URL completa, retorna como está
   if (url.startsWith('http')) return url;
-  
-  // Garante que tenhamos a base URL
+
   const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-  
-  // Trata diferentes formatos de caminhos
+
   if (url.startsWith('/uploads/')) {
-    // Caminho começa com /uploads/
     return `${baseUrl}${url}`;
   } else if (url.startsWith('uploads/')) {
-    // Caminho começa sem barra
     return `${baseUrl}/${url}`;
   } else if (url.startsWith('tracks/')) {
-    // Caminho começa com tracks/ (caso comum do erro)
     return `${baseUrl}/uploads/${url}`;
   } else {
-    // Outros casos, adiciona /uploads/ se necessário
     return `${baseUrl}/uploads/${url}`;
   }
 };
@@ -32,7 +24,7 @@ export interface CreateTrackData {
   duration: number
   lyrics?: string
   chords?: string
-  credits?: string // JSON string
+  credits?: string
   postDescription?: string
 }
 
@@ -66,15 +58,13 @@ export interface AudioCorrectionOptions {
 }
 
 export const TrackService = {
-  // Criar nova faixa
   async createTrack(data: CreateTrackData, audioFile: File, token: string, overdubFiles?: File[], overdubDurations?: number[]) {
     const formData = new FormData()
     formData.append("name", data.name)
     formData.append("projectId", data.projectId)
     formData.append("duration", data.duration.toString())
     formData.append("file", audioFile)
-    
-    // Adicionar campos opcionais
+
     if (data.lyrics) {
       formData.append("lyrics", data.lyrics)
     }
@@ -88,7 +78,6 @@ export const TrackService = {
       formData.append("postDescription", data.postDescription)
     }
 
-    // Anexar overdubs (se houver)
     if (overdubFiles && overdubFiles.length > 0) {
       for (const f of overdubFiles) {
         formData.append('overdubs', f)
@@ -109,7 +98,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Criar colaboração para uma faixa existente
   async createCollaboration(data: CreateCollaborationData, audioFile: File, token: string) {
     const formData = new FormData()
     formData.append("trackId", data.trackId)
@@ -120,7 +108,7 @@ export const TrackService = {
     formData.append("duration", data.duration.toString())
     formData.append("file", audioFile)
 
-    const response = await fetch(`${API_URL}/collaborations/audio`, {
+    const response = await fetch(`${API_URL}/api/collaborations/audio`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -131,7 +119,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Buscar feed de áudios (áudios independentes de todos os usuários)
   async getFeed(token: string, page = 1, limit = 10) {
     const response = await fetch(`${API_URL}/tracks/feed?page=${page}&limit=${limit}`, {
       method: "GET",
@@ -141,7 +128,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Buscar áudios de um usuário específico
   async getUserTracks(userId: string, page = 1, limit = 10) {
     const response = await fetch(`${API_URL}/tracks/user/${userId}?page=${page}&limit=${limit}`, {
       method: "GET",
@@ -150,7 +136,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Excluir faixa
   async deleteTrack(id: string, token: string) {
     const response = await fetch(`${API_URL}/tracks/${id}`, {
       method: "DELETE",
@@ -160,7 +145,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Correção de tempo avançada para faixas existentes
   async correctTrackTiming(options: AudioCorrectionOptions, token: string): Promise<any> {
     const response = await fetch(`${API_URL}/ai-audio/correct-timing`, {
       method: "POST",
@@ -171,7 +155,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Enviar arquivo para correção de tempo avançada
   async uploadForTimingCorrection(
     file: File,
     options: {
@@ -183,15 +166,15 @@ export const TrackService = {
   ): Promise<any> {
     const formData = new FormData()
     formData.append("audioFile", file)
-    
+
     if (options.targetBpm) {
       formData.append("targetBpm", options.targetBpm.toString())
     }
-    
+
     if (options.quantizeStrength) {
       formData.append("quantizeStrength", options.quantizeStrength.toString())
     }
-    
+
     if (options.preserveExpression !== undefined) {
       formData.append("preserveExpression", options.preserveExpression.toString())
     }
@@ -207,7 +190,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Obter status do processamento
   async getProcessStatus(processId: string, token: string): Promise<any> {
     const response = await fetch(`${API_URL}/ai-audio/process-status/${processId}`, {
       method: "GET",
@@ -217,7 +199,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Curtir uma faixa
   async likeTrack(trackId: string, token: string): Promise<any> {
     const response = await fetch(`${API_URL}/tracks/${trackId}/like`, {
       method: "POST",
@@ -226,7 +207,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Descurtir uma faixa
   async unlikeTrack(trackId: string, token: string): Promise<any> {
     const response = await fetch(`${API_URL}/tracks/${trackId}/like`, {
       method: "DELETE",
@@ -235,7 +215,6 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Verificar se o usuário curtiu uma faixa
   async checkIfLiked(trackId: string, token: string): Promise<{liked: boolean}> {
     const response = await fetch(`${API_URL}/tracks/${trackId}/like/check`, {
       method: "GET",
@@ -244,16 +223,14 @@ export const TrackService = {
     return handleApiError(response)
   },
 
-  // Buscar comentários de uma faixa
-  async getTrackComments(trackId: string, token?: string): Promise<any> { // Assuming comments might be public
+  async getTrackComments(trackId: string, token?: string): Promise<any> {
     const response = await fetch(`${API_URL}/comments/track/${trackId}`, {
       method: "GET",
-      headers: getAuthHeaders(token), // Token might be needed depending on API
+      headers: getAuthHeaders(token),
     })
     return handleApiError(response)
   },
 
-  // Adicionar comentário a uma faixa
   async addTrackComment(trackId: string, content: string, token: string): Promise<any> {
     const response = await fetch(`${API_URL}/tracks/${trackId}/comments`, {
       method: "POST",

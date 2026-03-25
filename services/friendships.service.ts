@@ -98,7 +98,7 @@ class FriendshipService {
 
       notification.success("Pedido de amizade enviado!")
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao enviar pedido. Tente novamente.")
       return null
@@ -142,7 +142,7 @@ class FriendshipService {
 
       notification.success("Pedido aceito! Agora vocês são amigos.")
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao aceitar pedido. Tente novamente.")
       return null
@@ -186,7 +186,7 @@ class FriendshipService {
 
       notification.success("Pedido recusado")
       return true
-      
+
     } catch (error) {
       notification.error("Erro ao recusar pedido. Tente novamente.")
       return false
@@ -230,7 +230,7 @@ class FriendshipService {
 
       notification.success("Amizade removida")
       return true
-      
+
     } catch (error) {
       notification.error("Erro ao remover amizade. Tente novamente.")
       return false
@@ -262,7 +262,7 @@ class FriendshipService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao carregar pedidos. Tente novamente.")
       return []
@@ -294,7 +294,7 @@ class FriendshipService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao carregar amigos. Tente novamente.")
       return null
@@ -327,7 +327,7 @@ class FriendshipService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       return null
     }
@@ -358,7 +358,7 @@ class FriendshipService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao carregar sugestões. Tente novamente.")
       return []
@@ -367,3 +367,46 @@ class FriendshipService {
 }
 
 export const friendshipService = new FriendshipService()
+
+export const sendFriendshipRequest = (customToken: string, addresseeLogin: string) =>
+  friendshipService.sendFriendshipRequest(addresseeLogin, customToken)
+
+export const acceptFriendship = (customToken: string, friendshipId: string) =>
+  friendshipService.acceptFriendship(friendshipId, customToken)
+
+export const declineFriendship = (customToken: string, friendshipId: string) =>
+  friendshipService.declineFriendship(friendshipId, customToken)
+
+export const removeFriendship = (customToken: string, friendshipId: string) =>
+  friendshipService.removeFriendship(friendshipId, customToken)
+
+export const getPendingFriendships = (customToken: string) =>
+  friendshipService.getPendingFriendships(customToken)
+
+export const getFriends = (customToken: string) =>
+  friendshipService.getFriends(customToken)
+
+export const getFriendshipStatus = (customToken: string, login: string) =>
+  friendshipService.getFriendshipStatus(login, customToken)
+
+export const getFriendshipSuggestions = (
+  arg1?: string | number,
+  arg2?: string | number
+) => {
+  let customToken: string | undefined
+  let limit: number | undefined
+
+  if (typeof arg1 === "string") {
+    customToken = arg1
+    if (typeof arg2 === "number") {
+      limit = arg2
+    }
+  } else if (typeof arg1 === "number") {
+    limit = arg1
+    if (typeof arg2 === "string") {
+      customToken = arg2
+    }
+  }
+
+  return friendshipService.getFriendshipSuggestions(limit, customToken)
+}

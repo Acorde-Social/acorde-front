@@ -455,7 +455,7 @@ export function Pricing() {
                                                                     feature.free ? (
                                                                         <Check className="h-5 w-5 text-green-500 mx-auto" />
                                                                     ) : (
-                                                                        <X className="h-5 w-5 text-red-400 mx-auto" />
+                                                                        <X className="h-5 w-5 text-warning mx-auto" />
                                                                     )
                                                                 ) : (
                                                                     <span className="text-[#374151] font-medium">{feature.free}</span>
@@ -466,7 +466,7 @@ export function Pricing() {
                                                                     feature.jammer ? (
                                                                         <Check className="h-5 w-5 text-green-500 mx-auto" />
                                                                     ) : (
-                                                                        <X className="h-5 w-5 text-red-400 mx-auto" />
+                                                                        <X className="h-5 w-5 text-warning mx-auto" />
                                                                     )
                                                                 ) : (
                                                                     <span className="text-[#fcd34d] font-semibold">{feature.jammer}</span>
@@ -477,7 +477,7 @@ export function Pricing() {
                                                                     feature.producer ? (
                                                                         <Check className="h-5 w-5 text-green-500 mx-auto" />
                                                                     ) : (
-                                                                        <X className="h-5 w-5 text-red-400 mx-auto" />
+                                                                        <X className="h-5 w-5 text-warning mx-auto" />
                                                                     )
                                                                 ) : (
                                                                     <span className="text-[#2c1e4a] font-semibold">{feature.producer}</span>
@@ -513,7 +513,7 @@ export function Pricing() {
                                                         feature.free ? (
                                                             <Check className="h-3 w-3 text-green-500 mx-auto" />
                                                         ) : (
-                                                            <X className="h-3 w-3 text-red-400 mx-auto" />
+                                                            <X className="h-3 w-3 text-warning mx-auto" />
                                                         )
                                                     ) : (
                                                         <span className="text-xs font-medium text-[#374151]">{feature.free}</span>
@@ -526,7 +526,7 @@ export function Pricing() {
                                                         feature.jammer ? (
                                                             <Check className="h-3 w-3 text-green-500 mx-auto" />
                                                         ) : (
-                                                            <X className="h-3 w-3 text-red-400 mx-auto" />
+                                                            <X className="h-3 w-3 text-warning mx-auto" />
                                                         )
                                                     ) : (
                                                         <span className="text-xs font-semibold text-[#fcd34d]">{feature.jammer}</span>
@@ -539,7 +539,7 @@ export function Pricing() {
                                                         feature.producer ? (
                                                             <Check className="h-3 w-3 text-green-500 mx-auto" />
                                                         ) : (
-                                                            <X className="h-3 w-3 text-red-400 mx-auto" />
+                                                            <X className="h-3 w-3 text-warning mx-auto" />
                                                         )
                                                     ) : (
                                                         <span className="text-xs font-semibold text-[#2c1e4a]">{feature.producer}</span>

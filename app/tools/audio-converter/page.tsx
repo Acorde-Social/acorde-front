@@ -1,22 +1,32 @@
 'use client';
 
+import { WaveformBackground } from "@/components/common/WaveformBackground"
+
 import { useState } from 'react';
 import { AudioConverter } from '@/components/audio/audio-converter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Music, Zap, Shield, FileAudio } from 'lucide-react';
+import { FloatingFigures } from '@/components/common/FloatingFigures';
 
 export default function AudioConverterPage() {
 	const [convertedFile, setConvertedFile] = useState<File | null>(null);
 
 	const handleConversionComplete = (mp3File: File) => {
 		setConvertedFile(mp3File);
-		console.log('Arquivo convertido:', mp3File.name, mp3File.size);
 	};
 
 	return (
-		<div className="container mx-auto py-6 sm:py-8 px-4 max-w-4xl">
-			{/* Cabeçalho */}
+		<div className="bg-background relative overflow-hidden min-h-screen">
+			<div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10 dark:from-[#0f0c18] dark:via-[#3b2010]/15 dark:to-[#2c1e4a]/25 pointer-events-none" />
+			<WaveformBackground />
+			<div className="absolute inset-0 pointer-events-none">
+				<div className="scale-175 opacity-60 dark:opacity-65">
+					<FloatingFigures />
+				</div>
+			</div>
+
+			<div className="relative z-10 container mx-auto py-6 sm:py-8 px-4 max-w-4xl">
 			<div className="text-center mb-6 sm:mb-8">
 				<div className="flex justify-center mb-4">
 					<div className="p-3 bg-primary/10 rounded-full">
@@ -29,14 +39,12 @@ export default function AudioConverterPage() {
 				</p>
 			</div>
 
-			{/* Tabs */}
 			<Tabs defaultValue="converter" className="w-full">
 				<TabsList className="grid w-full grid-cols-2 h-auto">
 					<TabsTrigger value="converter" className="text-sm sm:text-base">Conversor</TabsTrigger>
 					<TabsTrigger value="sobre" className="text-sm sm:text-base">Sobre</TabsTrigger>
 				</TabsList>
 
-				{/* Tab: Conversor */}
 				<TabsContent value="converter">
 					<Card>
 						<CardHeader>
@@ -69,10 +77,8 @@ export default function AudioConverterPage() {
 					</Card>
 				</TabsContent>
 
-				{/* Tab: Sobre */}
 				<TabsContent value="sobre">
 					<div className="grid gap-6">
-						{/* Características */}
 						<Card>
 							<CardHeader>
 								<CardTitle>Por que usar nosso conversor?</CardTitle>
@@ -113,7 +119,6 @@ export default function AudioConverterPage() {
 							</CardContent>
 						</Card>
 
-						{/* Formatos Suportados */}
 						<Card>
 							<CardHeader>
 								<CardTitle>Formatos Suportados</CardTitle>
@@ -140,7 +145,6 @@ export default function AudioConverterPage() {
 							</CardContent>
 						</Card>
 
-						{/* Como Funciona */}
 						<Card>
 							<CardHeader>
 								<CardTitle>Como Funciona?</CardTitle>
@@ -184,7 +188,6 @@ export default function AudioConverterPage() {
 							</CardContent>
 						</Card>
 
-						{/* Dicas */}
 						<Card>
 							<CardHeader>
 								<CardTitle>💡 Dicas</CardTitle>
@@ -215,6 +218,7 @@ export default function AudioConverterPage() {
 					</div>
 				</TabsContent>
 			</Tabs>
+			</div>
 		</div>
 	);
 }

@@ -71,7 +71,7 @@ class NotificationService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao carregar notificações. Tente novamente.")
       return []
@@ -98,7 +98,7 @@ class NotificationService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       return null
     }
@@ -138,7 +138,7 @@ class NotificationService {
       }
 
       return await response.json()
-      
+
     } catch (error) {
       notification.error("Erro ao processar notificação. Tente novamente.")
       return null
@@ -170,7 +170,7 @@ class NotificationService {
 
       notification.success("Todas as notificações foram marcadas como lidas")
       return true
-      
+
     } catch (error) {
       notification.error("Erro ao processar notificações. Tente novamente.")
       return false
@@ -212,7 +212,7 @@ class NotificationService {
 
       notification.success("Notificação removida")
       return true
-      
+
     } catch (error) {
       notification.error("Erro ao deletar notificação. Tente novamente.")
       return false
@@ -221,3 +221,18 @@ class NotificationService {
 }
 
 export const notificationService = new NotificationService()
+
+export const getNotifications = (limit?: number, unreadOnly?: boolean, customToken?: string) =>
+  notificationService.getNotifications(limit, unreadOnly, customToken)
+
+export const getNotificationCount = (customToken?: string) =>
+  notificationService.getNotificationCount(customToken)
+
+export const markNotificationAsRead = (notificationId: string, customToken?: string) =>
+  notificationService.markNotificationAsRead(notificationId, customToken)
+
+export const markAllNotificationsAsRead = (customToken?: string) =>
+  notificationService.markAllNotificationsAsRead(customToken)
+
+export const deleteNotification = (notificationId: string, customToken?: string) =>
+  notificationService.deleteNotification(notificationId, customToken)

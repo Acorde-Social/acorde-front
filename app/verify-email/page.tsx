@@ -9,13 +9,12 @@ import { Check, AlertCircle, Loader2, MailCheck } from "lucide-react"
 import { API_URL, handleApiError } from "@/lib/api-config"
 import { useToast } from "@/hooks/use-toast"
 
-// Componente para o conteúdo que utiliza useSearchParams
 function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
   const router = useRouter()
   const { toast } = useToast()
-  
+
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying")
   const [message, setMessage] = useState("")
   const [email, setEmail] = useState("")
@@ -33,7 +32,7 @@ function VerifyEmailContent() {
   const verifyEmail = async (token: string) => {
     try {
       const response = await fetch(`${API_URL}/auth/verify-email?token=${token}`)
-      
+
       if (response.ok) {
         const data = await response.json()
         setStatus("success")
@@ -60,16 +59,16 @@ function VerifyEmailContent() {
     }
 
     setIsResending(true)
-    
+
     try {
       const response = await fetch(`${API_URL}/auth/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       })
-      
+
       const data = await handleApiError(response)
-      
+
       toast({
         title: "Email reenviado",
         description: data.message || "Email de verificação reenviado com sucesso",
@@ -93,7 +92,7 @@ function VerifyEmailContent() {
           {status === "verifying" ? "Verificando seu email..." : ""}
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="flex flex-col items-center justify-center p-6">
         {status === "verifying" && (
           <div className="flex flex-col items-center gap-4 py-8">
@@ -119,14 +118,14 @@ function VerifyEmailContent() {
 
         {status === "error" && (
           <div className="flex flex-col items-center gap-4 py-8">
-            <div className="h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className="h-12 w-12 rounded-full bg-warning/15 dark:bg-warning/25 flex items-center justify-center">
+              <AlertCircle className="h-6 w-6 text-warning" />
             </div>
             <div className="text-center">
               <h3 className="font-medium text-lg">Erro na verificação</h3>
               <p className="text-muted-foreground mt-1">{message}</p>
             </div>
-            
+
             <div className="w-full space-y-4 mt-4">
               <div className="space-y-2">
                 <p className="text-sm text-center">Informe seu email para reenviar a verificação:</p>
@@ -138,9 +137,9 @@ function VerifyEmailContent() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              
-              <Button 
-                className="w-full" 
+
+              <Button
+                className="w-full"
                 onClick={handleResend}
                 disabled={isResending}
               >
@@ -156,7 +155,7 @@ function VerifyEmailContent() {
                   </>
                 )}
               </Button>
-              
+
               <div className="text-center text-sm">
                 <Link href="/login" className="text-primary hover:underline">
                   Voltar para o login
@@ -170,7 +169,6 @@ function VerifyEmailContent() {
   )
 }
 
-// Componente principal com fallback para o Suspense
 export default function VerifyEmailPage() {
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">

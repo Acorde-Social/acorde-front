@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { WaveformBackground } from "@/components/common/WaveformBackground"
+
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,9 +34,11 @@ import { PostModal } from '@/components/home/post-modal';
 import { Pencil } from 'lucide-react';
 import { useMultiAudioPlayer } from '@/hooks/use-multi-audio-player';
 import { useFeed } from '@/hooks/use-feed';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useUI } from '@/hooks/use-ui';
 import { DarkCard } from '@/components/ui/dark-card';
 import { FloatingFigures } from '@/components/common/FloatingFigures';
+import { useRouter } from 'next/navigation';
 
 interface IStats {
   projects: number;
@@ -44,23 +48,71 @@ interface IStats {
 }
 
 export default function HomePage() {
-  const { user, token } = useAuth();
+  const { user, token, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const { playingAudioId, audioProgress, audioCurrentTime, handlePlayPause, handleSeek } =
     useMultiAudioPlayer();
 
-  const { feedItems, stats, isLoading, loadFeed } = useFeed();
+  const shouldLoadFeed = !!user && !authLoading;
+  const { feedItems, stats, isInitialLoading, isLoadingMore, hasMore, loadMore } = useFeed(shouldLoadFeed);
+  const { lastElementRef: sentinelaRef } = useInfiniteScroll({
+    loading: isLoadingMore,
+    hasMore,
+    onLoadMore: loadMore,
+  });
 
   const { activeTab, setActiveTab, isPostModalOpen, setIsPostModalOpen } = useUI();
 
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  const [authLoadingTimedOut, setAuthLoadingTimedOut] = useState(false);
+  const hoverCloseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openSidebarCard = (cardId: string) => {
+    if (hoverCloseTimeoutRef.current) {
+      clearTimeout(hoverCloseTimeoutRef.current);
+      hoverCloseTimeoutRef.current = null;
+    }
+    setExpandedCard(cardId);
+  };
+
+  const closeSidebarCard = () => {
+    if (hoverCloseTimeoutRef.current) {
+      clearTimeout(hoverCloseTimeoutRef.current);
+    }
+    hoverCloseTimeoutRef.current = setTimeout(() => {
+      setExpandedCard(null);
+    }, 220);
+  };
 
   useEffect(() => {
-    if (user) {
-      loadFeed();
+    if (!authLoading && !user) {
+      router.replace('/login');
     }
-  }, [user, loadFeed]);
+  }, [authLoading, user, router]);
+
+  useEffect(() => {
+    if (!authLoading || user) {
+      setAuthLoadingTimedOut(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setAuthLoadingTimedOut(true);
+      router.replace('/login');
+    }, 3500);
+
+    return () => clearTimeout(timeoutId);
+  }, [authLoading, user, router]);
+
+  useEffect(() => {
+    return () => {
+      if (hoverCloseTimeoutRef.current) {
+        clearTimeout(hoverCloseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleQuickAction = (action: string) => {
     toast({
@@ -73,7 +125,7 @@ export default function HomePage() {
     setIsPostModalOpen(true);
   };
 
-  if (!user || isLoading) {
+  if ((authLoading && !user && !authLoadingTimedOut) || (user && isInitialLoading)) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
@@ -84,28 +136,21 @@ export default function HomePage() {
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   return (
-    <div className="bg-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10" />
-      <div className="absolute inset-0 opacity-[0.03]">
-        <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1200 400">
-          <defs>
-            <pattern id="cta-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
-              <circle cx="30" cy="30" r="1" fill="#2c1e4a" opacity="0.2" />
-              <circle cx="60" cy="30" r="1" fill="#fcd34d" opacity="0.2" />
-              <circle cx="30" cy="60" r="1" fill="#374151" opacity="0.2" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#cta-pattern)" />
-        </svg>
-      </div>
+    <div className="bg-background relative overflow-hidden min-h-screen">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10 dark:from-[#0f0c18] dark:via-[#3b2010]/15 dark:to-[#2c1e4a]/25" />
+      <WaveformBackground />
       <div className="absolute inset-0">
-        <div className="scale-175 opacity-50">
+        <div className="scale-175 opacity-60 dark:opacity-65">
           <FloatingFigures />
         </div>
       </div>
 
-      <div className='relative z-10'>
+      <div className='relative z-10 min-h-screen'>
       <PostModal isOpen={isPostModalOpen} onClose={() => setIsPostModalOpen(false)} />
       <div className="py-8 px-4 lg:px-8">
         <div className="grid grid-cols-1 gap-6 lg:gap-12">
@@ -114,23 +159,27 @@ export default function HomePage() {
               <div className="space-y-4">
                 <div
                   className="relative"
-                  onMouseEnter={() => setExpandedCard('profile')}
-                  onMouseLeave={() => setExpandedCard(null)}
+                  onMouseEnter={() => openSidebarCard('profile')}
+                  onMouseLeave={closeSidebarCard}
                 >
                   <div className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
                     <AvatarUpload showCamera={false} />
                   </div>
                   {expandedCard === 'profile' && (
-                    <div className="absolute left-full top-0 ml-10 w-80">
-                      <DarkCard className="w-[90%] lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+                    <div
+                      className="absolute left-full top-0 ml-4 w-80"
+                      onMouseEnter={() => openSidebarCard('profile')}
+                      onMouseLeave={closeSidebarCard}
+                    >
+                      <DarkCard className="w-[90%] lg:w-[90%] xl:w-[80%] 2xl:w-[70%] text-foreground dark:text-white">
                         <div className="flex flex-col p-6 gap-4">
                           <div className="flex items-center gap-4 lg:flex-col">
                             <AvatarUpload showCamera={true} />
                             <div>
-                              <h1 className="text-3xl lg:text-xl xl:text-xl 2xl:text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-black">
+                              <h1 className="text-3xl lg:text-xl xl:text-xl 2xl:text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-black dark:text-white">
                                 {user.name}!
                               </h1>
-                              <div className="text-muted-foreground flex flex-col items-center gap-1 mt-1 lg:items-center">
+                              <div className="text-muted-foreground dark:text-white/85 flex flex-col items-center gap-1 mt-1 lg:items-center">
                                 <Badge variant="outline" className="bg-primary/5 mt-2">
                                   {user.role}
                                 </Badge>
@@ -157,19 +206,23 @@ export default function HomePage() {
 
                 <div
                   className="relative"
-                  onMouseEnter={() => setExpandedCard('create-post')}
-                  onMouseLeave={() => setExpandedCard(null)}
+                  onMouseEnter={() => openSidebarCard('create-post')}
+                  onMouseLeave={closeSidebarCard}
                 >
                   <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                    <Plus className="h-6 w-6 text-secondary mx-auto" />
+                    <Plus className="h-6 w-6 text-secondary dark:text-white mx-auto" />
                   </button>
 
                   {expandedCard === 'create-post' && (
-                    <div className="absolute left-full top-0 ml-10 w-80">
-                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+                    <div
+                      className="absolute left-full top-0 ml-4 w-80"
+                      onMouseEnter={() => openSidebarCard('create-post')}
+                      onMouseLeave={closeSidebarCard}
+                    >
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[70%] text-foreground dark:text-white">
                         <CardHeader className="pb-3">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <Plus className="h-5 w-5 text-secondary" />
+                            <Plus className="h-5 w-5 text-secondary dark:text-white" />
                             Criar Post
                           </CardTitle>
                         </CardHeader>
@@ -187,7 +240,7 @@ export default function HomePage() {
                               </Avatar>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="relative text-muted-foreground group-hover:text-primary transition-colors">
+                                  <span className="relative text-muted-foreground dark:text-white/85 group-hover:text-primary transition-colors">
                                     O que vai postar hoje?
                                     <span
                                       className="absolute -left-2 top-1/2 -translate-y-1/2 w-[2px] h-4 bg-primary"
@@ -196,7 +249,7 @@ export default function HomePage() {
                                   </span>
                                   <Plus className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <p className="text-xs text-muted-foreground dark:text-white/75 mt-1">
                                   Compartilhe uma ideia, projeto ou colaboração
                                 </p>
                               </div>
@@ -210,19 +263,23 @@ export default function HomePage() {
 
                 <div
                   className="relative"
-                  onMouseEnter={() => setExpandedCard('network')}
-                  onMouseLeave={() => setExpandedCard(null)}
+                  onMouseEnter={() => openSidebarCard('network')}
+                  onMouseLeave={closeSidebarCard}
                 >
                   <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                    <AudioWaveform className="h-6 w-6 text-secondary mx-auto" />
+                    <AudioWaveform className="h-6 w-6 text-secondary dark:text-white mx-auto" />
                   </button>
 
                   {expandedCard === 'network' && (
-                    <div className="absolute left-full top-0 ml-10 w-80">
-                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[70%]">
+                    <div
+                      className="absolute left-full top-0 ml-4 w-80"
+                      onMouseEnter={() => openSidebarCard('network')}
+                      onMouseLeave={closeSidebarCard}
+                    >
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[70%] text-foreground dark:text-white">
                         <CardHeader className="pb-3">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <AudioWaveform className="h-5 w-5 text-secondary" />
+                            <AudioWaveform className="h-5 w-5 text-secondary dark:text-white" />
                             Minha Rede
                           </CardTitle>
                         </CardHeader>
@@ -232,23 +289,23 @@ export default function HomePage() {
                               <div className="text-2xl font-bold text-primary">
                                 {stats.projects}
                               </div>
-                              <div className="text-xs text-muted-foreground">Projetos</div>
+                              <div className="text-xs text-muted-foreground dark:text-white/75">Projetos</div>
                             </div>
                             <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
                               <div className="text-2xl font-bold text-primary">
                                 {stats.collaborations}
                               </div>
-                              <div className="text-xs text-muted-foreground">Colabs</div>
+                              <div className="text-xs text-muted-foreground dark:text-white/75">Colabs</div>
                             </div>
                             <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
                               <div className="text-2xl font-bold text-primary">
                                 {stats.followers}
                               </div>
-                              <div className="text-xs text-muted-foreground">Seguidores</div>
+                              <div className="text-xs text-muted-foreground dark:text-white/75">Seguidores</div>
                             </div>
                             <div className="text-center p-3 rounded-lg bg-muted/20 border border-secondary/10">
                               <div className="text-2xl font-bold text-primary">{stats.tracks}</div>
-                              <div className="text-xs text-muted-foreground">Faixas</div>
+                              <div className="text-xs text-muted-foreground dark:text-white/75">Faixas</div>
                             </div>
                           </div>
                         </CardContent>
@@ -259,58 +316,62 @@ export default function HomePage() {
 
                 <div
                   className="relative"
-                  onMouseEnter={() => setExpandedCard('actions')}
-                  onMouseLeave={() => setExpandedCard(null)}
+                  onMouseEnter={() => openSidebarCard('actions')}
+                  onMouseLeave={closeSidebarCard}
                 >
                   <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                    <Clock className="h-6 w-6 text-secondary mx-auto" />
+                    <Clock className="h-6 w-6 text-secondary dark:text-white mx-auto" />
                   </button>
 
                   {expandedCard === 'actions' && (
-                    <div className="absolute left-full top-0 ml-10 w-80">
-                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[80%]">
+                    <div
+                      className="absolute left-full top-0 ml-4 w-80"
+                      onMouseEnter={() => openSidebarCard('actions')}
+                      onMouseLeave={closeSidebarCard}
+                    >
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[80%] text-foreground dark:text-white">
                         <CardHeader className="pb-3">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <Clock className="h-5 w-5 text-secondary" />
+                            <Clock className="h-5 w-5 text-secondary dark:text-white" />
                             Ações Rápidas
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
                           <Button
                             variant="outline"
-                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary"
+                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary dark:text-white"
                             onClick={() => handleQuickAction('Gravação rápida')}
                           >
-                            <Mic className="h-4 w-4 mr-3 text-secondary" />
+                            <Mic className="h-4 w-4 mr-3 text-secondary dark:text-white" />
                             Gravar Ideia
                           </Button>
                           <Button
                             variant="outline"
-                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary"
+                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary dark:text-white"
                             asChild
                           >
                             <Link href="/projects/new">
-                              <Music className="h-4 w-4 mr-3 text-secondary" />
+                              <Music className="h-4 w-4 mr-3 text-secondary dark:text-white" />
                               Novo Projeto
                             </Link>
                           </Button>
                           <Button
                             variant="outline"
-                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary"
+                            className="w-full justify-start hover:bg-primary/5 transition-all font-bold bg-muted/20 text-secondary dark:text-white"
                             asChild
                           >
                             <Link href="/explore">
-                              <Users className="h-4 w-4 mr-3 text-secondary" />
+                              <Users className="h-4 w-4 mr-3 text-secondary dark:text-white" />
                               Encontrar Músicos
                             </Link>
                           </Button>
                           <Button
                             variant="outline"
-                            className="w-full justify-start hover:bg-primary/5 font-bold bg-muted/20 text-secondary"
+                            className="w-full justify-start hover:bg-primary/5 font-bold bg-muted/20 text-secondary dark:text-white"
                             asChild
                           >
                             <Link href="/collaborations">
-                              <Guitar className="h-4 w-4 mr-3 text-secondary" />
+                              <Guitar className="h-4 w-4 mr-3 text-secondary dark:text-white" />
                               Minhas Colabs
                             </Link>
                           </Button>
@@ -322,19 +383,23 @@ export default function HomePage() {
 
                 <div
                   className="relative"
-                  onMouseEnter={() => setExpandedCard('recommended')}
-                  onMouseLeave={() => setExpandedCard(null)}
+                  onMouseEnter={() => openSidebarCard('recommended')}
+                  onMouseLeave={closeSidebarCard}
                 >
                   <button className="w-full p-2 rounded-lg hover:bg-primary/10 transition-colors">
-                    <Star className="h-6 w-6 text-secondary mx-auto" />
+                    <Star className="h-6 w-6 text-secondary dark:text-white mx-auto" />
                   </button>
 
                   {expandedCard === 'recommended' && (
-                    <div className="absolute left-full top-0 ml-10 w-80">
-                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[80%]">
+                    <div
+                      className="absolute left-full top-0 ml-4 w-80"
+                      onMouseEnter={() => openSidebarCard('recommended')}
+                      onMouseLeave={closeSidebarCard}
+                    >
+                      <DarkCard className="w-full lg:w-[90%] xl:w-[80%] 2xl:w-[80%] text-foreground dark:text-white">
                         <CardHeader className="pb-3">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <Star className="h-5 w-5 text-secondary" />
+                            <Star className="h-5 w-5 text-secondary dark:text-white" />
                             Recomendados
                           </CardTitle>
                         </CardHeader>
@@ -347,8 +412,8 @@ export default function HomePage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">Rafael Jazz</p>
-                                <p className="text-xs text-muted-foreground">Saxofonista</p>
+                                <p className="text-sm font-medium truncate dark:text-white">Rafael Jazz</p>
+                                <p className="text-xs text-muted-foreground dark:text-white/75">Saxofonista</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
@@ -358,8 +423,8 @@ export default function HomePage() {
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">Banda Progressiva</p>
-                                <p className="text-xs text-muted-foreground">Projeto</p>
+                                <p className="text-sm font-medium truncate dark:text-white">Banda Progressiva</p>
+                                <p className="text-xs text-muted-foreground dark:text-white/75">Projeto</p>
                               </div>
                             </div>
                           </div>
@@ -397,7 +462,7 @@ export default function HomePage() {
 
                   <TabsContent value="feed" className="mt-6">
                     <div className="space-y-4">
-                      {isLoading ? (
+                      {isInitialLoading ? (
                         Array.from({ length: 3 }).map((_, i) => (
                           <Card key={i} className="animate-pulse">
                             <CardContent className="p-6">
@@ -545,7 +610,12 @@ export default function HomePage() {
                           </Button>
                         </Card>
                       )}
+                      {hasMore && <div ref={sentinelaRef} className="h-10" />}
+                      {isLoadingMore && (
+                        <p className="text-center text-sm text-muted-foreground">carregando mais posts</p>
+                      )}
                     </div>
+
                   </TabsContent>
 
                   <TabsContent value="projects">

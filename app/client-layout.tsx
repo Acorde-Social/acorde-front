@@ -28,9 +28,45 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 }
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-	// Marcar como hidratado após o primeiro render
 	useEffect(() => {
 		document.documentElement.classList.add('hydrated')
+	}, [])
+
+	useEffect(() => {
+		const hasRecovered = sessionStorage.getItem('chunk-recovery-attempted') === '1'
+
+		const triggerRecoveryReload = () => {
+			if (!hasRecovered) {
+				sessionStorage.setItem('chunk-recovery-attempted', '1')
+				window.location.reload()
+			}
+		}
+
+		const handleErrorEvent = (event: ErrorEvent) => {
+			const message = event?.message || ''
+			if (message.includes('ChunkLoadError') || message.includes('Loading chunk')) {
+				triggerRecoveryReload()
+			}
+		}
+
+		const handlePromiseRejection = (event: PromiseRejectionEvent) => {
+			const reason = String(event?.reason || '')
+			if (
+				reason.includes('ChunkLoadError') ||
+				reason.includes('Loading chunk') ||
+				reason.includes('Failed to fetch dynamically imported module')
+			) {
+				triggerRecoveryReload()
+			}
+		}
+
+		window.addEventListener('error', handleErrorEvent)
+		window.addEventListener('unhandledrejection', handlePromiseRejection)
+
+		return () => {
+			window.removeEventListener('error', handleErrorEvent)
+			window.removeEventListener('unhandledrejection', handlePromiseRejection)
+		}
 	}, [])
 
 	return (

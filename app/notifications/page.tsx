@@ -33,7 +33,7 @@ import { ptBR } from "date-fns/locale"
 import { fixImageUrl } from "@/lib/utils"
 
 export default function NotificationsPage() {
-	const { user, token } = useAuth()
+	const { user, token, isLoading: authLoading } = useAuth()
 	const router = useRouter()
 	const { toast } = useToast()
 
@@ -43,13 +43,17 @@ export default function NotificationsPage() {
 	const [processingIds, setProcessingIds] = useState<Set<string>>(new Set())
 
 	useEffect(() => {
+		if (authLoading) {
+			return
+		}
+
 		if (!user || !token) {
 			router.push("/login")
 			return
 		}
 
 		fetchNotifications()
-	}, [user, token, router])
+	}, [authLoading, user, token, router])
 
 	const fetchNotifications = async () => {
 		if (!token) return
@@ -137,7 +141,7 @@ export default function NotificationsPage() {
 		switch (type) {
 			case "TRACK_LIKE":
 			case "COMMENT_LIKE":
-				return <Heart className="h-5 w-5 text-red-500" />
+					return <Heart className="h-5 w-5 text-warning" />
 			case "COMMENT_NEW":
 				return <MessageCircle className="h-5 w-5 text-blue-500" />
 			case "COLLABORATION_INVITE":

@@ -33,9 +33,13 @@ export default function SentCollaborationsPage() {
   const [actionInProgress, setActionInProgress] = useState<string | null>(null)
   const { toast } = useToast()
   const router = useRouter()
-  const { user, token } = useAuth()
+  const { user, token, isLoading: authLoading } = useAuth()
 
   useEffect(() => {
+    if (authLoading) {
+      return
+    }
+
     if (!user || !token) {
       router.push("/login")
       return
@@ -46,7 +50,6 @@ export default function SentCollaborationsPage() {
         const data = await CollaborationService.getUserAudioCollaborations(token)
         setCollaborations(data)
       } catch (error) {
-        console.error("Error fetching collaborations:", error)
         toast({
           title: "Error",
           description: "Could not load your collaborations. Please try again later.",
@@ -58,11 +61,10 @@ export default function SentCollaborationsPage() {
     }
 
     fetchCollaborations()
-  }, [user, token, router, toast])
+  }, [authLoading, user, token, router, toast])
 
   const getFullAudioUrl = (url: string) => {
     if (!url) return ""
-    // Return full URL if already absolute, otherwise prepend API URL
     return url.startsWith("http") ? url : `${API_URL}/${url}`
   }
 
@@ -73,7 +75,7 @@ export default function SentCollaborationsPage() {
       case "ACCEPTED":
         return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Accepted</Badge>
       case "REJECTED":
-        return <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">Rejected</Badge>
+        return <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">Rejected</Badge>
       default:
         return <Badge variant="outline">Unknown</Badge>
     }
@@ -91,7 +93,6 @@ export default function SentCollaborationsPage() {
         description: "Your collaboration has been removed successfully.",
       })
     } catch (error) {
-      console.error("Error deleting collaboration:", error)
       toast({
         title: "Error",
         description: "Could not delete the collaboration. Please try again later.",

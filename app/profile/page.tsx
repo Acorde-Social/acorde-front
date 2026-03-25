@@ -16,41 +16,39 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 import {
   Loader2, Upload, X, Music, Guitar, Eye, Edit3, Camera,
-  Save, XCircle, Plus, Sparkles, Disc3, Waves, Radio
+  Save, XCircle, Plus, Sparkles
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 import { AuthGuard } from "@/components/auth-guard"
+import { FloatingFigures } from "@/components/common/FloatingFigures"
+import { WaveformBackground } from "@/components/common/WaveformBackground"
 import { ProjectService, type Project as ServiceProject } from "@/services/project-service"
 import { fixImageUrl } from "@/lib/utils"
 import { API_URL } from "@/lib/api-config"
 import "./modern-profile.css"
 
 export default function ProfilePage() {
-  const { user, token } = useAuth()
+  const { user, token, isLoading: authLoading } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
 
-  // Estados do formulário
   const [name, setName] = useState("")
   const [bio, setBio] = useState("")
   const [instruments, setInstruments] = useState<string[]>([])
   const [experience, setExperience] = useState("")
   const [newInstrument, setNewInstrument] = useState("")
 
-  // Estados de arquivos
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null)
 
-  // Estados de controle
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [projectsFetched, setProjectsFetched] = useState(false)
 
-  // Estados de dados
   const [projects, setProjects] = useState<ServiceProject[]>([])
   const [collaborations, setCollaborations] = useState<ServiceProject[]>([])
 
@@ -68,7 +66,6 @@ export default function ProfilePage() {
       setCollaborations(collaboratingProjects.slice(0, 6))
       setProjectsFetched(true)
     } catch (error) {
-      console.error("Erro ao buscar projetos:", error)
       setProjectsFetched(true)
       toast({
         title: "Erro ao carregar projetos",
@@ -212,7 +209,6 @@ export default function ProfilePage() {
       setIsEditDialogOpen(false)
       router.refresh()
     } catch (error: any) {
-      console.error("Erro ao atualizar perfil:", error)
       toast({
         title: "Erro ao atualizar perfil",
         description: error.message || "Não foi possível salvar suas alterações.",
@@ -239,46 +235,45 @@ export default function ProfilePage() {
   ]
 
   useEffect(() => {
+    if (authLoading) return
     if (user && token && !projectsFetched) {
       fetchUserProjects()
     }
-  }, [user, token, projectsFetched])
+  }, [user, token, projectsFetched, authLoading])
 
   return (
     <AuthGuard>
-      <div className="w-full min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-        {/* Hero Header com Imagem de Capa */}
-        <div className="relative h-[280px] md:h-[320px] w-full overflow-hidden">
-          {user?.coverImageUrl ? (
-            <Image
-              src={fixImageUrl(user.coverImageUrl)}
-              alt="Cover"
-              fill
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/10 to-secondary/20">
-              <div className="absolute inset-0 opacity-20">
-                <Waves className="absolute top-20 left-10 h-24 w-24 animate-pulse" />
-                <Disc3 className="absolute bottom-10 right-20 h-32 w-32 animate-spin-slow" />
-                <Radio className="absolute top-32 right-10 h-16 w-16 animate-bounce-slow" />
-              </div>
-            </div>
-          )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+      <div className="relative bg-background overflow-hidden min-h-screen">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f9fafb] via-[#fcd34d]/10 to-[#2c1e4a]/10 dark:from-[#0f0c18] dark:via-[#3b2010]/15 dark:to-[#2c1e4a]/25 pointer-events-none" />
+        <WaveformBackground />
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="scale-175 opacity-60 dark:opacity-65">
+            <FloatingFigures />
+          </div>
         </div>
+        <div className="relative z-10">
 
-        {/* Container Principal */}
-        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 -mt-24 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-4 w-full">
+        <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 pt-6 pb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 w-full">
 
-            {/* Sidebar - Info do Usuário */}
             <div className="lg:col-span-1">
-              <Card className="glass-card lg:sticky lg:top-4 overflow-hidden">
-                <div className="relative pt-8 pb-4">
-                  <div className="flex justify-center">
+              <Card className="glass-card lg:sticky lg:top-4 overflow-hidden border border-black/5 dark:border-white/10 bg-white/70 dark:bg-[#111827]/70 backdrop-blur-md shadow-xl">
+                <div className="relative h-24 sm:h-28 w-full overflow-hidden">
+                  {user?.coverImageUrl ? (
+                    <Image
+                      src={fixImageUrl(user.coverImageUrl)}
+                      alt="Cover"
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#2c1e4a]/40 via-[#6d28d9]/20 to-[#0f0c18]/50 dark:from-[#2c1e4a]/70 dark:via-[#3b2010]/40 dark:to-[#0f0c18]/90" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                </div>
+                <div className="relative pt-0 pb-4">
+                  <div className="flex justify-center -mt-12">
                     <div className="relative group">
                       <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-full animate-spin-slow opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -313,14 +308,13 @@ export default function ProfilePage() {
                 </div>
 
                 <CardHeader className="text-center pt-0 space-y-1">
-                  <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#2c1e4a] to-[#6d28d9] dark:from-[#fcd34d] dark:to-[#f97316] bg-clip-text text-transparent">
                     {user?.name}
                   </CardTitle>
-                  <CardDescription className="text-sm">{user?.email}</CardDescription>
+                  <CardDescription className="text-sm dark:text-gray-400">{user?.email}</CardDescription>
                 </CardHeader>
 
                 <CardContent className="space-y-4 px-4 pb-4">
-                  {/* Botões de Ação */}
                   <div className="flex gap-2">
                     <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                       <DialogTrigger asChild>
@@ -345,9 +339,7 @@ export default function ProfilePage() {
                         </DialogHeader>
 
                         <div className="space-y-6 py-4">
-                          {/* Upload de Imagens */}
                           <div className="grid grid-cols-2 gap-4">
-                            {/* Avatar */}
                             <div className="space-y-2">
                               <Label>Foto de Perfil</Label>
                               <div className="relative group">
@@ -372,7 +364,6 @@ export default function ProfilePage() {
                               </div>
                             </div>
 
-                            {/* Cover */}
                             <div className="space-y-2">
                               <Label>Imagem de Capa</Label>
                               <div className="relative h-32 border-2 border-dashed border-muted-foreground/50 hover:border-primary transition-colors rounded-lg overflow-hidden group cursor-pointer">
@@ -399,7 +390,6 @@ export default function ProfilePage() {
                             </div>
                           </div>
 
-                          {/* Informações Básicas */}
                           <div className="space-y-4">
                             <div className="space-y-2">
                               <Label htmlFor="name">Nome *</Label>
@@ -539,14 +529,13 @@ export default function ProfilePage() {
                     </Button>
                   </div>
 
-                  {/* Informações do Perfil */}
                   <div className="space-y-4">
                     {user?.bio && (
                       <div className="space-y-2">
                         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                           Biografia
                         </h3>
-                        <p className="text-sm leading-relaxed">{user.bio}</p>
+                        <p className="text-sm leading-relaxed text-foreground/80 dark:text-gray-300">{user.bio}</p>
                       </div>
                     )}
 
@@ -589,10 +578,9 @@ export default function ProfilePage() {
               </Card>
             </div>
 
-            {/* Conteúdo Principal - Projetos e Colaborações */}
             <div className="lg:col-span-2 space-y-6">
               <Tabs defaultValue="projects" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 h-12">
+                <TabsList className="grid w-full grid-cols-2 h-12 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
                   <TabsTrigger value="projects" className="text-base">
                     <Music className="h-4 w-4 mr-2" />
                     Meus Projetos
@@ -615,7 +603,7 @@ export default function ProfilePage() {
 
                 <TabsContent value="projects" className="mt-6 space-y-4">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold">Projetos Criados</h2>
+                    <h2 className="text-xl font-bold text-foreground dark:text-gray-100">Projetos Criados</h2>
                     {user?.role === "COMPOSER" && (
                       <Button asChild size="sm" className="hover:scale-105 transition-transform">
                         <Link href="/projects/new">
@@ -635,7 +623,7 @@ export default function ProfilePage() {
                       {projects.map((project) => (
                         <Card
                           key={project.id}
-                          className="group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden"
+                          className="group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border border-black/5 dark:border-white/10 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-sm"
                         >
                           <div className="relative h-40 w-full overflow-hidden">
                             <Image
@@ -648,16 +636,16 @@ export default function ProfilePage() {
                           </div>
                           <CardContent className="p-4 space-y-3">
                             <div>
-                              <h3 className="font-bold truncate text-lg group-hover:text-primary transition-colors">
+                              <h3 className="font-bold truncate text-lg group-hover:text-primary transition-colors text-foreground dark:text-gray-100">
                                 {project.title}
                               </h3>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
+                              <p className="text-sm text-muted-foreground dark:text-gray-400 line-clamp-2">
                                 {project.description || "Sem descrição"}
                               </p>
                             </div>
                             <div className="flex justify-between items-center">
-                              <Badge variant="outline">{project.genre}</Badge>
-                              <Button asChild size="sm" variant="ghost" className="group-hover:bg-primary group-hover:text-primary-foreground">
+                              <Badge variant="outline" className="dark:border-white/20 dark:text-gray-300">{project.genre}</Badge>
+                              <Button asChild size="sm" variant="ghost" className="group-hover:bg-primary group-hover:text-primary-foreground dark:text-gray-300">
                                 <Link href={`/projects/${project.id}`}>
                                   Ver Projeto →
                                 </Link>
@@ -668,11 +656,11 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <Card className="border-dashed">
+                    <Card className="border-dashed border-black/15 dark:border-white/15 bg-white/40 dark:bg-[#111827]/40">
                       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                         <Music className="h-16 w-16 text-muted-foreground/50 mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Nenhum projeto ainda</h3>
-                        <p className="text-muted-foreground mb-6 max-w-sm">
+                        <h3 className="text-lg font-semibold mb-2 text-foreground dark:text-gray-200">Nenhum projeto ainda</h3>
+                        <p className="text-muted-foreground dark:text-gray-400 mb-6 max-w-sm">
                           Comece sua jornada musical criando seu primeiro projeto!
                         </p>
                         {user?.role === "COMPOSER" && (
@@ -689,7 +677,7 @@ export default function ProfilePage() {
                 </TabsContent>
 
                 <TabsContent value="collaborations" className="mt-6 space-y-4">
-                  <h2 className="text-xl font-bold">Projetos em Colaboração</h2>
+                  <h2 className="text-xl font-bold text-foreground dark:text-gray-100">Projetos em Colaboração</h2>
 
                   {isLoading ? (
                     <div className="flex justify-center py-12">
@@ -700,7 +688,7 @@ export default function ProfilePage() {
                       {collaborations.map((project) => (
                         <Card
                           key={project.id}
-                          className="group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden"
+                          className="group hover:shadow-xl hover:scale-[1.02] transition-all duration-300 overflow-hidden border border-black/5 dark:border-white/10 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-sm"
                         >
                           <div className="relative h-40 w-full overflow-hidden">
                             <Image
@@ -717,16 +705,16 @@ export default function ProfilePage() {
                           </div>
                           <CardContent className="p-4 space-y-3">
                             <div>
-                              <h3 className="font-bold truncate text-lg group-hover:text-primary transition-colors">
+                              <h3 className="font-bold truncate text-lg group-hover:text-primary transition-colors text-foreground dark:text-gray-100">
                                 {project.title}
                               </h3>
-                              <p className="text-sm text-muted-foreground line-clamp-2">
+                              <p className="text-sm text-muted-foreground dark:text-gray-400 line-clamp-2">
                                 {project.description || "Sem descrição"}
                               </p>
                             </div>
                             <div className="flex justify-between items-center">
-                              <Badge variant="outline">{project.genre}</Badge>
-                              <Button asChild size="sm" variant="ghost" className="group-hover:bg-primary group-hover:text-primary-foreground">
+                              <Badge variant="outline" className="dark:border-white/20 dark:text-gray-300">{project.genre}</Badge>
+                              <Button asChild size="sm" variant="ghost" className="group-hover:bg-primary group-hover:text-primary-foreground dark:text-gray-300">
                                 <Link href={`/projects/${project.id}`}>
                                   Ver Projeto →
                                 </Link>
@@ -737,11 +725,11 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   ) : (
-                    <Card className="border-dashed">
+                    <Card className="border-dashed border-black/15 dark:border-white/15 bg-white/40 dark:bg-[#111827]/40">
                       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                         <Sparkles className="h-16 w-16 text-muted-foreground/50 mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Nenhuma colaboração ainda</h3>
-                        <p className="text-muted-foreground mb-6 max-w-sm">
+                        <h3 className="text-lg font-semibold mb-2 text-foreground dark:text-gray-200">Nenhuma colaboração ainda</h3>
+                        <p className="text-muted-foreground dark:text-gray-400 mb-6 max-w-sm">
                           Explore projetos e comece a colaborar com outros artistas!
                         </p>
                         <Button asChild>
@@ -757,6 +745,7 @@ export default function ProfilePage() {
               </Tabs>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </AuthGuard>
